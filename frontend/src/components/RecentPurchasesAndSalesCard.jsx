@@ -89,7 +89,7 @@ export function RecentPurchasesAndSalesCard({ products = [], sales = [], checkou
                       <div className="min-w-0">
                         <h5 className="text-xs font-black text-zinc-900 truncate">{item.name}</h5>
                         <p className="text-[9px] font-bold text-zinc-400 uppercase">
-                          Supplier: <span className="text-zinc-700 font-black">{item.supplierName || 'Farm'}</span> • {petis} Petis
+                          Supplier: <span className="text-zinc-700 font-black">{item.supplierName || 'Supplier'}</span> • {petis} Boxes
                         </p>
                       </div>
                     </div>

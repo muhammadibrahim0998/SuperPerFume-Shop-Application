@@ -42,7 +42,7 @@ export function LoginView() {
             <img src={companyLogo} alt="Attock Shop Logo" className="h-14 w-auto object-contain drop-shadow-md" />
           </div>
           <p className="text-[var(--color-text-muted)] font-bold tracking-[0.12em] uppercase text-[8px] mt-2 opacity-70">
-            Attock Shop - Yousafzai Eggs Traders
+            PerFume Shop Center
           </p>
         </div>
 

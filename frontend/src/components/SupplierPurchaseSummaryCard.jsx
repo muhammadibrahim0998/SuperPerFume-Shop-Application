@@ -234,7 +234,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
                     <div>
                       <h5 className="text-xs font-black text-zinc-900 line-clamp-1">{item.name}</h5>
                       <p className="text-[10px] text-teal-700 font-bold uppercase mt-0.5">
-                        Supplier: <span className="text-zinc-800 font-black">{item.supplierName || 'Farm / Wholesaler'}</span>
+                        Supplier: <span className="text-zinc-800 font-black">{item.supplierName || 'Supplier / Wholesaler'}</span>
                       </p>
                     </div>
 

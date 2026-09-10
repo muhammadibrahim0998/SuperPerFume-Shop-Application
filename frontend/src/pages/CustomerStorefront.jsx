@@ -95,7 +95,7 @@ function CustomerAuthView({ shopInfo }) {
                 {shopInfo?.logoUrl ? (
                   <img src={shopInfo.logoUrl} alt={shopInfo.name} className="w-12 h-12 rounded-xl object-contain" />
                 ) : (
-                  <img src={companyLogo} alt="Yousafzai Agri Foods" className="w-12 h-12 object-contain rounded-xl" />
+                  <img src={companyLogo} alt="PerFume Shop Center" className="w-12 h-12 object-contain rounded-xl" />
                 )}
               </div>
             </div>
@@ -656,7 +656,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleWhatsAppCustomerShare = (cust, index = 0) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const name = cust.fullName || 'Registered Customer';
     const phone = cust.phone || '';
     const email = cust.email || 'N/A';
@@ -704,7 +704,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportCustomerExcel = (cust, index = 0) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const name = cust.fullName || 'Registered Customer';
     const email = cust.email || 'N/A';
     const phone = cust.phone || 'N/A';
@@ -817,7 +817,7 @@ function StoreContent({ shopId }) {
           </tr>
           <tr style="height: 12px;"><td colspan="5" style="border:none;"></td></tr>
           <tr>
-            <td colspan="5" class="footer-note">Official Customer Statement • Generated via Yosafze Egg Traders Financial System</td>
+            <td colspan="5" class="footer-note">Official Customer Statement • Generated via PerFume Shop Center Financial System</td>
           </tr>
         </table>
       </body>
@@ -835,7 +835,7 @@ function StoreContent({ shopId }) {
   };
 
   const handlePrintRegisteredCustomerRecord = (cust, index = 0) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const name = cust.fullName || 'Registered Customer';
     const email = cust.email || 'N/A';
     const phone = cust.phone || 'N/A';
@@ -975,7 +975,7 @@ function StoreContent({ shopId }) {
               </div>
 
               <div class="statement-footer">
-                Yosafze Egg Traders • Official Customer Management &amp; Accounts Ledger
+                PerFume Shop Center • Official Customer Management &amp; Accounts Ledger
               </div>
             </div>
           </div>
@@ -1431,8 +1431,8 @@ function StoreContent({ shopId }) {
     const avgBill = totalBills > 0 ? Math.round(totalRevenue / totalBills) : 0;
 
     return {
-      totalRevenue: totalRevenue || (reportTimeframe === 'DAY' ? dashStats.todaySales : reportTimeframe === 'MONTH' ? dashStats.monthlySales : reportTimeframe === 'YEAR' ? dashStats.yearlySales : dashStats.totalRevenue),
-      totalProfit: totalProfit || (reportTimeframe === 'DAY' ? dashStats.todayProfit : reportTimeframe === 'MONTH' ? dashStats.monthlyProfit : reportTimeframe === 'YEAR' ? dashStats.yearlyProfit : dashStats.totalProfit),
+      totalRevenue,
+      totalProfit,
       totalEggs,
       totalPetis,
       totalTrays,
@@ -1442,7 +1442,7 @@ function StoreContent({ shopId }) {
       bankSales,
       creditSales
     };
-  }, [filteredSalesForReport, reportTimeframe, dashStats]);
+  }, [filteredSalesForReport]);
 
   // Dynamic Manual Expenses Tracking State
   const [expensesList, setExpensesList] = useState([]);
@@ -1589,7 +1589,7 @@ function StoreContent({ shopId }) {
 
   const handlePrintSingleExpense = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1691,7 +1691,7 @@ function StoreContent({ shopId }) {
               </div>
 
               <div class="voucher-footer">
-                Yosafze Egg Traders • Financial Accounting &amp; Expense Management
+                PerFume Shop Center • Financial Accounting &amp; Expense Management
               </div>
             </div>
           </div>
@@ -1705,7 +1705,7 @@ function StoreContent({ shopId }) {
 
   const handleWhatsAppSingleExpense = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1730,7 +1730,7 @@ function StoreContent({ shopId }) {
 
   const handleExportSingleExpenseExcel = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1806,7 +1806,7 @@ function StoreContent({ shopId }) {
           </tr>
           <tr style="height: 12px;"><td colspan="4" style="border:none;"></td></tr>
           <tr>
-            <td colspan="4" class="footer-note">Official Expense Voucher • Generated via Yosafze Egg Traders Financial System</td>
+            <td colspan="4" class="footer-note">Official Expense Voucher • Generated via PerFume Shop Center Financial System</td>
           </tr>
         </table>
       </body>
@@ -2155,10 +2155,6 @@ function StoreContent({ shopId }) {
       grossProfit = reportTimeframe === 'DAY' ? todayProfitTotal : reportTimeframe === 'MONTH' ? monthProfitTotal : reportTimeframe === 'YEAR' ? yearProfitTotal : allProfitTotal;
     }
 
-    // Fallback to dashStats if sales list was momentarily empty
-    if (totalRevenue === 0) {
-      totalRevenue = reportTimeframe === 'DAY' ? (dashStats.todaySales || 0) : reportTimeframe === 'MONTH' ? (dashStats.monthlySales || 0) : reportTimeframe === 'YEAR' ? (dashStats.yearlySales || 0) : (dashStats.totalRevenue || 0);
-    }
 
     // 3. Filter Purchases / Restocks (items) for active timeframe
     const filteredPurchases = (items || []).filter(p => {
@@ -2273,25 +2269,25 @@ function StoreContent({ shopId }) {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && (d.toISOString().split('T')[0] === todayStr || d.toDateString() === now.toDateString());
     });
-    const todayRevenue = todaySales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.todaySales || 0;
-    const todayOrders = todaySales.length || dashStats.todayOrdersCount || 0;
+    const todayRevenue = todaySales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
+    const todayOrders = todaySales.length;
 
     const monthSales = activeData.filter(s => {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
-    const monthRevenue = monthSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.monthlySales || 0;
-    const monthOrders = monthSales.length || dashStats.monthlyOrdersCount || 0;
+    const monthRevenue = monthSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
+    const monthOrders = monthSales.length;
 
     const yearSales = activeData.filter(s => {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && d.getFullYear() === currentYear;
     });
-    const yearRevenue = yearSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.yearlySales || 0;
-    const yearOrders = yearSales.length || dashStats.yearlyOrdersCount || 0;
+    const yearRevenue = yearSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
+    const yearOrders = yearSales.length;
 
-    const totalRevenue = activeData.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.totalRevenue || 0;
-    const totalOrders = activeData.length || dashStats.totalOrders || 0;
+    const totalRevenue = activeData.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
+    const totalOrders = activeData.length;
 
     return {
       todayRevenue,
@@ -2303,7 +2299,7 @@ function StoreContent({ shopId }) {
       totalRevenue,
       totalOrders
     };
-  }, [unifiedSalesList, shopSalesList, dashStats]);
+  }, [unifiedSalesList, shopSalesList]);
 
   const purchasesLiveBreakdown = useMemo(() => {
     let totalPurchasesCost = 0;
@@ -2328,21 +2324,21 @@ function StoreContent({ shopId }) {
       dueBalance += Number(p.dueAmount || p.balanceDue || 0);
     });
 
-    const totalPetisPurchased = totalPurchasesEggs > 0 ? Number((totalPurchasesEggs / 360).toFixed(1)) : (Number(dashStats.totalPetisPurchased) || 0);
-    const totalTraysPurchased = totalPurchasesEggs > 0 ? Math.round(totalPurchasesEggs / 30) : (dashStats.totalTraysPurchased || 0);
+    const totalPetisPurchased = totalPurchasesEggs > 0 ? Number((totalPurchasesEggs / 360).toFixed(1)) : 0;
+    const totalTraysPurchased = totalPurchasesEggs > 0 ? Math.round(totalPurchasesEggs / 30) : 0;
 
     return {
       totalPetisPurchased,
       totalTraysPurchased,
-      totalPurchaseCost: totalPurchasesCost || dashStats.totalPurchaseCost || 0,
-      cashPaidToSupplier: cashPaid || dashStats.cashPaidToSupplier || 0,
-      bankPaidToSupplier: bankPaid || dashStats.bankPaidToSupplier || 0,
-      dueToSupplier: dueBalance || dashStats.dueToSupplier || 0,
+      totalPurchaseCost: totalPurchasesCost,
+      cashPaidToSupplier: cashPaid,
+      bankPaidToSupplier: bankPaid,
+      dueToSupplier: dueBalance,
     };
-  }, [items, dashStats]);
+  }, [items]);
 
   const stockLiveBreakdown = useMemo(() => {
-    let totalEggs = 0;
+    let totalBottles = 0;
     let totalValue = 0;
     let lowStockCount = 0;
     let outOfStockCount = 0;
@@ -2352,34 +2348,51 @@ function StoreContent({ shopId }) {
       const peti = Number(item.petiQuantity || 0);
       const tray = Number(item.trayQuantity || 0);
       const itemStock = Number(item.stock || 0);
-      const totalItemEggs = (peti * 360) + (tray * 30) + e || (itemStock * 30);
-      totalEggs += totalItemEggs;
+      
+      const tPerP = Number(item.traysPerPeti) || 12;
+      const ePerT = Number(item.eggsPerTray) || 30;
+      const ePerP = tPerP * ePerT;
 
-      const price = Number(item.price || item.costPrice || 0);
-      totalValue += (totalItemEggs / 30) * price;
+      let totalItemUnits = 0;
+      if (peti > 0 || tray > 0 || e > 0) {
+        totalItemUnits = (peti * ePerP) + (tray * ePerT) + e;
+      } else {
+        totalItemUnits = item.unitType === 'peti' ? itemStock * ePerP : item.unitType === 'tray' ? itemStock * ePerT : itemStock;
+      }
 
-      if (totalItemEggs === 0 || itemStock === 0) {
+      totalBottles += totalItemUnits;
+
+      const unitCost = Number(item.costPrice || item.price || 0);
+      const itemVal = item.unitType === 'peti'
+        ? (totalItemUnits / ePerP) * unitCost
+        : item.unitType === 'tray'
+          ? (totalItemUnits / ePerT) * unitCost
+          : totalItemUnits * unitCost;
+
+      totalValue += itemVal;
+
+      if (totalItemUnits === 0 || itemStock === 0) {
         outOfStockCount++;
-      } else if (totalItemEggs < 300 || itemStock < 10) {
+      } else if (totalItemUnits < (item.minStock || 10)) {
         lowStockCount++;
       }
     });
 
-    const totalPetis = totalEggs > 0 ? Number((totalEggs / 360).toFixed(1)) : (dashStats.totalStockPetis || 0);
-    const totalTrays = totalEggs > 0 ? Math.round(totalEggs / 30) : (dashStats.totalStockTrays || 0);
-    const totalStockEggs = totalEggs || dashStats.totalStockEggs || 0;
-    const totalInventoryValue = totalValue > 0 ? Math.round(totalValue) : (dashStats.totalInventoryValue || 0);
+    const totalPetis = totalBottles > 0 ? Number((totalBottles / 360).toFixed(1)) : 0;
+    const totalTrays = totalBottles > 0 ? Math.round(totalBottles / 30) : 0;
+    const totalStockEggs = totalBottles;
+    const totalInventoryValue = Math.round(totalValue);
 
     return {
       totalPetis,
       totalTrays,
       totalStockEggs,
       totalInventoryValue,
-      totalProducts: (items || []).length || dashStats.totalProducts || 0,
+      totalProducts: (items || []).length,
       lowStockCount,
       outOfStockCount
     };
-  }, [items, dashStats]);
+  }, [items]);
 
   // ─── Executive Net Realized Profit/Loss Breakdown for Main Dashboard ───
   const netStats = useMemo(() => {
@@ -2425,7 +2438,7 @@ function StoreContent({ shopId }) {
 
   // ─── Generate Official Profit PDF via jsPDF & autoTable ───
   const generateProfitReportPDF = (timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -2501,7 +2514,7 @@ function StoreContent({ shopId }) {
 
   // ─── Generate Official Sales PDF via jsPDF & autoTable ───
   const generateSalesReportPDF = (timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -2583,7 +2596,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleWhatsAppReportShare = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const periodName = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
 
@@ -2627,7 +2640,7 @@ function StoreContent({ shopId }) {
       }
 
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
-      message += `🙏 *Thank you! Generated via Yosafze Egg Traders System*`;
+      message += `🙏 *Thank you! Generated via PerFume Shop Center System*`;
 
       const encodedText = encodeURIComponent(message);
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
@@ -2656,7 +2669,7 @@ function StoreContent({ shopId }) {
       message += `💵 *(=) FINAL PURE REALIZED NET PROFIT: Rs. ${(profitReportStats.finalNetProfit || 0).toLocaleString('en-PK')}*\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `📎 *Official PDF Statement (${pdfFileName}) downloaded to your device.*\n`;
-      message += `_Yosafze Egg Traders Financial System_`;
+      message += `_PerFume Shop Center Financial System_`;
 
       const encodedText = encodeURIComponent(message);
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
@@ -2689,14 +2702,14 @@ function StoreContent({ shopId }) {
 
     message += `===============================\n`;
     message += `📎 *Official PDF Report (${pdfFileName}) downloaded to your device.*\n`;
-    message += `_Yosafze Egg Traders Sales Management System_`;
+    message += `_PerFume Shop Center Sales Management System_`;
 
     const encodedText = encodeURIComponent(message);
     window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
   };
 
   const handlePrintSingleReport = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
 
@@ -2804,7 +2817,7 @@ function StoreContent({ shopId }) {
             </div>
 
             <div class="footer">
-              <div>Generated via Yosafze Egg Traders Admin System</div>
+              <div>Generated via PerFume Shop Center Admin System</div>
               <div class="sign">Authorized Signature &amp; Stamp</div>
             </div>
           </body>
@@ -2921,7 +2934,7 @@ function StoreContent({ shopId }) {
             </table>
 
             <div class="footer">
-              <div>Report Generated by Yosafze Egg Traders Admin System</div>
+              <div>Report Generated by PerFume Shop Center Admin System</div>
               <div class="sign">Authorized Signature &amp; Stamp</div>
             </div>
           </body>
@@ -3024,7 +3037,7 @@ function StoreContent({ shopId }) {
             </tfoot>
           </table>
           <div class="footer">
-            <div>Report Generated by Yosafze Egg Traders Admin System</div>
+            <div>Report Generated by PerFume Shop Center Admin System</div>
             <div class="sign">Authorized Signature</div>
           </div>
         </body>
@@ -3036,7 +3049,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportExcelReport = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const timeLabel = timeframe === 'DAY' ? 'Daily (Today)' : timeframe === 'MONTH' ? 'Monthly (This Month)' : timeframe === 'YEAR' ? 'Yearly (This Year)' : 'All-Time Total';
 
@@ -3303,7 +3316,7 @@ function StoreContent({ shopId }) {
     }
 
     let csvRows = [];
-    csvRows.push([`"YOSAFZE EGG TRADERS - OFFICIAL NET PROFIT & FINANCIAL REPORT"`]);
+    csvRows.push([`"PERFUME SHOP CENTER - OFFICIAL NET PROFIT & FINANCIAL REPORT"`]);
     csvRows.push([`"Store Branch"`, `"${shopName}"`]);
     csvRows.push([`"Report Period Filter"`, `"${timeLabel}"`]);
     csvRows.push([`"Generated Date"`, `"${dateStr}"`]);
@@ -3336,7 +3349,7 @@ function StoreContent({ shopId }) {
     csvRows.push([`"Sold Eggs Stock"`, dashStats.soldEggs || 0, `"Eggs"`, `"Eggs Sold"`]);
     csvRows.push([`"Total Damaged Loss"`, dashStats.totalDamagedLoss || 0, `"PKR"`, `"Egg Breakage Loss"`]);
     csvRows.push([]);
-    csvRows.push([`"Generated via Yosafze Egg Traders Management System"`]);
+    csvRows.push([`"Generated via PerFume Shop Center Management System"`]);
 
     const csvString = csvRows.map(e => e.join(",")).join("\n");
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
@@ -3350,9 +3363,9 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportAllSalesExcel = () => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     let csvRows = [];
-    csvRows.push([`"YOSAFZE EGG TRADERS - ALL SALES & CUSTOMER BILLS REPORT"`]);
+    csvRows.push([`"PERFUME SHOP CENTER - ALL SALES & CUSTOMER BILLS REPORT"`]);
     csvRows.push([`"Store / Branch"`, `"${shopName}"`]);
     csvRows.push([`"Export Date"`, `"${new Date().toLocaleString()}"`]);
     csvRows.push([`"Total Sales Count"`, shopSalesList.length]);
@@ -3379,7 +3392,7 @@ function StoreContent({ shopId }) {
     });
 
     csvRows.push([]);
-    csvRows.push([`"Generated via Yosafze Egg Traders Management System"`]);
+    csvRows.push([`"Generated via PerFume Shop Center Management System"`]);
 
     const csvString = csvRows.map(e => e.join(",")).join("\n");
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
@@ -3393,7 +3406,7 @@ function StoreContent({ shopId }) {
   };
 
   const handlePrintCustomerSingleRecord = (sale) => {
-    const shopName = shop?.name || 'Yosafze Egg Traders';
+    const shopName = shop?.name || 'PerFume Shop Center';
     const customerName = sale.customerName || 'Walk-in Customer';
     const customerPhone = sale.customerPhone || '';
     const saleDate = new Date(sale.saleDate || sale.createdAt).toLocaleString();
@@ -3469,7 +3482,7 @@ function StoreContent({ shopId }) {
           </div>
           <div class="footer">
             <div class="sign">Customer Signature</div>
-            <div class="sign">Yosafze Egg Traders Stamp</div>
+            <div class="sign">PerFume Shop Center Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }
@@ -3598,7 +3611,7 @@ function StoreContent({ shopId }) {
           </div>
           <div class="footer">
             <div class="sign">Shop Admin / Manager Signature</div>
-            <div class="sign">Yosafze Egg Traders Stamp</div>
+            <div class="sign">PerFume Shop Center Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }
@@ -4038,7 +4051,7 @@ function StoreContent({ shopId }) {
                 {shop?.logoUrl ? (
                   <img src={shop.logoUrl} alt={shop.name} className="w-full h-full object-cover rounded-lg" />
                 ) : (
-                  <img src={companyLogo} alt="Yousafzai Agri Foods" className="w-full h-full object-cover rounded-lg" />
+                  <img src={companyLogo} alt="PerFume Shop Center" className="w-full h-full object-cover rounded-lg" />
                 )}
               </button>
               <div className="min-w-0">
@@ -4579,7 +4592,7 @@ function StoreContent({ shopId }) {
                         {/* Direct Jump to Profit Report */}
                         <div className="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs flex-wrap gap-2">
                           <span className="text-slate-400 text-[10px] font-bold uppercase">
-                            Yosafze Egg Traders Financial Ledger &bull; Real-time MongoDB Synchronized
+                            PerFume Shop Center Financial Ledger &bull; Real-time MongoDB Synchronized
                           </span>
                           <button
                             onClick={() => { setActiveView('report-profit'); }}
@@ -4750,11 +4763,11 @@ function StoreContent({ shopId }) {
                             </span>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                            {/* Petis (Yellow & Green Gradient As Requested) */}
+                            {/* Boxes */}
                             <div className="p-3.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-emerald-600 rounded-xl text-white shadow-md flex items-center justify-between border border-amber-300/40 border-b-4 border-b-emerald-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
-                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-amber-100">Petis</span>
-                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{Number(stockLiveBreakdown.totalPetis || 0).toFixed(1)} Petis</h4>
+                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-amber-100">Boxes (Cartons)</span>
+                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{Number(stockLiveBreakdown.totalPetis || 0).toFixed(1)} Boxes</h4>
                                 <span className="text-[8.5px] text-emerald-100/90 font-bold block">{stockLiveBreakdown.totalProducts || 0} Products</span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -4762,11 +4775,11 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Trays (Gray & Blue Gradient As Requested) */}
+                            {/* Packs */}
                             <div className="p-3.5 bg-gradient-to-r from-slate-600 via-sky-600 to-blue-700 rounded-xl text-white shadow-md flex items-center justify-between border border-sky-300/40 border-b-4 border-b-slate-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
-                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-sky-100">Trays</span>
-                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalTrays || 0).toLocaleString('en-PK')} Trays</h4>
+                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-sky-100">Packs</span>
+                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalTrays || 0).toLocaleString('en-PK')} Packs</h4>
                                 <span className="text-[8.5px] text-blue-100/90 font-bold block">Available</span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -4774,11 +4787,11 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Eggs (Gray & Blue Gradient As Requested) */}
+                            {/* Bottles / Units */}
                             <div className="p-3.5 bg-gradient-to-r from-slate-700 via-blue-600 to-slate-800 rounded-xl text-white shadow-md flex items-center justify-between border border-blue-300/40 border-b-4 border-b-slate-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
-                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-slate-200">Eggs</span>
-                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalStockEggs || 0).toLocaleString('en-PK')} Eggs</h4>
+                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-slate-200">Bottles / Pieces</span>
+                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalStockEggs || 0).toLocaleString('en-PK')} Bottles</h4>
                                 <span className="text-[8.5px] text-blue-100/90 font-bold block">Available</span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -4786,7 +4799,7 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Stock Worth (Yellow & Green Gradient As Requested) */}
+                            {/* Stock Worth */}
                             <div className="p-3.5 bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-700 rounded-xl text-white shadow-md flex items-center justify-between border border-amber-300/40 border-b-4 border-b-emerald-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
                                 <span className="text-[9.5px] font-bold text-amber-100 uppercase tracking-wide block">Stock Worth</span>
@@ -4815,8 +4828,8 @@ function StoreContent({ shopId }) {
                             <div className="p-3.5 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200/90 rounded-xl text-slate-900 shadow-sm flex items-center justify-between border border-slate-300 hover:border-slate-400 hover:shadow transition-all">
                               <div>
                                 <span className="text-[9.5px] font-bold text-slate-600 uppercase tracking-wide block">Purchased</span>
-                                <h4 className="text-lg sm:text-xl font-black text-slate-900 mt-0.5">{(Number(purchasesLiveBreakdown.totalPetisPurchased) || 0).toFixed(1)} Petis</h4>
-                                <span className="text-[8.5px] text-slate-500 font-bold block">{(purchasesLiveBreakdown.totalTraysPurchased || 0)} Trays</span>
+                                <h4 className="text-lg sm:text-xl font-black text-slate-900 mt-0.5">{(Number(purchasesLiveBreakdown.totalPetisPurchased) || 0).toFixed(1)} Boxes</h4>
+                                <span className="text-[8.5px] text-slate-500 font-bold block">{(purchasesLiveBreakdown.totalTraysPurchased || 0)} Packs</span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-slate-300/80 border border-slate-400/60 flex items-center justify-center text-slate-800 shrink-0">
                                 <Truck className="w-4 h-4" />
@@ -8844,10 +8857,10 @@ function ShopsList() {
 
         <div className="text-center mb-8 space-y-2">
           <div className="inline-flex p-2 bg-white rounded-2xl mb-1 shadow-xl">
-            <img src={companyLogo} alt="Yosafze Egg Traders" className="h-14 sm:h-16 w-auto object-contain drop-shadow-md" />
+            <img src={companyLogo} alt="PerFume Shop Center" className="h-14 sm:h-16 w-auto object-contain drop-shadow-md" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase italic">
-            YOSAFZE EGG TRADERS
+            PERFUME SHOP CENTER
           </h1>
           <p className="text-emerald-400 font-black uppercase tracking-[0.25em] text-[11px]">
             Multi-Branch Portal (Peshawar, Attock, Mardan & All Branches)
@@ -8872,7 +8885,7 @@ function ShopsList() {
                       {s.logoUrl ? (
                         <img src={s.logoUrl} alt={s.name} className="w-7 h-7 object-contain rounded-lg" />
                       ) : (
-                        <img src={companyLogo} alt="Yosafze Egg Traders" className="w-7 h-7 object-contain rounded-lg" />
+                        <img src={companyLogo} alt="PerFume Shop Center" className="w-7 h-7 object-contain rounded-lg" />
                       )}
                     </div>
                     <div className="bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1">

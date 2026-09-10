@@ -21,7 +21,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
   const customerPhone = bill.customerPhone || '';
   const items = bill.items || [];
   const totalAmount = bill.totalAmount || 0;
-  const shopName = shop?.name || 'Yosafze Egg Traders';
+  const shopName = shop?.name || 'PerFume Shop Center';
   const shopAddress = shop?.address || '';
   const shopPhone = shop?.phone || '';
 
@@ -40,7 +40,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
       return { bank: 'Bank Al Habib', accountNo: '2013008100773501' };
     }
     if (name.includes('attock') || address.includes('attock')) {
-      return { bank: 'UBL (Yousafzai Eggs Traders)', accountNo: 'UBL-0109000306243543' };
+      return { bank: 'UBL (PerFume Shop Center)', accountNo: 'UBL-0109000306243543' };
     }
     return { bank: 'UBL / Meezan', accountNo: 'UBL-0109000306243543' };
   };
@@ -337,7 +337,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
             </tr>
             <tr style="height: 16px;"><td colspan="5" style="border:none;"></td></tr>
             <tr>
-              <td colspan="5" class="footer-note" style="border:none;">Generated via Yosafze Egg Traders Management System • Verified Official Receipt</td>
+              <td colspan="5" class="footer-note" style="border:none;">Generated via PerFume Shop Center Management System • Verified Official Receipt</td>
             </tr>
           </table>
         </body>
@@ -573,7 +573,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
 
           <div class="footer">
             <div class="sign">Customer Signature</div>
-            <div class="sign">Yosafze Egg Traders Stamp</div>
+            <div class="sign">PerFume Shop Center Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }

@@ -39,21 +39,21 @@ export function AnalyticsCards({
     >
       <motion.div variants={itemVariants}>
         <StatCard
-          title="Total Petis (Boxes)"
-          value={`${(totalPetis || 0).toLocaleString('en-PK')} Petis`}
+          title="Total Boxes"
+          value={`${(totalPetis || 0).toLocaleString('en-PK')} Boxes`}
           icon={Box}
           color="orange"
-          sub={`${totalProducts} Egg Products`}
+          sub={`${totalProducts} Products`}
         />
       </motion.div>
 
       <motion.div variants={itemVariants}>
         <StatCard
           title="Available Stock"
-          value={`${(totalStockUnits || 0).toLocaleString('en-PK')} Eggs`}
+          value={`${(totalStockUnits || 0).toLocaleString('en-PK')} Bottles`}
           icon={Package}
           color="green"
-          sub={`Total Egg Count`}
+          sub={`Total Units`}
         />
       </motion.div>
 

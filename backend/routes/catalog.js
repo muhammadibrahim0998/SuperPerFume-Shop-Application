@@ -6,29 +6,7 @@ import { resolveShopId } from '../utils/shopResolver.js';
 
 const router = express.Router();
 
-const DEFAULT_EGG_PRODUCTS = [
-  { name: 'loman brown',       category: 'loman brown',       price: 25, stock: 500, costPrice: 20 },
-  { name: 'china egge',        category: 'china egge',        price: 20, stock: 600, costPrice: 15 },
-  { name: 'loman brown egge',  category: 'loman brown egge',  price: 26, stock: 500, costPrice: 21 },
-  { name: 'loman black',       category: 'loman black',       price: 28, stock: 400, costPrice: 22 },
-  { name: 'china eggs',        category: 'china eggs',        price: 20, stock: 600, costPrice: 15 },
-  { name: 'pak egg',           category: 'pak egg',           price: 22, stock: 600, costPrice: 17 },
-  { name: 'Super Jumbo',       category: 'Super Jumbo',       price: 30, stock: 500, costPrice: 24 },
-  { name: 'Jumbo',             category: 'Jumbo',             price: 28, stock: 500, costPrice: 22 },
-  { name: 'Stander',           category: 'Stander',           price: 25, stock: 500, costPrice: 20 },
-  { name: 'Weak Shell',        category: 'Weak Shell',        price: 18, stock: 300, costPrice: 14 },
-  { name: 'Dusty',             category: 'Dusty',             price: 16, stock: 300, costPrice: 12 },
-  { name: 'Floor',             category: 'Floor',             price: 15, stock: 200, costPrice: 11 },
-  { name: 'Step Stander',      category: 'Step Stander',      price: 22, stock: 400, costPrice: 17 },
-  { name: 'Step Jumbo',        category: 'Step Jumbo',        price: 24, stock: 400, costPrice: 19 },
-  { name: 'Sandy',             category: 'Sandy',             price: 15, stock: 200, costPrice: 11 },
-  { name: 'Starter',           category: 'Starter',           price: 20, stock: 400, costPrice: 15 },
-  { name: 'Double White',      category: 'Double White',      price: 32, stock: 200, costPrice: 25 },
-  { name: 'Double Brown',      category: 'Double Brown',      price: 35, stock: 200, costPrice: 28 },
-  { name: 'Golden',            category: 'Golden',            price: 40, stock: 150, costPrice: 32 },
-  { name: 'Breeder',           category: 'Breeder',           price: 45, stock: 150, costPrice: 36 },
-  { name: 'Special',           category: 'Special',           price: 50, stock: 150, costPrice: 40 }
-];
+
 
 // GET /api/catalog/:shopId  — public, no auth needed
 router.get('/:shopId', async (req, res) => {
@@ -45,23 +23,6 @@ router.get('/:shopId', async (req, res) => {
     const realShopId = shop._id;
     const settings = await Settings.findOne({ shopId: realShopId }).select('shopName logoUrl currency address phone');
 
-    // Auto-seed default egg categories/products ONLY if the shop branch has zero items
-    const existingCount = await Item.countDocuments({ shopId: realShopId });
-    if (existingCount === 0) {
-      for (const prod of DEFAULT_EGG_PRODUCTS) {
-        await Item.create({
-          shopId: realShopId,
-          name: prod.name,
-          category: prod.category,
-          price: prod.price,
-          costPrice: prod.costPrice,
-          stock: prod.stock,
-          minStock: 10,
-          description: `Fresh egg category: ${prod.name}`,
-          images: ['/egg2.png']
-        });
-      }
-    }
 
     const filter = { shopId: realShopId };
     if (search) {
@@ -107,16 +68,10 @@ router.get('/:shopId', async (req, res) => {
       return itemObj;
     });
 
-    // Get unique categories (including all standard egg categories)
+    // Get unique categories dynamically from items
     const allItems = await Item.find({ shopId: realShopId }).select('category');
     const existingCats = allItems.map(i => i.category).filter(Boolean);
-    const defaultCats = [
-      'Super Jumbo', 'Jumbo', 'Stander', 'Step Stander', 'Step Jumbo',
-      'Starter', 'Weak Shell', 'Dusty', 'Floor', 'Sandy',
-      'Double White', 'Double Brown', 'Golden', 'Breeder', 'Special',
-      'loman brown', 'loman black', 'china eggs', 'pak egg', 'A Grade', 'Eggs'
-    ];
-    const categories = ['All', ...new Set([...defaultCats, ...existingCats])];
+    const categories = ['All', ...new Set(existingCats)];
 
     res.json({
       shop: {

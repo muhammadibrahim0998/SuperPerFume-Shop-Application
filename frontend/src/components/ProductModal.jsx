@@ -289,7 +289,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
               <h2 className="text-base font-black tracking-tight text-white uppercase italic">
                 {mode === "add" ? "Add Product & Stock" : mode === "edit" ? "Edit Product" : "View Product"}
               </h2>
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Yosafze Egg Traders • Stock Entry</p>
+              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">PerFume Shop Center • Stock Entry</p>
             </div>
           </div>
           <button
@@ -420,7 +420,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                 {...register("name")}
                 disabled={mode === "view"}
                 className={`w-full bg-slate-800 border ${errors.name ? 'border-rose-500' : 'border-slate-700'} rounded-xl py-2 px-3 text-sm font-bold text-white outline-none focus:border-emerald-500 placeholder:text-slate-500`}
-                placeholder="e.g. Super Jumbo Eggs (79g)"
+                placeholder="e.g. Perfume Name / Brand"
               />
               {errors.name && <p className="text-rose-400 text-xs font-bold uppercase">{errors.name.message}</p>}
             </div>
@@ -431,23 +431,17 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                 name="category"
                 control={control}
                 render={({ field }) => {
-                  const defaultCats = [
-                    'Super Jumbo', 'Jumbo', 'Stander', 'Step Stander', 'Step Jumbo',
-                    'Starter', 'Weak Shell', 'Dusty', 'Floor', 'Sandy',
-                    'Double White', 'Double Brown', 'Golden', 'Breeder', 'Special',
-                    'loman brown', 'loman black', 'china eggs', 'pak egg', 'A Grade', 'Eggs'
-                  ];
-                  const mergedCats = Array.from(new Set([...defaultCats, ...(categories || []).filter(c => c !== "All")]));
+                  const availableCats = (categories || []).filter(c => c && c !== "All");
                   return (
                     <CreatableSelect
                       {...field}
                       isClearable
                       isDisabled={mode === 'view'}
-                      options={mergedCats.map(c => ({ value: c, label: c }))}
+                      options={availableCats.map(c => ({ value: c, label: c }))}
                       onChange={(val) => field.onChange(val ? val.value : "")}
                       onCreateOption={(inputValue) => field.onChange(inputValue)}
                       value={field.value ? { label: field.value, value: field.value } : null}
-                      placeholder="Category..."
+                      placeholder="Type or select category..."
                     styles={{
                       control: (base, state) => ({
                         ...base,
@@ -485,16 +479,20 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             <div className="space-y-1">
               <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Primary Unit</label>
               <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
-                {['peti', 'tray', 'egg'].map((type) => (
+                {[
+                  { key: 'peti', label: 'Box' },
+                  { key: 'tray', label: 'Pack' },
+                  { key: 'egg', label: 'Bottle / Piece' }
+                ].map(({ key, label }) => (
                   <button
-                    key={type}
+                    key={key}
                     type="button"
-                    onClick={() => setValue('unitType', type)}
+                    onClick={() => setValue('unitType', key)}
                     className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                      unitType === type ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                      unitType === key ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    {type}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -528,21 +526,21 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             </div>
           </div>
 
-          {/* Section 3: Egg Stock Inventory Breakdown */}
+          {/* Section 3: Perfume Stock Inventory Breakdown */}
           <div className="p-3.5 bg-slate-900/90 rounded-2xl border border-emerald-500/30 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Box className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-black uppercase text-emerald-300 tracking-wider">Egg Inventory Quantities</span>
+                <span className="text-xs font-black uppercase text-emerald-300 tracking-wider">Perfume Inventory Quantities</span>
               </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">1 Peti = 12 Trays = 360 Eggs</span>
+              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">1 Box = 12 Packs = 360 Bottles</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5">
               <div className="space-y-1">
                 <label className="text-xs font-black text-amber-400 uppercase flex items-center justify-between">
-                  <span>Petis (Boxes)</span>
-                  <span className="text-[9px] text-amber-300/80 font-bold">1P = 12T</span>
+                  <span>Boxes (Cartons)</span>
+                  <span className="text-[9px] text-amber-300/80 font-bold">1 Box = 12 Packs</span>
                 </label>
                 <input
                   type="number"
@@ -570,8 +568,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
               <div className="space-y-1">
                 <label className="text-xs font-black text-teal-400 uppercase flex items-center justify-between">
-                  <span>Trays</span>
-                  <span className="text-[9px] text-teal-300/80 font-bold">1T = 30 Eggs</span>
+                  <span>Packs</span>
+                  <span className="text-[9px] text-teal-300/80 font-bold">1 Pack = 30 Bottles</span>
                 </label>
                 <input
                   type="number"
@@ -599,8 +597,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
               <div className="space-y-1">
                 <label className="text-xs font-black text-emerald-400 uppercase flex items-center justify-between">
-                  <span>Single Eggs</span>
-                  <span className="text-[9px] text-emerald-300/80 font-bold">Total Eggs</span>
+                  <span>Bottles / Pieces</span>
+                  <span className="text-[9px] text-emerald-300/80 font-bold">Total Bottles</span>
                 </label>
                 <input
                   type="number"
@@ -632,11 +630,11 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             <div className="p-2 bg-emerald-950/40 border border-emerald-500/20 rounded-xl flex items-center justify-between text-xs font-black text-emerald-300">
               <span>Total Calculated Stock:</span>
               <div className="flex gap-2">
-                <span className="text-amber-400">{totalPetisCalculated} Petis</span>
+                <span className="text-amber-400">{totalPetisCalculated} Boxes</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-teal-400">{totalTraysCalculated} Trays</span>
+                <span className="text-teal-400">{totalTraysCalculated} Packs</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-emerald-400">{totalEggsCalculated.toLocaleString()} Eggs</span>
+                <span className="text-emerald-400">{totalEggsCalculated.toLocaleString()} Bottles</span>
               </div>
             </div>
           </div>
@@ -686,13 +684,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             {/* Supplier Info Inputs */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-300 uppercase">Supplier / Farm Name</label>
+                <label className="text-xs font-black text-slate-300 uppercase">Supplier / Brand Name</label>
                 <input
                   type="text"
                   {...register("supplierName")}
                   disabled={mode === "view"}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Al-Madina Egg Farm"
+                  placeholder="e.g. Al-Rehab / Rasasi / Lattafa"
                 />
               </div>
 
@@ -708,13 +706,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-amber-400 uppercase">Farm Location</label>
+                <label className="text-xs font-black text-amber-400 uppercase">Supplier Location / City</label>
                 <input
                   type="text"
                   {...register("supplierLocation")}
                   disabled={mode === "view"}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Multan Farm"
+                  placeholder="e.g. Dubai / Karachi / Peshawar"
                 />
               </div>
             </div>
