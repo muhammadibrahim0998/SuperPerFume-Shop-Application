@@ -48,35 +48,33 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
 
   // Helper to extract clean name and separate Peti / Tray / Egg badges
   const getItemBreakdownDetails = (item) => {
-    if (!item) return { rawName: 'Egg', petis: '0 Peti', trays: '0 Trays', eggs: '0 Eggs', unit: 'peti', qty: 1 };
-    let rawName = item.rawProductName || (item.name ? item.name.replace(/\s*\([^)]*\)/g, '').trim() : 'Egg');
-    if (!rawName) rawName = 'Egg';
+    if (!item) return { rawName: 'Product', petis: '0 Dozen', trays: '0 Box', eggs: '0 Products', unit: 'peti', qty: 1 };
+    let rawName = item.rawProductName || (item.name ? item.name.replace(/\s*\([^)]*\)/g, '').trim() : 'Product');
+    if (!rawName) rawName = 'Product';
 
     const qty = Number(item.quantity) || 1;
     const nameLower = (item.name || '').toLowerCase();
     const unit = String(item.unit || item.selectedUnit || '').toLowerCase() || 
-      (nameLower.includes('peti') ? 'peti' : nameLower.includes('tray') ? 'tray' : 'egg');
-
-    const tPerPeti = Number(item.traysPerPeti) || 12;
-    const ePerTray = Number(item.eggsPerTray) || 30;
-    const ePerPeti = tPerPeti * ePerTray;
+      (nameLower.includes('peti') || nameLower.includes('dozen') ? 'peti' : nameLower.includes('tray') || nameLower.includes('box') ? 'tray' : 'egg');
 
     let petis = '';
     let trays = '';
     let eggs = '';
 
-    if (unit === 'peti') {
-      petis = `${qty} Peti${qty > 1 ? 's' : ''}`;
-      trays = `${(qty * tPerPeti).toFixed(1).replace(/\.0$/, '')} Trays`;
-      eggs = `${Math.round(qty * ePerPeti).toLocaleString()} Eggs`;
-    } else if (unit === 'tray') {
-      petis = `${(qty / tPerPeti).toFixed(2).replace(/\.00$/, '')} Peti`;
-      trays = `${qty} Tray${qty > 1 ? 's' : ''}`;
-      eggs = `${Math.round(qty * ePerTray).toLocaleString()} Eggs`;
+    if (unit === 'peti' || unit === 'dozen') {
+      const totalSingle = qty * 12;
+      petis = `${qty} Doz (${totalSingle} Pcs)`;
+      trays = `${(totalSingle / 30).toFixed(1).replace(/\.0$/, '')} Box`;
+      eggs = `${totalSingle} Products`;
+    } else if (unit === 'tray' || unit === 'box') {
+      const totalSingle = qty * 30;
+      petis = `${(totalSingle / 12).toFixed(1).replace(/\.0$/, '')} Doz`;
+      trays = `${qty} Box (${totalSingle} Pcs)`;
+      eggs = `${totalSingle} Products`;
     } else {
-      petis = `${(qty / ePerPeti).toFixed(2).replace(/\.00$/, '')} Peti`;
-      trays = `${(qty / ePerTray).toFixed(1).replace(/\.0$/, '')} Trays`;
-      eggs = `${qty} Egg${qty > 1 ? 's' : ''}`;
+      petis = `${(qty / 12).toFixed(2).replace(/\.00$/, '')} Doz`;
+      trays = `${(qty / 30).toFixed(2).replace(/\.00$/, '')} Box`;
+      eggs = `${qty} Single Product${qty > 1 ? 's' : ''}`;
     }
 
     return { rawName, petis, trays, eggs, unit, qty };
@@ -151,7 +149,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
       const d = getItemBreakdownDetails(item);
       return [
         index + 1,
-        `${d.rawName.toUpperCase()}\n[ 📦 ${d.petis}  |  🍱 ${d.trays}  |  🥚 ${d.eggs} ]`,
+        `${d.rawName.toUpperCase()}\n[ 📦 ${d.petis}  |  🍱 ${d.trays}  |  🧴 ${d.eggs} ]`,
         item.quantity,
         `${currency} ${(item.price || 0).toLocaleString()}`,
         `${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}`
@@ -244,7 +242,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
             <div style="font-size: 9pt; font-weight: bold;">
               <span style="color: #b45309;">📦 ${d.petis}</span> &nbsp;•&nbsp;
               <span style="color: #0284c7;">🍱 ${d.trays}</span> &nbsp;•&nbsp;
-              <span style="color: #15803d;">🥚 ${d.eggs}</span>
+              <span style="color: #15803d;">🧴 ${d.eggs}</span>
             </div>
           </td>
           <td style="text-align: center; border: 1px solid #94a3b8; padding: 8px 10px; font-weight: 900; color: #15803d; vertical-align: middle;">${item.quantity}</td>
@@ -383,7 +381,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
     text += `📦 *ITEMS PURCHASED:*\n`;
     items.forEach((item, idx) => {
       const d = getItemBreakdownDetails(item);
-      text += `${idx + 1}. *${d.rawName.toUpperCase()}*\n   📦 *${d.petis}* | 🍱 *${d.trays}* | 🥚 *${d.eggs}*\n   Qty: ${item.quantity} x ${currency} ${(item.price || 0).toLocaleString()} = *${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}*\n`;
+      text += `${idx + 1}. *${d.rawName.toUpperCase()}*\n   📦 *${d.petis}* | 🍱 *${d.trays}* | 🧴 *${d.eggs}*\n   Qty: ${item.quantity} x ${currency} ${(item.price || 0).toLocaleString()} = *${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}*\n`;
     });
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
     text += `💵 *GRAND TOTAL PAID: ${currency} ${totalAmount.toLocaleString()}*\n`;
@@ -499,7 +497,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
           <div style="display:flex; flex-wrap:wrap; gap:6px; font-size:10px; font-weight:800;">
             <span style="background:#fef3c7; color:#92400e; padding:2px 7px; border-radius:4px; border:1px solid #fde68a;">📦 ${d.petis}</span>
             <span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🍱 ${d.trays}</span>
-            <span style="background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:4px; border:1px solid #bbf7d0;">🥚 ${d.eggs}</span>
+            <span style="background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:4px; border:1px solid #bbf7d0;">🧴 ${d.eggs}</span>
           </div>
         </td>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; vertical-align:middle; font-weight:900; color:#059669;">${item.quantity}</td>
@@ -689,7 +687,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
                               <span>🍱</span> {d.trays}
                             </span>
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-black">
-                              <span>🥚</span> {d.eggs}
+                              <span>🧴</span> {d.eggs}
                             </span>
                           </div>
                         </div>

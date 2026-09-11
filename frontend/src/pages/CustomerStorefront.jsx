@@ -282,7 +282,7 @@ function CartDrawer({ currency }) {
                     {item.image ? (
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover/cart:scale-105 transition-transform duration-300" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center"><Egg className="w-6 h-6 text-slate-600" /></div>
+                      <div className="w-full h-full flex items-center justify-center"><Package className="w-6 h-6 text-slate-600" /></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -290,7 +290,7 @@ function CartDrawer({ currency }) {
                       {item.name}
                     </p>
                     <p className="text-emerald-400 font-black text-sm mt-0.5">
-                      {safeCurrency} {Number(item.price || 0).toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">/ {currentUnit.toUpperCase()}</span>
+                      {safeCurrency} {Number(item.price || 0).toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">/ {currentUnit === 'egg' ? 'PERFUME' : currentUnit.toUpperCase()}</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/80 shadow-inner">
@@ -319,39 +319,39 @@ function CartDrawer({ currency }) {
                   </div>
                 </div>
 
-                {/* Peti, Tray, Single Egg Unit Switcher in Cart */}
+                {/* Peti, Tray, Perfume Unit Switcher in Cart */}
                 <div className="flex items-center justify-between pt-2.5 border-t border-slate-800/80 gap-1.5">
                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Unit:</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'peti')}
-                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'peti'
+                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'peti'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      📦 Peti
+                      📦 1 Dozen (12)
                     </button>
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'tray')}
-                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'tray'
+                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'tray'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      🍱 Tray
+                      🍱 1 Box (30)
                     </button>
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'egg')}
-                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'egg'
+                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'egg'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      🥚 Egg
+                      🧴 Single Product
                     </button>
                   </div>
                 </div>
@@ -1013,32 +1013,29 @@ function StoreContent({ shopId }) {
     if (!product) return 0;
     const basePrice = Number(product.price) || 0;
     const pEgg = Number(product.pricePerEgg) || 0;
-    const pTray = Number(product.pricePerTray) || 0;
-    const pPeti = Number(product.pricePerPeti) || 0;
+    const pTray = Number(product.pricePerTray) || 0; // 1 Box (30 products)
+    const pPeti = Number(product.pricePerPeti) || 0; // 1 Dozen (12 products)
     const uType = String(product.unitType || 'tray').toLowerCase();
 
-    let eggRate = pEgg;
-    if (!eggRate && pTray > 0) eggRate = pTray / 30;
-    else if (!eggRate && pPeti > 0) eggRate = pPeti / 360;
-    else if (!eggRate && basePrice > 0) {
-      eggRate = uType === 'peti' ? basePrice / 360 : uType === 'tray' ? basePrice / 30 : basePrice;
+    let singleRate = pEgg;
+    if (!singleRate && pPeti > 0) singleRate = pPeti / 12;
+    else if (!singleRate && pTray > 0) singleRate = pTray / 30;
+    else if (!singleRate && basePrice > 0) {
+      singleRate = (uType === 'peti' || uType === 'dozen') ? basePrice / 12 : (uType === 'tray' || uType === 'box') ? basePrice / 30 : basePrice;
     }
-    if (!eggRate) eggRate = 30;
+    if (!singleRate) singleRate = 30;
 
-    if (unit === 'peti') {
+    if (unit === 'peti' || unit === 'dozen') {
       if (pPeti > 0) return pPeti;
-      if (pTray > 0) return pTray * 12;
-      return Math.round(eggRate * 360);
+      return Math.round(singleRate * 12);
     }
-    if (unit === 'tray') {
+    if (unit === 'tray' || unit === 'box') {
       if (pTray > 0) return pTray;
-      if (pPeti > 0) return Math.round(pPeti / 12);
-      return Math.round(eggRate * 30);
+      return Math.round(singleRate * 30);
     }
-    // 'egg'
+    // 'egg' (Single Product)
     if (pEgg > 0) return pEgg;
-    if (pTray > 0) return Math.round(pTray / 30);
-    return Math.round(eggRate);
+    return Math.round(singleRate);
   };
 
   const addToWalkInCart = (product, unit = 'tray') => {
@@ -1127,37 +1124,35 @@ function StoreContent({ shopId }) {
     try {
       const saleItems = walkInCart.map(item => {
         const unit = item.selectedUnit || 'tray';
-        const tPerPeti = item.product?.traysPerPeti || 12;
-        const ePerTray = item.product?.eggsPerTray || 30;
-        const ePerPeti = tPerPeti * ePerTray;
         const qty = Number(item.quantity) || 1;
 
         let breakdownStr = '';
-        if (unit === 'peti') {
-          const totalTrays = (qty * tPerPeti).toFixed(1).replace(/\.0$/, '');
-          const totalEggs = Math.round(qty * ePerPeti);
-          breakdownStr = `${qty} Peti • ${totalTrays} Trays • ${totalEggs.toLocaleString()} Eggs`;
-        } else if (unit === 'tray') {
-          const totalEggs = Math.round(qty * ePerTray);
-          const totalPetis = (qty / tPerPeti).toFixed(2).replace(/\.00$/, '');
-          breakdownStr = `${qty} Tray • ${totalEggs.toLocaleString()} Eggs • ${totalPetis} Peti`;
+        let totalSingleProducts = 0;
+
+        if (unit === 'peti' || unit === 'dozen') {
+          totalSingleProducts = Math.round(qty * 12);
+          const totalBoxes = (totalSingleProducts / 30).toFixed(1).replace(/\.0$/, '');
+          breakdownStr = `${qty} Dozen (${totalSingleProducts} Single Products • ${totalBoxes} Boxes)`;
+        } else if (unit === 'tray' || unit === 'box') {
+          totalSingleProducts = Math.round(qty * 30);
+          const totalDozens = (totalSingleProducts / 12).toFixed(1).replace(/\.0$/, '');
+          breakdownStr = `${qty} Box (${totalSingleProducts} Single Products • ${totalDozens} Dozen)`;
         } else {
-          const totalTrays = (qty / ePerTray).toFixed(1).replace(/\.0$/, '');
-          const totalPetis = (qty / ePerPeti).toFixed(2).replace(/\.00$/, '');
-          breakdownStr = `${qty} Egg • ${totalTrays} Trays • ${totalPetis} Peti`;
+          totalSingleProducts = qty;
+          const totalDozens = (qty / 12).toFixed(2).replace(/\.00$/, '');
+          breakdownStr = `${qty} Single Product${qty > 1 ? 's' : ''}`;
         }
 
-        const unitMultiplier = unit === 'peti' ? ePerPeti : unit === 'tray' ? ePerTray : 1;
-        const totalEggs = qty * unitMultiplier;
+        const unitMultiplier = (unit === 'peti' || unit === 'dozen') ? 12 : (unit === 'tray' || unit === 'box') ? 30 : 1;
         const unitPrice = item.unitPrice || getProductUnitPrice(item.product, unit);
         const subtotal = Math.round(unitPrice * qty);
 
         const unitCost = Number(item.product.costPrice) > 0 ? Number(item.product.costPrice) : (Number(item.product.price) || 0) * 0.8;
-        const costPerEgg = item.product.unitType === 'peti' ? unitCost / ePerPeti : item.product.unitType === 'tray' ? unitCost / ePerTray : unitCost;
-        const itemTotalCost = Math.round(costPerEgg * totalEggs);
+        const costPerSingle = (item.product.unitType === 'peti' || item.product.unitType === 'dozen') ? unitCost / 12 : (item.product.unitType === 'tray' || item.product.unitType === 'box') ? unitCost / 30 : unitCost;
+        const itemTotalCost = Math.round(costPerSingle * totalSingleProducts);
         const profit = Math.max(0, subtotal - itemTotalCost);
 
-        const unitLabel = unit === 'peti' ? 'Peti' : unit === 'tray' ? 'Tray' : 'Egg';
+        const unitLabel = (unit === 'peti' || unit === 'dozen') ? '1 Dozen (12)' : (unit === 'tray' || unit === 'box') ? '1 Box (30)' : 'Single Product';
 
         return {
           productId: item.product._id,
@@ -1166,7 +1161,7 @@ function StoreContent({ shopId }) {
           quantity: qty,
           unit: unit,
           unitLabel: unitLabel,
-          totalEggs: totalEggs,
+          totalEggs: totalSingleProducts,
           price: unitPrice,
           costPrice: unitCost,
           subtotal: subtotal,
@@ -5405,24 +5400,25 @@ function StoreContent({ shopId }) {
                                 <div className="min-w-0 flex-1">
                                   <h4 className="font-black text-gray-900 text-xs uppercase tracking-tight truncate">{product.name}</h4>
                                   <p className="text-emerald-700 font-extrabold text-[11px] mt-0.5">
-                                    {currency} {trayPrice.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ Tray</span>
+                                    {currency} {eggPrice.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ Single</span>
                                   </p>
                                   <span className={`text-[9px] font-bold uppercase ${product.stock > 0 ? 'text-gray-400' : 'text-rose-500'}`}>
-                                    Stock: {product.stock} eggs ({(product.stock / 360).toFixed(1)} Petis)
+                                    Stock: {product.stock} Products ({(product.stock / 12).toFixed(1)} Doz • {(product.stock / 30).toFixed(1)} Box)
                                   </span>
                                 </div>
                               </div>
 
-                              {/* 3 Direct Unit Add Buttons: Peti, Tray, Egg */}
+                              {/* 3 Direct Unit Add Buttons: 1 Dozen (12), 1 Box (30), Single (1) */}
                               <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-gray-100">
                                 <button
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'peti')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Peti (${currency} ${petiPrice})`}
+                                  className="py-1 px-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Dozen (12 Products) - ${currency} ${petiPrice}`}
                                 >
-                                  <span>📦 Peti</span>
+                                  <span>📦 1 Dozen</span>
+                                  <span className="text-[7.5px] font-bold text-amber-600">12 Pcs</span>
                                   <span className="text-[8px] font-extrabold text-amber-900">{currency}{petiPrice}</span>
                                 </button>
 
@@ -5430,10 +5426,11 @@ function StoreContent({ shopId }) {
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'tray')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Tray (${currency} ${trayPrice})`}
+                                  className="py-1 px-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Box (30 Products) - ${currency} ${trayPrice}`}
                                 >
-                                  <span>🍱 Tray</span>
+                                  <span>🍱 1 Box</span>
+                                  <span className="text-[7.5px] font-bold text-emerald-600">30 Pcs</span>
                                   <span className="text-[8px] font-extrabold text-emerald-900">{currency}{trayPrice}</span>
                                 </button>
 
@@ -5441,10 +5438,11 @@ function StoreContent({ shopId }) {
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'egg')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Egg (${currency} ${eggPrice})`}
+                                  className="py-1 px-1 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Single Product - ${currency} ${eggPrice}`}
                                 >
-                                  <span>🥚 Egg</span>
+                                  <span>🧴 Single</span>
+                                  <span className="text-[7.5px] font-bold text-blue-600">1 Pc</span>
                                   <span className="text-[8px] font-extrabold text-blue-900">{currency}{eggPrice}</span>
                                 </button>
                               </div>
@@ -5612,7 +5610,7 @@ function StoreContent({ shopId }) {
                                       <div className="min-w-0 flex-1">
                                         <p className="font-black text-gray-900 uppercase truncate text-xs">{item.product.name}</p>
                                         <span className="text-[10px] font-bold text-emerald-700">
-                                          {currency} {itemRate.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ {currentUnit.toUpperCase()}</span>
+                                          {currency} {itemRate.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ {currentUnit === 'peti' ? 'DOZEN (12)' : currentUnit === 'tray' ? 'BOX (30)' : 'SINGLE'}</span>
                                         </span>
                                       </div>
 
@@ -5629,14 +5627,14 @@ function StoreContent({ shopId }) {
                                       </div>
                                     </div>
 
-                                    {/* Unit Selection Pills (Peti, Tray, Egg) & Qty Counter */}
+                                    {/* Unit Selection Pills (1 Dozen (12), 1 Box (30), Single (1)) & Qty Counter */}
                                     <div className="flex items-center justify-between gap-2 pt-1 border-t border-gray-200/60">
                                       {/* Unit Pills */}
                                       <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-gray-200">
                                         {[
-                                          { id: 'peti', label: '📦 Peti' },
-                                          { id: 'tray', label: '🍱 Tray' },
-                                          { id: 'egg', label: '🥚 Egg' },
+                                          { id: 'peti', label: '📦 1 Doz (12)' },
+                                          { id: 'tray', label: '🍱 1 Box (30)' },
+                                          { id: 'egg', label: '🧴 Single' },
                                         ].map(u => (
                                           <button
                                             key={u.id}
@@ -5672,31 +5670,32 @@ function StoreContent({ shopId }) {
                                       </div>
                                     </div>
 
-                                    {/* Live Dynamic Breakdown: 1 Peti = 12 Trays • 360 Eggs */}
+                                    {/* Live Dynamic Breakdown: 1 Dozen = 12 Products • 1 Box = 30 Products */}
                                     {(() => {
-                                      const tPerPeti = item.product?.traysPerPeti || 12;
-                                      const ePerTray = item.product?.eggsPerTray || 30;
-                                      const ePerPeti = tPerPeti * ePerTray;
                                       const qty = Number(item.quantity) || 1;
                                       let breakdownStr = '';
+                                      let unitTitle = '';
                                       if (currentUnit === 'peti') {
-                                        const totalTrays = (qty * tPerPeti).toFixed(1).replace(/\.0$/, '');
-                                        const totalEggs = Math.round(qty * ePerPeti).toLocaleString();
-                                        breakdownStr = `${totalTrays} Trays • ${totalEggs} Eggs`;
+                                        const totalSingle = qty * 12;
+                                        const totalBoxes = (totalSingle / 30).toFixed(1).replace(/\.0$/, '');
+                                        unitTitle = `${qty} DOZEN`;
+                                        breakdownStr = `${totalSingle} Single Products • ${totalBoxes} Boxes`;
                                       } else if (currentUnit === 'tray') {
-                                        const totalEggs = Math.round(qty * ePerTray).toLocaleString();
-                                        const totalPetis = (qty / tPerPeti).toFixed(2).replace(/\.00$/, '');
-                                        breakdownStr = `${totalEggs} Eggs • ${totalPetis} Peti`;
+                                        const totalSingle = qty * 30;
+                                        const totalDozens = (totalSingle / 12).toFixed(1).replace(/\.0$/, '');
+                                        unitTitle = `${qty} BOX`;
+                                        breakdownStr = `${totalSingle} Single Products • ${totalDozens} Dozen`;
                                       } else {
-                                        const totalTrays = (qty / ePerTray).toFixed(1).replace(/\.0$/, '');
-                                        const totalPetis = (qty / ePerPeti).toFixed(2).replace(/\.00$/, '');
-                                        breakdownStr = `${totalTrays} Trays • ${totalPetis} Peti`;
+                                        const totalDoz = (qty / 12).toFixed(2).replace(/\.00$/, '');
+                                        const totalBox = (qty / 30).toFixed(2).replace(/\.00$/, '');
+                                        unitTitle = `${qty} SINGLE`;
+                                        breakdownStr = `${qty} Single Product${qty > 1 ? 's' : ''} (${totalDoz} Doz • ${totalBox} Box)`;
                                       }
 
                                       return (
                                         <div className="flex items-center justify-between px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-lg text-[10px] font-black text-emerald-800">
                                           <span className="uppercase text-emerald-700 flex items-center gap-1 font-bold">
-                                            <span>⚡</span> {qty} {currentUnit.toUpperCase()} =
+                                            <span>⚡</span> {unitTitle} =
                                           </span>
                                           <span className="font-extrabold text-emerald-900 tracking-tight">{breakdownStr}</span>
                                         </div>
@@ -6837,7 +6836,7 @@ function StoreContent({ shopId }) {
                               🍱 {profitReportStats.totalPurchasesTrays} T
                             </span>
                             <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                              🥚 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} E
+                              🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} P
                             </span>
                           </div>
                         </div>
@@ -6972,7 +6971,7 @@ function StoreContent({ shopId }) {
                             🍱 {profitReportStats.totalPurchasesTrays} Trays
                           </span>
                           <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                            🥚 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Eggs
+                            🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Perfumes
                           </span>
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-blue-200/60">
@@ -7010,7 +7009,7 @@ function StoreContent({ shopId }) {
                         </div>
                       </div>
 
-                      {/* Card 4: Damaged Egg Loss */}
+                      {/* Card 4: Damaged Perfume Loss */}
                       <div className="bg-amber-50/50 border-2 border-amber-200 rounded-2xl p-3.5 shadow-sm space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
@@ -7018,7 +7017,7 @@ function StoreContent({ shopId }) {
                               #4
                             </span>
                             <span className="font-black text-amber-950 text-xs uppercase">
-                              (-) Damaged Egg Loss
+                              (-) Damaged Perfume Loss
                             </span>
                           </div>
                           <span className="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[8.5px] font-black uppercase">
@@ -7027,7 +7026,7 @@ function StoreContent({ shopId }) {
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-amber-200/60">
                           <span className="text-[11px] font-bold text-gray-600">
-                            {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Eggs)
+                            {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Perfumes)
                           </span>
                           <span className="text-base font-black text-amber-700">
                             - {currency} {Number(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}
@@ -7110,7 +7109,7 @@ function StoreContent({ shopId }) {
                                   🍱 {profitReportStats.totalPurchasesTrays} Trays
                                 </span>
                                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[9px] font-black">
-                                  🥚 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Eggs
+                                  🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Perfumes
                                 </span>
                               </div>
                             </td>
@@ -8281,15 +8280,15 @@ function StoreContent({ shopId }) {
                 return (
                   <div className="grid grid-cols-3 gap-1.5 pt-0.5">
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-amber-300 block uppercase">📦 1 Peti</span>
+                      <span className="text-[8.5px] font-bold text-amber-300 block uppercase">📦 1 Dozen (12)</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {pPrice.toLocaleString()}</span>
                     </div>
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-sky-300 block uppercase">🍱 1 Tray</span>
+                      <span className="text-[8.5px] font-bold text-sky-300 block uppercase">🍱 1 Box (30)</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {tPrice.toLocaleString()}</span>
                     </div>
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-emerald-300 block uppercase">🥚 1 Egg</span>
+                      <span className="text-[8.5px] font-bold text-emerald-300 block uppercase">🧴 Single Product</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {ePrice}</span>
                     </div>
                   </div>
