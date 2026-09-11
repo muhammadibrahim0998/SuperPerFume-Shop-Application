@@ -34,7 +34,7 @@ const seedEggCategories = async () => {
     if (!shop) {
       // Create a default shop if none exists
       shop = await Shop.create({
-        name: 'Yousafzai Eggs Traders',
+        name: 'Maidan Perfume Shop',
         address: 'Pakistan',
         status: 'active',
         contactNumber: '03489273035'

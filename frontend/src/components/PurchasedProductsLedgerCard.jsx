@@ -62,12 +62,11 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
 
       const isCredit = !isOnline && (
         pMethodLower.includes('credit') || 
-        pMethodLower.includes('due') || 
-        pMethodLower.includes('qaraz')
+        pMethodLower.includes('due')
       );
 
-      // Strict Routed Paid vs Due (Qaraz) calculation (No overlap)
-      const isCreditMethod = isCredit || pMethodLower.includes('credit') || pMethodLower.includes('due') || pMethodLower.includes('qaraz') || pMethodLower.includes('partial');
+      // Strict Routed Paid vs Due (Credit) calculation (No overlap)
+      const isCreditMethod = isCredit || pMethodLower.includes('credit') || pMethodLower.includes('due') || pMethodLower.includes('partial');
       const hasExplicitDue = p.dueAmountToSupplier !== undefined && p.dueAmountToSupplier !== null && Number(p.dueAmountToSupplier) > 0;
       
       let due = 0;
@@ -78,7 +77,7 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
         due = Math.min(cost, Math.max(0, rawDue));
         paid = Math.max(0, cost - due);
       } else {
-        // 100% Cash / Bank Paid (No Qaraz)
+        // 100% Cash / Bank Paid (No Credit)
         paid = cost;
         due = 0;
       }
@@ -156,10 +155,10 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
             Stock Bought
           </span>
           <h4 className="text-xl sm:text-2xl font-black text-amber-900 tracking-tight">
-            {stats.totalPetisBought} Petis
+            {stats.totalPetisBought} Boxes
           </h4>
           <span className="text-[9px] font-bold text-amber-800 uppercase mt-1 block">
-            {stats.totalTraysBought.toLocaleString()} Trays Total
+            {stats.totalTraysBought.toLocaleString()} Packs Total
           </span>
         </div>
 
@@ -214,9 +213,9 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
               </tr>
             ) : (
               purchasedProducts.map((p, idx) => {
-                const petis = p.petiQuantity || (p.stock ? (p.stock / 360).toFixed(1) : 0);
-                const trays = p.trayQuantity || (p.stock ? Math.round(p.stock / 30) : 0);
-                const cost = Number(p.totalPurchaseCost) || (Number(p.costPrice) > 0 ? (Number(p.stock || 0) * (Number(p.costPrice) / (p.unitType === 'egg' ? 1 : p.unitType === 'tray' ? 30 : 360))) : 0);
+                const boxes = p.petiQuantity || (p.stock ? (p.stock / 12).toFixed(1) : 0);
+                const packs = p.trayQuantity || (p.stock ? Math.round(p.stock / 6) : 0);
+                const cost = Number(p.totalPurchaseCost) || (Number(p.costPrice) > 0 ? (Number(p.stock || 0) * Number(p.costPrice)) : 0);
 
                 return (
                   <tr key={p._id || idx} className="hover:bg-zinc-50/80 transition-colors">
@@ -227,19 +226,19 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
                         </div>
                         <div>
                           <span className="font-black text-zinc-900 block">{p.name}</span>
-                          <span className="text-[9px] text-zinc-400 uppercase font-bold">{p.category || 'Eggs'}</span>
+                          <span className="text-[9px] text-zinc-400 uppercase font-bold">{p.category || 'General'}</span>
                         </div>
                       </div>
                     </td>
 
                     <td className="py-3 px-4">
                       <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-[11px] font-black">
-                        📦 {petis} Petis ({trays} Trays)
+                        📦 {boxes} Boxes ({packs} Packs / Sets)
                       </span>
                     </td>
 
                     <td className="py-3 px-4 text-amber-600 font-black">
-                      Rs. {fmt(p.costPrice || (cost / (petis || 1)))} / {p.unitType || 'peti'}
+                      Rs. {fmt(p.costPrice || (cost / (boxes || 1)))} / {p.unitType || 'unit'}
                     </td>
 
                     <td className="py-3 px-4 font-black text-zinc-900">
@@ -247,7 +246,7 @@ export function PurchasedProductsLedgerCard({ products = [], onAddProduct, onEdi
                     </td>
 
                     <td className="py-3 px-4 text-teal-700 font-black">
-                      {p.supplierName || 'Wholesale Farm'}
+                      {p.supplierName || 'Distributor / Supplier'}
                     </td>
 
                     <td className="py-3 px-4">

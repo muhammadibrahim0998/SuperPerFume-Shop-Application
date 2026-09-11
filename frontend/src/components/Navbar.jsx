@@ -71,17 +71,17 @@ export function Navbar({
               {logoUrl ? (
                 <img src={logoUrl} alt={shopName} className="w-full h-full object-cover rounded-lg" />
               ) : (
-                <img src={companyLogo} alt="Attock Shop" className="w-full h-full object-cover rounded-lg" />
+                <img src={companyLogo} alt="Maidan Perfume Shop" className="w-full h-full object-cover rounded-lg" />
               )}
             </div>
             <div className="hidden md:flex flex-col">
               <h1 className="text-base font-black tracking-tight text-yellow-300 group-hover:text-amber-200 uppercase italic drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:drop-shadow-[0_0_12px_rgba(251,191,36,0.8)] leading-none transition-all duration-300">
-                {user?.role === 'super_admin' || !shopName || shopName === 'Egg Station POS'
-                  ? 'PERFUME SHOP CENTER'
+                {user?.role === 'super_admin' || !shopName || shopName.toLowerCase().includes('egg')
+                  ? 'MAIDAN PERFUME SHOP'
                   : shopName.toUpperCase()}
               </h1>
               <span className="text-[9px] font-black text-emerald-300 group-hover:text-emerald-200 uppercase tracking-widest leading-tight mt-1 transition-all duration-300">
-                {user?.role === 'super_admin' ? 'SUPER ADMIN' : 'PERFUME SHOP'}
+                {user?.role === 'super_admin' ? 'SUPER ADMIN' : 'PERFUME & RETAIL'}
               </span>
             </div>
           </div>

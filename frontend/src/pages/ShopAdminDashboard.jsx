@@ -87,8 +87,8 @@ export function ShopAdminDashboard({
 
   // ─── Calculate top level sums ───────────────────────────────────────
   const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0);
-  const totalStockEggs = products.reduce((sum, product) => sum + (product.stock || 0), 0);
-  const totalPetis = products.reduce((sum, product) => sum + (product.petiQuantity || ((product.stock || 0) / 360)), 0);
+  const totalStockUnits = products.reduce((sum, product) => sum + (product.stock || 0), 0);
+  const totalPetis = products.reduce((sum, product) => sum + (product.petiQuantity || (product.stock || 0)), 0);
 
   // Combine POS sales + EasyPaisa checkout orders
   const validOrders = checkoutOrders.filter(o => o.paymentStatus !== 'FAILED');
@@ -252,7 +252,7 @@ export function ShopAdminDashboard({
             totalValue={totalValue}
             lowStockProducts={products.filter(p => p.stock > 0 && p.stock <= p.minStock)}
             outOfStockProducts={products.filter(p => p.stock === 0)}
-            totalStockUnits={totalStockEggs}
+            totalStockUnits={totalStockUnits}
             totalCustomers={totalCustomers}
             totalSalesCount={totalSalesCount}
             totalPetis={Number(totalPetis.toFixed(1))}

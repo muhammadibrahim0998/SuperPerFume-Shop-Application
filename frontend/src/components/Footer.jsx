@@ -1,5 +1,5 @@
 import React from 'react';
-import { Egg, Heart, Zap } from 'lucide-react';
+import { Sparkles, Heart, Zap } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -15,7 +15,7 @@ export function Footer() {
           {/* Brand/Logo Section - Miniatured */}
           <div className="flex items-center gap-3 group cursor-default">
             <div className="p-1.5 bg-green-600 rounded-lg group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
-              <Egg className="w-3.5 h-3.5 text-[var(--color-text-primary)]" />
+              <Sparkles className="w-3.5 h-3.5 text-[var(--color-text-primary)]" />
             </div>
             <div>
               <h2 className="text-xs font-black text-[var(--color-text-primary)] tracking-widest leading-none uppercase">NEXFLOW</h2>

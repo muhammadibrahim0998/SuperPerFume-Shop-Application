@@ -25,7 +25,7 @@ export const generateInvoice = async (sale, filePath, settings = {}) => {
 
       const bold = "Helvetica-Bold";
       const normal = "Helvetica";
-      const shopName = settings.shopName || "COSMETICS SHOP";
+      const shopName = settings.shopName || "MAIDAN PERFUME SHOP";
       const shopAddress = settings.address || "Inventory Management System";
       const shopPhone = settings.phone ? `Contact: ${settings.phone}` : "Contact: +923014455631";
       const currency = settings.currency || "PKR";
@@ -124,7 +124,7 @@ export const generateInvoice = async (sale, filePath, settings = {}) => {
       const sName = (shopName || '').toLowerCase();
       if (sName.includes('peshawar') || sName.includes('peshawer')) bankAcc = "Meezan Bank: 07190104740373 (Title: RIZWAN ULLAH)";
       else if (sName.includes('mardan')) bankAcc = "Bank Al Habib: 2013008100773501";
-      else if (sName.includes('attock')) bankAcc = "UBL: UBL-0109000306243543 (Title: Yousafzai Eggs Traders)";
+      else if (sName.includes('attock') || sName.includes('maidan')) bankAcc = "UBL: UBL-0109000306243543 (Title: Maidan Perfume Shop)";
 
       doc.moveDown(4.5);
       doc.font(bold).fontSize(8).fillColor("#2563eb").text(`BRANCH BANK: ${bankAcc}`, { align: "center" });

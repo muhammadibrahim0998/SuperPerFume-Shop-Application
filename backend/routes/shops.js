@@ -6,8 +6,6 @@ import User from '../models/User.js';
 import Settings from '../models/Settings.js';
 import Item from '../models/Item.js';
 
-
-
 const router = express.Router();
 
 // Get all shops (Super Admin only)

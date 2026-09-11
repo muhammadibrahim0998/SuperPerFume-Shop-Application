@@ -63,7 +63,7 @@ export function ProductCard({ product, onEdit, onDelete, onView }) {
 
         {/* Category Badge - Top Left */}
         <div className="absolute top-3 left-3 bg-[#111827]/90 px-3 py-1 rounded-full text-[9px] font-black text-emerald-400 uppercase tracking-widest border border-slate-700/80 backdrop-blur-md">
-          {product.category || 'Egg'}
+          {product.category || 'Perfume'}
         </div>
 
         {/* Stock Status Badge - Top Right */}
@@ -91,27 +91,27 @@ export function ProductCard({ product, onEdit, onDelete, onView }) {
             {product.name}
           </h3>
           
-          {/* Explicit Unit Pricing Breakdown (Peti, Tray, Egg) */}
+          {/* Explicit Unit Pricing Breakdown */}
           {(() => {
             const price = Number(product.price) || 0;
-            const unit = product.unitType || 'peti';
-            const petiRate = product.pricePerPeti || (unit === 'peti' ? price : unit === 'tray' ? price * 12 : price * 360);
-            const trayRate = product.pricePerTray || (unit === 'tray' ? price : unit === 'peti' ? price / 12 : price * 30);
-            const eggRate = product.pricePerEgg || (unit === 'egg' ? price : unit === 'tray' ? price / 30 : price / 360);
+            const unit = (product.unitType || 'piece').toLowerCase();
+            const boxRate = product.pricePerPeti || (unit === 'box' || unit === 'peti' ? price : price * 12);
+            const packRate = product.pricePerTray || (unit === 'pack' || unit === 'tray' ? price : price * 6);
+            const singleRate = product.pricePerEgg || (unit === 'piece' || unit === 'bottle' || unit === 'egg' ? price : price);
 
             return (
               <div className="grid grid-cols-3 gap-1 p-2 bg-slate-900/90 rounded-xl border border-slate-700/80 text-[10px] font-black">
                 <div className="text-center border-r border-slate-700/60 pr-1">
-                  <span className="text-[7px] text-amber-400 font-bold uppercase block">Peti (Box)</span>
-                  <span className="text-white text-[11px]">Rs.{Math.round(petiRate).toLocaleString()}</span>
+                  <span className="text-[7px] text-amber-400 font-bold uppercase block">Box / Carton</span>
+                  <span className="text-white text-[11px]">Rs.{Math.round(boxRate).toLocaleString()}</span>
                 </div>
                 <div className="text-center border-r border-slate-700/60 px-1">
-                  <span className="text-[7px] text-teal-400 font-bold uppercase block">Tray</span>
-                  <span className="text-white text-[11px]">Rs.{Math.round(trayRate).toLocaleString()}</span>
+                  <span className="text-[7px] text-teal-400 font-bold uppercase block">Pack / Set</span>
+                  <span className="text-white text-[11px]">Rs.{Math.round(packRate).toLocaleString()}</span>
                 </div>
                 <div className="text-center pl-1">
-                  <span className="text-[7px] text-emerald-400 font-bold uppercase block">Single Egg</span>
-                  <span className="text-white text-[11px]">Rs.{eggRate < 100 ? eggRate.toFixed(1) : Math.round(eggRate)}</span>
+                  <span className="text-[7px] text-emerald-400 font-bold uppercase block">Single Unit</span>
+                  <span className="text-white text-[11px]">Rs.{singleRate < 100 ? singleRate.toFixed(1) : Math.round(singleRate)}</span>
                 </div>
               </div>
             );

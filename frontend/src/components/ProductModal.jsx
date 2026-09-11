@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import CreatableSelect from 'react-select/creatable';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema } from "../schemas/productSchema";
-import { X, Upload, Loader2, Star, Box, Egg, UserCheck, ImageIcon, Link as LinkIcon, ShieldCheck, Camera, Plus, Banknote, CreditCard, AlertCircle } from "lucide-react";
+import { X, Upload, Loader2, Star, Box, Package, Sparkles, UserCheck, ImageIcon, Link as LinkIcon, ShieldCheck, Camera, Plus, Banknote, CreditCard, AlertCircle } from "lucide-react";
 import { uploadImages } from "../services/api";
 import { toast } from "sonner";
 
@@ -11,8 +11,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
   const { register, handleSubmit, reset, setValue, getValues, watch, control, formState: { errors } } = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: "", category: "Eggs", stock: 0, minStock: 0, price: 0, costPrice: 0,
-      unitType: "peti", traysPerPeti: 12, eggsPerTray: 30,
+      name: "", category: "Perfumes", stock: 0, minStock: 0, price: 0, costPrice: 0,
+      unitType: "piece", traysPerPeti: 12, eggsPerTray: 30,
       petiQuantity: 0, trayQuantity: 0, eggQuantity: 0,
       supplierName: "", totalPurchaseCost: 0, amountPaidToSupplier: 0, dueAmountToSupplier: 0, paymentMethod: "Cash",
       paymentReceipt: "", images: [], description: "", mfgDate: "", expiryDate: ""
@@ -128,8 +128,11 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
           supplierLocation: product.supplierLocation || product.farmLocation || "",
           totalPurchaseCost: product.totalPurchaseCost || 0,
           amountPaidToSupplier: product.amountPaidToSupplier !== undefined ? product.amountPaidToSupplier : (product.totalPurchaseCost || 0),
+          cashPaidToSupplier: product.cashPaidToSupplier || 0,
+          bankPaidToSupplier: product.bankPaidToSupplier || 0,
           dueAmountToSupplier: product.dueAmountToSupplier || 0,
           paymentMethod: product.paymentMethod || "Cash",
+          isOnlinePayment: Boolean(product.isOnlinePayment),
           paymentReceipt: product.paymentReceipt || "",
           images: product.images || [],
           description: product.description || "",
@@ -206,6 +209,16 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
     const rawMethod = String(data.paymentMethod || "Cash").trim();
     const isOnlineOrBank = rawMethod.toLowerCase().includes('bank') || rawMethod.toLowerCase().includes('online') || data.isOnlinePayment === true;
 
+    let cashPaid = 0;
+    let bankPaid = 0;
+    if (isOnlineOrBank) {
+      bankPaid = paidAmt;
+      cashPaid = 0;
+    } else {
+      cashPaid = paidAmt;
+      bankPaid = 0;
+    }
+
     let determinedMethod = "Cash";
     if (isOnlineOrBank) {
       determinedMethod = dueAmt > 0 && paidAmt === 0 
@@ -236,6 +249,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
       supplierLocation: data.supplierLocation?.trim() || "",
       totalPurchaseCost: totalBill,
       amountPaidToSupplier: paidAmt,
+      cashPaidToSupplier: cashPaid,
+      bankPaidToSupplier: bankPaid,
       dueAmountToSupplier: dueAmt,
       paymentMethod: determinedMethod,
       paymentReceipt: data.paymentReceipt || "",
@@ -283,13 +298,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-700/60 bg-slate-900/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400">
-              <Egg className="w-5 h-5" />
+              <Package className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base font-black tracking-tight text-white uppercase italic">
                 {mode === "add" ? "Add Product & Stock" : mode === "edit" ? "Edit Product" : "View Product"}
               </h2>
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">PerFume Shop Center • Stock Entry</p>
+              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Maidan Perfume Shop • Stock Entry</p>
             </div>
           </div>
           <button
@@ -420,28 +435,28 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                 {...register("name")}
                 disabled={mode === "view"}
                 className={`w-full bg-slate-800 border ${errors.name ? 'border-rose-500' : 'border-slate-700'} rounded-xl py-2 px-3 text-sm font-bold text-white outline-none focus:border-emerald-500 placeholder:text-slate-500`}
-                placeholder="e.g. Perfume Name / Brand"
+                placeholder="e.g. Amber Oud Perfume 100ml"
               />
               {errors.name && <p className="text-rose-400 text-xs font-bold uppercase">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Category</label>
+              <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Category (Select or Type New)</label>
               <Controller
                 name="category"
                 control={control}
                 render={({ field }) => {
-                  const availableCats = (categories || []).filter(c => c && c !== "All");
+                  const existingCats = Array.from(new Set((categories || []).filter(c => c && c !== "All")));
                   return (
                     <CreatableSelect
                       {...field}
                       isClearable
                       isDisabled={mode === 'view'}
-                      options={availableCats.map(c => ({ value: c, label: c }))}
+                      options={existingCats.map(c => ({ value: c, label: c }))}
                       onChange={(val) => field.onChange(val ? val.value : "")}
                       onCreateOption={(inputValue) => field.onChange(inputValue)}
                       value={field.value ? { label: field.value, value: field.value } : null}
-                      placeholder="Type or select category..."
+                      placeholder="Select or type new category..."
                     styles={{
                       control: (base, state) => ({
                         ...base,
@@ -479,20 +494,16 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             <div className="space-y-1">
               <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Primary Unit</label>
               <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
-                {[
-                  { key: 'peti', label: 'Box' },
-                  { key: 'tray', label: 'Pack' },
-                  { key: 'egg', label: 'Bottle / Piece' }
-                ].map(({ key, label }) => (
+                {['piece', 'bottle', 'box', 'pack'].map((type) => (
                   <button
-                    key={key}
+                    key={type}
                     type="button"
-                    onClick={() => setValue('unitType', key)}
+                    onClick={() => setValue('unitType', type)}
                     className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                      unitType === key ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                      unitType === type ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    {label}
+                    {type}
                   </button>
                 ))}
               </div>
@@ -526,21 +537,21 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             </div>
           </div>
 
-          {/* Section 3: Perfume Stock Inventory Breakdown */}
+          {/* Section 3: Stock Inventory Breakdown */}
           <div className="p-3.5 bg-slate-900/90 rounded-2xl border border-emerald-500/30 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Box className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-black uppercase text-emerald-300 tracking-wider">Perfume Inventory Quantities</span>
+                <span className="text-xs font-black uppercase text-emerald-300 tracking-wider">Stock & Unit Quantities</span>
               </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">1 Box = 12 Packs = 360 Bottles</span>
+              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">1 Box = 12 Packs = Multi-Units</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5">
               <div className="space-y-1">
                 <label className="text-xs font-black text-amber-400 uppercase flex items-center justify-between">
-                  <span>Boxes (Cartons)</span>
-                  <span className="text-[9px] text-amber-300/80 font-bold">1 Box = 12 Packs</span>
+                  <span>Cartons / Boxes</span>
+                  <span className="text-[9px] text-amber-300/80 font-bold">Boxes</span>
                 </label>
                 <input
                   type="number"
@@ -569,7 +580,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
               <div className="space-y-1">
                 <label className="text-xs font-black text-teal-400 uppercase flex items-center justify-between">
                   <span>Packs</span>
-                  <span className="text-[9px] text-teal-300/80 font-bold">1 Pack = 30 Bottles</span>
+                  <span className="text-[9px] text-teal-300/80 font-bold">Packs</span>
                 </label>
                 <input
                   type="number"
@@ -597,8 +608,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
               <div className="space-y-1">
                 <label className="text-xs font-black text-emerald-400 uppercase flex items-center justify-between">
-                  <span>Bottles / Pieces</span>
-                  <span className="text-[9px] text-emerald-300/80 font-bold">Total Bottles</span>
+                  <span>Single Units</span>
+                  <span className="text-[9px] text-emerald-300/80 font-bold">Total Units</span>
                 </label>
                 <input
                   type="number"
@@ -634,7 +645,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                 <span className="text-slate-500">•</span>
                 <span className="text-teal-400">{totalTraysCalculated} Packs</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-emerald-400">{totalEggsCalculated.toLocaleString()} Bottles</span>
+                <span className="text-emerald-400">{totalEggsCalculated.toLocaleString()} Units</span>
               </div>
             </div>
           </div>
@@ -684,13 +695,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             {/* Supplier Info Inputs */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-300 uppercase">Supplier / Brand Name</label>
+                <label className="text-xs font-black text-slate-300 uppercase">Supplier / Farm Name</label>
                 <input
                   type="text"
                   {...register("supplierName")}
                   disabled={mode === "view"}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Al-Rehab / Rasasi / Lattafa"
+                  placeholder="e.g. Al-Madina Egg Farm"
                 />
               </div>
 
@@ -706,13 +717,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-amber-400 uppercase">Supplier Location / City</label>
+                <label className="text-xs font-black text-amber-400 uppercase">Farm Location</label>
                 <input
                   type="text"
                   {...register("supplierLocation")}
                   disabled={mode === "view"}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Dubai / Karachi / Peshawar"
+                  placeholder="e.g. Multan Farm"
                 />
               </div>
             </div>
@@ -747,7 +758,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                       }}
                       className="px-2 py-0.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-300 text-[10px] font-black border border-rose-500/40 cursor-pointer"
                     >
-                      ⚠️ 100% Credit (قرض)
+                      ⚠️ 100% Credit
                     </button>
                   </div>
                 )}

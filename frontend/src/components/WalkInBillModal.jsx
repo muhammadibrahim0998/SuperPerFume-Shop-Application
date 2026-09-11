@@ -21,7 +21,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
   const customerPhone = bill.customerPhone || '';
   const items = bill.items || [];
   const totalAmount = bill.totalAmount || 0;
-  const shopName = shop?.name || 'PerFume Shop Center';
+  const shopName = shop?.name || 'Maidan Perfume Shop';
   const shopAddress = shop?.address || '';
   const shopPhone = shop?.phone || '';
 
@@ -39,42 +39,44 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
     if (name.includes('mardan') || address.includes('mardan')) {
       return { bank: 'Bank Al Habib', accountNo: '2013008100773501' };
     }
-    if (name.includes('attock') || address.includes('attock')) {
-      return { bank: 'UBL (PerFume Shop Center)', accountNo: 'UBL-0109000306243543' };
+    if (name.includes('attock') || address.includes('attock') || name.includes('maidan') || address.includes('maidan')) {
+      return { bank: 'UBL (Maidan Perfume Shop)', accountNo: 'UBL-0109000306243543' };
     }
-    return { bank: 'UBL / Meezan', accountNo: 'UBL-0109000306243543' };
+    return { bank: 'UBL / Meezan Bank', accountNo: 'UBL-0109000306243543' };
   };
   const branchBank = getBranchBank();
 
-  // Helper to extract clean name and separate Peti / Tray / Egg badges
+  // Helper to extract clean name and separate Box / Pack / Unit badges
   const getItemBreakdownDetails = (item) => {
-    if (!item) return { rawName: 'Product', petis: '0 Dozen', trays: '0 Box', eggs: '0 Products', unit: 'peti', qty: 1 };
+    if (!item) return { rawName: 'Product', petis: '1 Box', trays: '1 Pack', eggs: '1 Unit', unit: 'unit', qty: 1 };
     let rawName = item.rawProductName || (item.name ? item.name.replace(/\s*\([^)]*\)/g, '').trim() : 'Product');
     if (!rawName) rawName = 'Product';
 
     const qty = Number(item.quantity) || 1;
     const nameLower = (item.name || '').toLowerCase();
     const unit = String(item.unit || item.selectedUnit || '').toLowerCase() || 
-      (nameLower.includes('peti') || nameLower.includes('dozen') ? 'peti' : nameLower.includes('tray') || nameLower.includes('box') ? 'tray' : 'egg');
+      (nameLower.includes('box') || nameLower.includes('peti') ? 'box' : nameLower.includes('pack') || nameLower.includes('tray') ? 'pack' : 'unit');
+
+    const tPerPeti = Number(item.traysPerPeti) || 12;
+    const ePerTray = Number(item.eggsPerTray) || 30;
+    const ePerPeti = tPerPeti * ePerTray;
 
     let petis = '';
     let trays = '';
     let eggs = '';
 
-    if (unit === 'peti' || unit === 'dozen') {
-      const totalSingle = qty * 12;
-      petis = `${qty} Doz (${totalSingle} Pcs)`;
-      trays = `${(totalSingle / 30).toFixed(1).replace(/\.0$/, '')} Box`;
-      eggs = `${totalSingle} Products`;
-    } else if (unit === 'tray' || unit === 'box') {
-      const totalSingle = qty * 30;
-      petis = `${(totalSingle / 12).toFixed(1).replace(/\.0$/, '')} Doz`;
-      trays = `${qty} Box (${totalSingle} Pcs)`;
-      eggs = `${totalSingle} Products`;
+    if (unit === 'peti' || unit === 'box') {
+      petis = `${qty} Box${qty > 1 ? 'es' : ''}`;
+      trays = `${(qty * tPerPeti).toFixed(1).replace(/\.0$/, '')} Packs`;
+      eggs = `${Math.round(qty * ePerPeti).toLocaleString()} Units`;
+    } else if (unit === 'tray' || unit === 'pack' || unit === 'dozen') {
+      petis = `${(qty / tPerPeti).toFixed(2).replace(/\.00$/, '')} Boxes`;
+      trays = `${qty} Pack${qty > 1 ? 's' : ''}`;
+      eggs = `${Math.round(qty * ePerTray).toLocaleString()} Units`;
     } else {
-      petis = `${(qty / 12).toFixed(2).replace(/\.00$/, '')} Doz`;
-      trays = `${(qty / 30).toFixed(2).replace(/\.00$/, '')} Box`;
-      eggs = `${qty} Single Product${qty > 1 ? 's' : ''}`;
+      petis = `${(qty / ePerPeti).toFixed(2).replace(/\.00$/, '')} Boxes`;
+      trays = `${(qty / ePerTray).toFixed(1).replace(/\.0$/, '')} Packs`;
+      eggs = `${qty} Unit${qty > 1 ? 's' : ''}`;
     }
 
     return { rawName, petis, trays, eggs, unit, qty };
@@ -131,8 +133,15 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
     doc.setTextColor(71, 85, 105);
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Phone / WhatsApp: ${customerPhone || 'Walk-in'}`, 18, 61);
-    doc.text(`Payment: ${bill.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer (Approved)' : 'Paid in Cash'}`, 18, 66);
+    let paymentDesc = 'Paid in Cash';
+    if (Number(bill.dueAmount) > 0 && (Number(bill.cashPaid) > 0 || Number(bill.bankPaid) > 0)) {
+      paymentDesc = `Split: ${Number(bill.bankPaid) > 0 ? 'Bank' : 'Cash'} Paid (${currency} ${(Number(bill.cashPaid) || Number(bill.bankPaid) || 0).toLocaleString()}) + Due (${currency} ${(Number(bill.dueAmount) || 0).toLocaleString()})`;
+    } else if (bill.isCredit || bill.paymentMethod === 'CREDIT' || Number(bill.dueAmount) >= totalAmount) {
+      paymentDesc = `Credit Sale (Due: ${currency} ${(Number(bill.dueAmount) || totalAmount).toLocaleString()})`;
+    } else if (bill.paymentMethod === 'BANK_TRANSFER' || Number(bill.bankPaid) > 0) {
+      paymentDesc = 'Bank Transfer (Approved)';
+    }
+    doc.text(`Payment: ${paymentDesc}`, 18, 66);
 
     // Right Column
     doc.setFont('helvetica', 'bold');
@@ -149,7 +158,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
       const d = getItemBreakdownDetails(item);
       return [
         index + 1,
-        `${d.rawName.toUpperCase()}\n[ 📦 ${d.petis}  |  🍱 ${d.trays}  |  🧴 ${d.eggs} ]`,
+        `${d.rawName.toUpperCase()}\n[ 📦 ${d.petis}  |  🍱 ${d.trays}  |  🏷️ ${d.eggs} ]`,
         item.quantity,
         `${currency} ${(item.price || 0).toLocaleString()}`,
         `${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}`
@@ -242,7 +251,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
             <div style="font-size: 9pt; font-weight: bold;">
               <span style="color: #b45309;">📦 ${d.petis}</span> &nbsp;•&nbsp;
               <span style="color: #0284c7;">🍱 ${d.trays}</span> &nbsp;•&nbsp;
-              <span style="color: #15803d;">🧴 ${d.eggs}</span>
+              <span style="color: #15803d;">🏷️ ${d.eggs}</span>
             </div>
           </td>
           <td style="text-align: center; border: 1px solid #94a3b8; padding: 8px 10px; font-weight: 900; color: #15803d; vertical-align: middle;">${item.quantity}</td>
@@ -335,7 +344,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
             </tr>
             <tr style="height: 16px;"><td colspan="5" style="border:none;"></td></tr>
             <tr>
-              <td colspan="5" class="footer-note" style="border:none;">Generated via PerFume Shop Center Management System • Verified Official Receipt</td>
+              <td colspan="5" class="footer-note" style="border:none;">Generated via Maidan Perfume Shop Management System • Verified Official Receipt</td>
             </tr>
           </table>
         </body>
@@ -381,7 +390,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
     text += `📦 *ITEMS PURCHASED:*\n`;
     items.forEach((item, idx) => {
       const d = getItemBreakdownDetails(item);
-      text += `${idx + 1}. *${d.rawName.toUpperCase()}*\n   📦 *${d.petis}* | 🍱 *${d.trays}* | 🧴 *${d.eggs}*\n   Qty: ${item.quantity} x ${currency} ${(item.price || 0).toLocaleString()} = *${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}*\n`;
+      text += `${idx + 1}. *${d.rawName.toUpperCase()}*\n   📦 *${d.petis}* | 🍱 *${d.trays}* | 🏷️ *${d.eggs}*\n   Qty: ${item.quantity} x ${currency} ${(item.price || 0).toLocaleString()} = *${currency} ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}*\n`;
     });
     text += `━━━━━━━━━━━━━━━━━━━━\n`;
     text += `💵 *GRAND TOTAL PAID: ${currency} ${totalAmount.toLocaleString()}*\n`;
@@ -497,7 +506,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
           <div style="display:flex; flex-wrap:wrap; gap:6px; font-size:10px; font-weight:800;">
             <span style="background:#fef3c7; color:#92400e; padding:2px 7px; border-radius:4px; border:1px solid #fde68a;">📦 ${d.petis}</span>
             <span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🍱 ${d.trays}</span>
-            <span style="background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:4px; border:1px solid #bbf7d0;">🧴 ${d.eggs}</span>
+            <span style="background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:4px; border:1px solid #bbf7d0;">🏷️ ${d.eggs}</span>
           </div>
         </td>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; vertical-align:middle; font-weight:900; color:#059669;">${item.quantity}</td>
@@ -536,7 +545,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
             <div>
               <span style="color:#059669; text-transform:uppercase;">Customer:</span> <strong style="font-size:13px;">${customerName}</strong><br/>
               ${customerPhone ? `<span>Phone: ${customerPhone}</span><br/>` : ''}
-              <span>Payment: ${bill.paymentMethod === 'CREDIT' || bill.dueAmount > 0 || bill.isCredit ? 'Credit / Qaraz (Due Balance)' : (bill.paymentMethod === 'BANK_TRANSFER' || bill.paymentMethod === 'ONLINE' || bill.paymentMethod === 'BANK' ? 'Bank Transfer' : 'Cash Paid')}</span>
+              <span>Payment: ${bill.paymentMethod === 'CREDIT' || bill.dueAmount > 0 || bill.isCredit ? 'Credit (Due Balance)' : (bill.paymentMethod === 'BANK_TRANSFER' || bill.paymentMethod === 'ONLINE' || bill.paymentMethod === 'BANK' ? 'Bank Transfer' : 'Cash Paid')}</span>
             </div>
             <div style="text-align:right;">
               <span class="serial-tag">SERIAL NO: #${serialNo}</span><br/>
@@ -571,7 +580,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
 
           <div class="footer">
             <div class="sign">Customer Signature</div>
-            <div class="sign">PerFume Shop Center Stamp</div>
+            <div class="sign">Maidan Perfume Shop Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }
@@ -623,12 +632,16 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
               <div className="text-right">
                 <div className="flex items-center justify-end gap-1.5 mb-1">
                   <span className="text-[10px] font-mono font-bold text-slate-400 mr-2">Invoice: #{serialNo}</span>
-                  {bill.paymentMethod === 'CREDIT' || bill.dueAmount > 0 || bill.isCredit ? (
-                    <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-rose-950 text-rose-300 border border-rose-700 shadow-sm">
-                      📋 CREDIT / QARAZ
+                  {Number(bill.dueAmount) > 0 && (Number(bill.cashPaid) > 0 || Number(bill.bankPaid) > 0) ? (
+                    <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-amber-950 text-amber-300 border border-amber-600 shadow-sm">
+                      ⚡ PARTIAL / CREDIT
                     </span>
-                  ) : bill.paymentMethod === 'BANK_TRANSFER' || bill.paymentMethod === 'ONLINE' || bill.paymentMethod === 'BANK' ? (
-                    <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-amber-950 text-amber-300 border border-amber-700 shadow-sm">
+                  ) : bill.paymentMethod === 'CREDIT' || Number(bill.dueAmount) >= totalAmount || bill.isCredit ? (
+                    <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-rose-950 text-rose-300 border border-rose-700 shadow-sm">
+                      📋 CREDIT
+                    </span>
+                  ) : bill.paymentMethod === 'BANK_TRANSFER' || bill.paymentMethod === 'ONLINE' || bill.paymentMethod === 'BANK' || Number(bill.bankPaid) > 0 ? (
+                    <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-blue-950 text-blue-300 border border-blue-700 shadow-sm">
                       🏦 BANK TRANSFER
                     </span>
                   ) : (
@@ -687,7 +700,7 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
                               <span>🍱</span> {d.trays}
                             </span>
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-black">
-                              <span>🧴</span> {d.eggs}
+                              <span>🏷️</span> {d.eggs}
                             </span>
                           </div>
                         </div>
@@ -708,9 +721,21 @@ export default function WalkInBillModal({ bill, shop, onClose, currency = 'RS' }
                 })}
               </tbody>
             </table>
-            <div className="p-3.5 bg-slate-800/60 border-t border-slate-700 flex justify-between items-center">
-              <span className="text-xs font-black text-slate-300 uppercase tracking-widest">Grand Total Amount</span>
-              <span className="text-xl font-black text-emerald-400">{currency} {totalAmount.toLocaleString()}</span>
+            <div className="p-3.5 bg-slate-800/60 border-t border-slate-700 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-black text-slate-300 uppercase tracking-widest">Grand Total Amount</span>
+                <span className="text-xl font-black text-emerald-400">{currency} {totalAmount.toLocaleString()}</span>
+              </div>
+              {Number(bill.dueAmount) > 0 && (Number(bill.cashPaid) > 0 || Number(bill.bankPaid) > 0) && (
+                <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-700/60 bg-slate-900/60 p-2 rounded-xl">
+                  <span className="text-slate-300 font-bold uppercase text-[10px]">
+                    💵 Paid ({Number(bill.bankPaid) > 0 ? 'Bank' : 'Cash'}): <strong className="text-emerald-400 font-black">{currency} {(Number(bill.cashPaid) || Number(bill.bankPaid) || 0).toLocaleString()}</strong>
+                  </span>
+                  <span className="text-rose-400 font-bold uppercase text-[10px]">
+                    ⚠️ Credit Due: <strong className="text-rose-400 font-black">{currency} {(Number(bill.dueAmount) || 0).toLocaleString()}</strong>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

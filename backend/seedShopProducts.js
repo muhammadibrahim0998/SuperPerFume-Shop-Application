@@ -5,26 +5,22 @@ import Item from './models/Item.js';
 
 dotenv.config();
 
-const defaultEggProducts = [
-  { name: 'Super Jumbo 79gm', category: 'Eggs', price: 25, stock: 500, minStock: 50, images: ['/egg2.png'] },
-  { name: 'Jumbo 65gm', category: 'Eggs', price: 22, stock: 500, minStock: 50, images: ['/egg2.png'] },
-  { name: 'Stander 60gm', category: 'Eggs', price: 20, stock: 500, minStock: 50, images: ['/egg2.png'] },
-  { name: 'Starter 48gm', category: 'Eggs', price: 16, stock: 400, minStock: 40, images: ['/egg2.png'] },
-  { name: 'Weak Shell', category: 'Eggs', price: 18, stock: 300, minStock: 30, images: ['/egg2.png'] },
-  { name: 'Dusty', category: 'Eggs', price: 16, stock: 300, minStock: 30, images: ['/egg2.png'] },
-  { name: 'Floor', category: 'Eggs', price: 15, stock: 200, minStock: 20, images: ['/egg2.png'] },
-  { name: 'Double White', category: 'Eggs', price: 32, stock: 200, minStock: 20, images: ['/egg2.png'] },
-  { name: 'Double Brown', category: 'Eggs', price: 35, stock: 200, minStock: 20, images: ['/egg2.png'] },
-  { name: 'Golden', category: 'Eggs', price: 40, stock: 150, minStock: 15, images: ['/egg2.png'] },
-  { name: 'Breeder', category: 'Eggs', price: 45, stock: 150, minStock: 15, images: ['/egg2.png'] },
-  { name: 'Special', category: 'Eggs', price: 50, stock: 150, minStock: 15, images: ['/egg2.png'] },
-  { name: 'pak egg', category: 'Eggs', price: 22, stock: 500, minStock: 50, images: ['/egg2.png'] },
-  { name: 'china eggs', category: 'Eggs', price: 20, stock: 500, minStock: 50, images: ['/egg2.png'] }
+const defaultPerfumeProducts = [
+  { name: 'Oud Al Layl 100ml', category: 'Perfumes', price: 2500, costPrice: 1800, stock: 100, minStock: 10, unitType: 'bottle', images: [] },
+  { name: 'Amber Oud Gold Edition', category: 'Perfumes', price: 4200, costPrice: 3200, stock: 80, minStock: 8, unitType: 'bottle', images: [] },
+  { name: 'Dirham Gold 100ml', category: 'Perfumes', price: 1800, costPrice: 1300, stock: 120, minStock: 15, unitType: 'bottle', images: [] },
+  { name: 'Khamrah Lattafa 100ml', category: 'Perfumes', price: 5500, costPrice: 4200, stock: 60, minStock: 6, unitType: 'bottle', images: [] },
+  { name: 'Musk Al Tahara 12ml (Attar)', category: 'Attar / Ittar', price: 650, costPrice: 400, stock: 200, minStock: 25, unitType: 'bottle', images: [] },
+  { name: 'Shamama Tul Amber Attar 6ml', category: 'Attar / Ittar', price: 850, costPrice: 550, stock: 150, minStock: 20, unitType: 'bottle', images: [] },
+  { name: 'Rose & Vanilla Body Mist', category: 'Body Spray', price: 1200, costPrice: 850, stock: 90, minStock: 10, unitType: 'bottle', images: [] },
+  { name: 'Royal Bakhoor Incense 50g', category: 'Oud & Bakhoor', price: 1600, costPrice: 1100, stock: 75, minStock: 10, unitType: 'box', images: [] },
+  { name: 'Luxury Perfume Gift Set', category: 'Gift Sets', price: 7500, costPrice: 5500, stock: 40, minStock: 5, unitType: 'box', images: [] },
+  { name: 'White Oud Concentrated Oil', category: 'Essential Oils', price: 1100, costPrice: 750, stock: 110, minStock: 15, unitType: 'bottle', images: [] }
 ];
 
 const seedProducts = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/egge');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/PerFume_Shop_Center_hayaseri');
     console.log('Connected to DB');
 
     const shops = await Shop.find({});
@@ -33,7 +29,7 @@ const seedProducts = async () => {
       console.log(`Shop: "${shop.name}" (ID: ${shop._id}) has ${existingCount} items.`);
       if (existingCount < 5) {
         console.log(`Seeding default catalog products for "${shop.name}"...`);
-        const itemsToInsert = defaultEggProducts.map(p => ({
+        const itemsToInsert = defaultPerfumeProducts.map(p => ({
           ...p,
           shopId: shop._id
         }));

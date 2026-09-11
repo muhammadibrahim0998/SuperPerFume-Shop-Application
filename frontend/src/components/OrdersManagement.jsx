@@ -147,7 +147,7 @@ export function OrdersManagement({ shopId = null }) {
         </head>
         <body>
           <div class="header">
-            <h1>PERFUME SHOP CENTER</h1>
+            <h1>Maidan Perfume Shop</h1>
             <p>Registered Customer Order Receipt</p>
           </div>
           <div class="meta">
@@ -181,7 +181,7 @@ export function OrdersManagement({ shopId = null }) {
           </div>
           <div class="footer">
             <div class="sign">Customer Signature</div>
-            <div class="sign">PerFume Shop Center Stamp</div>
+            <div class="sign">Maidan Perfume Shop Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }

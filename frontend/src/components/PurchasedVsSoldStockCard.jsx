@@ -91,7 +91,7 @@ export function PurchasedVsSoldStockCard({ products = [], sales = [], checkoutOr
               Purchased vs Sold Inventory &amp; Price Breakdown
             </h3>
             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-              Peti (Box), Tray &amp; Revenue Analytics
+              Box, Pack &amp; Revenue Analytics
             </p>
           </div>
         </div>
@@ -119,9 +119,9 @@ export function PurchasedVsSoldStockCard({ products = [], sales = [], checkoutOr
 
           <div className="grid grid-cols-2 gap-3 bg-zinc-950/15 p-3 rounded-xl border border-zinc-950/10">
             <div>
-              <span className="text-[8px] font-black text-zinc-900 uppercase block">Total Petis &amp; Trays</span>
-              <h4 className="text-2xl font-black text-zinc-950">{stats.totalPetisStock} Petis</h4>
-              <span className="text-[9px] font-bold text-zinc-900">{stats.totalTraysStock.toLocaleString()} Trays ({stats.totalEggsStock.toLocaleString()} Eggs)</span>
+              <span className="text-[8px] font-black text-zinc-900 uppercase block">Total Boxes &amp; Packs</span>
+              <h4 className="text-2xl font-black text-zinc-950">{stats.totalPetisStock} Boxes</h4>
+              <span className="text-[9px] font-bold text-zinc-900">{stats.totalTraysStock.toLocaleString()} Packs ({stats.totalEggsStock.toLocaleString()} Single Units)</span>
             </div>
 
             <div>
@@ -145,9 +145,9 @@ export function PurchasedVsSoldStockCard({ products = [], sales = [], checkoutOr
 
           <div className="grid grid-cols-2 gap-3 bg-white/10 p-3 rounded-xl border border-white/10">
             <div>
-              <span className="text-[8px] font-black text-white/80 uppercase block">Total Sold Petis &amp; Trays</span>
-              <h4 className="text-2xl font-black text-white">{stats.totalSoldPetis} Petis</h4>
-              <span className="text-[9px] font-bold text-white/90">{stats.totalSoldTrays.toLocaleString()} Trays ({stats.totalSoldEggs.toLocaleString()} Eggs)</span>
+              <span className="text-[8px] font-black text-white/80 uppercase block">Total Sold Boxes &amp; Packs</span>
+              <h4 className="text-2xl font-black text-white">{stats.totalSoldPetis} Boxes</h4>
+              <span className="text-[9px] font-bold text-white/90">{stats.totalSoldTrays.toLocaleString()} Packs ({stats.totalSoldEggs.toLocaleString()} Single Units)</span>
             </div>
 
             <div>
@@ -164,7 +164,7 @@ export function PurchasedVsSoldStockCard({ products = [], sales = [], checkoutOr
       <div className="p-4 bg-zinc-50 border border-zinc-100 rounded-2xl space-y-2">
         <div className="flex items-center justify-between text-xs font-black">
           <span className="text-zinc-800 uppercase tracking-wider">Inventory Stock Sales Ratio:</span>
-          <span className="text-emerald-600">{stats.soldPercentage}% Sold ({stats.totalSoldPetis} Petis) • {(100 - stats.soldPercentage).toFixed(1)}% In Hand ({stats.totalPetisStock} Petis)</span>
+          <span className="text-emerald-600">{stats.soldPercentage}% Sold ({stats.totalSoldPetis} Boxes) • {(100 - stats.soldPercentage).toFixed(1)}% In Hand ({stats.totalPetisStock} Boxes)</span>
         </div>
         <div className="w-full h-3 bg-zinc-200 rounded-full overflow-hidden flex">
           <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${stats.soldPercentage}%` }} />

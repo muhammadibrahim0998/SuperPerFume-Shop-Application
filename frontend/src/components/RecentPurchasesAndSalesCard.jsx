@@ -17,7 +17,7 @@ export function RecentPurchasesAndSalesCard({ products = [], sales = [], checkou
     const posSalesList = sales.map(s => ({
       id: s._id,
       type: 'POS Sale',
-      name: s.items?.[0]?.name || 'Egg Order',
+      name: s.items?.[0]?.name || 'Product Order',
       qtyText: `${s.items?.[0]?.quantity || 1} units`,
       amount: s.totalAmount || 0,
       profit: s.totalProfit || 0,
@@ -28,7 +28,7 @@ export function RecentPurchasesAndSalesCard({ products = [], sales = [], checkou
     const onlineOrdersList = checkoutOrders.map(o => ({
       id: o._id,
       type: 'Online Order',
-      name: o.items?.[0]?.name || 'Online Egg Order',
+      name: o.items?.[0]?.name || 'Online Product Order',
       qtyText: `${o.items?.[0]?.quantity || 1} units`,
       amount: o.totalAmount || 0,
       profit: (o.totalAmount || 0) * 0.15,
@@ -89,7 +89,7 @@ export function RecentPurchasesAndSalesCard({ products = [], sales = [], checkou
                       <div className="min-w-0">
                         <h5 className="text-xs font-black text-zinc-900 truncate">{item.name}</h5>
                         <p className="text-[9px] font-bold text-zinc-400 uppercase">
-                          Supplier: <span className="text-zinc-700 font-black">{item.supplierName || 'Supplier'}</span> • {petis} Boxes
+                          Supplier: <span className="text-zinc-700 font-black">{item.supplierName || 'Distributor'}</span> • {petis} Boxes
                         </p>
                       </div>
                     </div>

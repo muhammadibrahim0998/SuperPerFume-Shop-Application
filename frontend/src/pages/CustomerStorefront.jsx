@@ -23,7 +23,7 @@ import { PurchasesManagement } from '../components/PurchasesManagement.jsx';
 import { SupplierPurchaseSummaryCard } from '../components/SupplierPurchaseSummaryCard.jsx';
 import { CountUpNumber } from '../components/CountUpNumber.jsx';
 import { ShopAdminCharts } from '../components/ShopAdminCharts.jsx';
-import { updateItem, deleteItem as apiDeleteItem, createItem, createSale, getSales, getShopOrders, deleteSale } from '../services/api.js';
+import { updateItem, deleteItem as apiDeleteItem, createItem, createSale, getSales, getShopOrders, deleteSale, settleCreditSale } from '../services/api.js';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -95,7 +95,7 @@ function CustomerAuthView({ shopInfo }) {
                 {shopInfo?.logoUrl ? (
                   <img src={shopInfo.logoUrl} alt={shopInfo.name} className="w-12 h-12 rounded-xl object-contain" />
                 ) : (
-                  <img src={companyLogo} alt="PerFume Shop Center" className="w-12 h-12 object-contain rounded-xl" />
+                  <img src={companyLogo} alt="Maidan Agri Foods" className="w-12 h-12 object-contain rounded-xl" />
                 )}
               </div>
             </div>
@@ -290,7 +290,7 @@ function CartDrawer({ currency }) {
                       {item.name}
                     </p>
                     <p className="text-emerald-400 font-black text-sm mt-0.5">
-                      {safeCurrency} {Number(item.price || 0).toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">/ {currentUnit === 'egg' ? 'PERFUME' : currentUnit.toUpperCase()}</span>
+                      {safeCurrency} {Number(item.price || 0).toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">/ {currentUnit.toUpperCase()}</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/80 shadow-inner">
@@ -319,39 +319,39 @@ function CartDrawer({ currency }) {
                   </div>
                 </div>
 
-                {/* Peti, Tray, Perfume Unit Switcher in Cart */}
+                {/* Peti, Tray, Single Egg Unit Switcher in Cart */}
                 <div className="flex items-center justify-between pt-2.5 border-t border-slate-800/80 gap-1.5">
                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Unit:</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'peti')}
-                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'peti'
+                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'peti'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      📦 1 Dozen (12)
+                      📦 Box
                     </button>
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'tray')}
-                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'tray'
+                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'tray'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      🍱 1 Box (30)
+                      🍱 Pack
                     </button>
                     <button
                       type="button"
                       onClick={() => updateCartItemUnit(item.itemId, currentUnit, 'egg')}
-                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'egg'
+                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${currentUnit === 'egg'
                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black shadow-md border-t border-t-amber-200 border-b-2 border-b-amber-800 scale-105'
                         : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:text-white'
                         }`}
                     >
-                      🧴 Single Product
+                      🏷️ Unit
                     </button>
                   </div>
                 </div>
@@ -445,7 +445,7 @@ function StoreContent({ shopId }) {
       const urlParams = new URLSearchParams(window.location.search);
       const urlView = urlParams.get('tab') || urlParams.get('view');
       if (urlView) return urlView;
-      const saved = sessionStorage.getItem('yosafze_active_view') || localStorage.getItem('yosafze_active_view');
+      const saved = sessionStorage.getItem('Maidan_active_view') || localStorage.getItem('Maidan_active_view');
       if (saved) return saved;
     } catch (e) { }
     return 'dashboard';
@@ -454,8 +454,8 @@ function StoreContent({ shopId }) {
   useEffect(() => {
     try {
       if (activeView) {
-        sessionStorage.setItem('yosafze_active_view', activeView);
-        localStorage.setItem('yosafze_active_view', activeView);
+        sessionStorage.setItem('Maidan_active_view', activeView);
+        localStorage.setItem('Maidan_active_view', activeView);
       }
     } catch (e) { }
   }, [activeView]);
@@ -488,6 +488,8 @@ function StoreContent({ shopId }) {
   const [walkInCustomerName, setWalkInCustomerName] = useState('');
   const [walkInCustomerPhone, setWalkInCustomerPhone] = useState('');
   const [walkInPaymentMethod, setWalkInPaymentMethod] = useState('CASH');
+  const [walkInPaidAmount, setWalkInPaidAmount] = useState('');
+  const [walkInPartialDestination, setWalkInPartialDestination] = useState('CASH'); // 'CASH' | 'BANK'
   const [walkInTransactionId, setWalkInTransactionId] = useState('');
   const [walkInPaymentProof, setWalkInPaymentProof] = useState('');
   const [viewingReceiptModal, setViewingReceiptModal] = useState(null);
@@ -500,6 +502,78 @@ function StoreContent({ shopId }) {
   const [activeCustMenuId, setActiveCustMenuId] = useState(null);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [allShopOrders, setAllShopOrders] = useState([]);
+
+  // Credit Payment / Settlement Modal State
+  const [settlingCreditSale, setSettlingCreditSale] = useState(null);
+  const [settleMethod, setSettleMethod] = useState('CASH'); // 'CASH' | 'BANK'
+  const [settleAmount, setSettleAmount] = useState('');
+  const [settleTxId, setSettleTxId] = useState('');
+  const [settleReceiptProof, setSettleReceiptProof] = useState('');
+  const [isSettlingCredit, setIsSettlingCredit] = useState(false);
+
+  const handleOpenSettleCredit = (sale) => {
+    setSettlingCreditSale(sale);
+    const due = Number(sale.dueAmount) > 0 ? Number(sale.dueAmount) : Number(sale.totalAmount);
+    setSettleAmount(due);
+    setSettleMethod('CASH');
+    setSettleTxId('');
+    setSettleReceiptProof('');
+  };
+
+  const handleSubmitSettleCredit = async (e) => {
+    if (e) e.preventDefault();
+    if (!settlingCreditSale) return;
+    const amt = Number(settleAmount);
+    if (!amt || amt <= 0) {
+      alert('Please enter a valid payment amount');
+      return;
+    }
+
+    setIsSettlingCredit(true);
+    try {
+      const saleId = settlingCreditSale._id || settlingCreditSale.id;
+      const res = await settleCreditSale(saleId, {
+        paymentMethod: settleMethod,
+        amountPaid: amt,
+        transactionId: settleTxId,
+        paymentProof: settleReceiptProof,
+        paymentReceipt: settleReceiptProof
+      });
+
+      setAddedMsg(res.message || 'Credit payment recorded successfully!');
+      setTimeout(() => setAddedMsg(''), 3500);
+
+      const updatedSale = res.sale;
+      if (updatedSale) {
+        setShopSalesList(prev => (prev || []).map(s => String(s._id || s.id) === String(updatedSale._id) ? updatedSale : s));
+      } else {
+        setShopSalesList(prev => (prev || []).map(s => {
+          if (String(s._id || s.id) === String(saleId)) {
+            const newDue = Math.max(0, (Number(s.dueAmount !== undefined ? s.dueAmount : s.totalAmount) - amt));
+            return {
+              ...s,
+              dueAmount: newDue,
+              isCredit: newDue > 0,
+              cashPaid: settleMethod === 'CASH' ? ((Number(s.cashPaid) || 0) + amt) : (s.cashPaid || 0),
+              bankPaid: settleMethod === 'BANK' ? ((Number(s.bankPaid) || 0) + amt) : (s.bankPaid || 0),
+              paymentMethod: newDue === 0 ? (settleMethod === 'BANK' ? 'BANK_TRANSFER' : 'CASH') : s.paymentMethod
+            };
+          }
+          return s;
+        }));
+      }
+
+      setSettlingCreditSale(null);
+      await fetchDashboardStats();
+      await fetchShopSales();
+      await fetchRegisteredCustomers();
+    } catch (err) {
+      console.error("Settle credit error:", err);
+      alert(err?.response?.data?.message || err.message || 'Failed to settle credit');
+    } finally {
+      setIsSettlingCredit(false);
+    }
+  };
 
   const handleReceiptUpload = (e) => {
     const file = e.target.files?.[0];
@@ -539,18 +613,22 @@ function StoreContent({ shopId }) {
       return;
     }
     try {
-      const token = localStorage.getItem('nexflow_token');
+      const token = localStorage.getItem('nexflow_token') || sessionStorage.getItem('nexflow_token');
       const res = await fetch(`/api/sales/${saleId}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+          'x-user-role': 'shop_admin'
         }
       });
       if (res.ok) {
         setAddedMsg('Sale record permanently deleted from database!');
         setTimeout(() => setAddedMsg(''), 3000);
-        setShopSalesList(prev => prev.filter(s => String(s._id || s.id) !== String(saleId)));
+        setShopSalesList(prev => prev.filter(s => String(s._id || s.id || s.orderId) !== String(saleId)));
         setAllShopOrders(prev => prev.filter(o => String(o._id || o.id) !== String(saleId)));
+        fetchShopSales();
+        fetchRegisteredCustomers();
         fetchDashboardStats();
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -656,7 +734,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleWhatsAppCustomerShare = (cust, index = 0) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const name = cust.fullName || 'Registered Customer';
     const phone = cust.phone || '';
     const email = cust.email || 'N/A';
@@ -704,7 +782,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportCustomerExcel = (cust, index = 0) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const name = cust.fullName || 'Registered Customer';
     const email = cust.email || 'N/A';
     const phone = cust.phone || 'N/A';
@@ -817,7 +895,7 @@ function StoreContent({ shopId }) {
           </tr>
           <tr style="height: 12px;"><td colspan="5" style="border:none;"></td></tr>
           <tr>
-            <td colspan="5" class="footer-note">Official Customer Statement • Generated via PerFume Shop Center Financial System</td>
+            <td colspan="5" class="footer-note">Official Customer Statement • Generated via Maidan Perfume Shop Financial System</td>
           </tr>
         </table>
       </body>
@@ -835,7 +913,7 @@ function StoreContent({ shopId }) {
   };
 
   const handlePrintRegisteredCustomerRecord = (cust, index = 0) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const name = cust.fullName || 'Registered Customer';
     const email = cust.email || 'N/A';
     const phone = cust.phone || 'N/A';
@@ -975,7 +1053,7 @@ function StoreContent({ shopId }) {
               </div>
 
               <div class="statement-footer">
-                PerFume Shop Center • Official Customer Management &amp; Accounts Ledger
+                Maidan Perfume Shop • Official Customer Management &amp; Accounts Ledger
               </div>
             </div>
           </div>
@@ -1012,30 +1090,33 @@ function StoreContent({ shopId }) {
   const getProductUnitPrice = (product, unit = 'tray') => {
     if (!product) return 0;
     const basePrice = Number(product.price) || 0;
-    const pEgg = Number(product.pricePerEgg) || 0;
-    const pTray = Number(product.pricePerTray) || 0; // 1 Box (30 products)
-    const pPeti = Number(product.pricePerPeti) || 0; // 1 Dozen (12 products)
+    const pEgg = Number(product.pricePerUnit) || 0;
+    const pTray = Number(product.pricePerTray) || 0;
+    const pPeti = Number(product.pricePerPeti) || 0;
     const uType = String(product.unitType || 'tray').toLowerCase();
 
-    let singleRate = pEgg;
-    if (!singleRate && pPeti > 0) singleRate = pPeti / 12;
-    else if (!singleRate && pTray > 0) singleRate = pTray / 30;
-    else if (!singleRate && basePrice > 0) {
-      singleRate = (uType === 'peti' || uType === 'dozen') ? basePrice / 12 : (uType === 'tray' || uType === 'box') ? basePrice / 30 : basePrice;
+    let eggRate = pEgg;
+    if (!eggRate && pTray > 0) eggRate = pTray / 30;
+    else if (!eggRate && pPeti > 0) eggRate = pPeti / 360;
+    else if (!eggRate && basePrice > 0) {
+      eggRate = uType === 'peti' ? basePrice / 360 : uType === 'tray' ? basePrice / 30 : basePrice;
     }
-    if (!singleRate) singleRate = 30;
+    if (!eggRate) eggRate = 30;
 
-    if (unit === 'peti' || unit === 'dozen') {
+    if (unit === 'peti') {
       if (pPeti > 0) return pPeti;
-      return Math.round(singleRate * 12);
+      if (pTray > 0) return pTray * 12;
+      return Math.round(eggRate * 360);
     }
-    if (unit === 'tray' || unit === 'box') {
+    if (unit === 'tray') {
       if (pTray > 0) return pTray;
-      return Math.round(singleRate * 30);
+      if (pPeti > 0) return Math.round(pPeti / 12);
+      return Math.round(eggRate * 30);
     }
-    // 'egg' (Single Product)
+    // 'egg'
     if (pEgg > 0) return pEgg;
-    return Math.round(singleRate);
+    if (pTray > 0) return Math.round(pTray / 30);
+    return Math.round(eggRate);
   };
 
   const addToWalkInCart = (product, unit = 'tray') => {
@@ -1124,35 +1205,37 @@ function StoreContent({ shopId }) {
     try {
       const saleItems = walkInCart.map(item => {
         const unit = item.selectedUnit || 'tray';
+        const tPerPeti = item.product?.traysPerPeti || 12;
+        const ePerTray = item.product?.eggsPerTray || 30;
+        const ePerPeti = tPerPeti * ePerTray;
         const qty = Number(item.quantity) || 1;
 
         let breakdownStr = '';
-        let totalSingleProducts = 0;
-
-        if (unit === 'peti' || unit === 'dozen') {
-          totalSingleProducts = Math.round(qty * 12);
-          const totalBoxes = (totalSingleProducts / 30).toFixed(1).replace(/\.0$/, '');
-          breakdownStr = `${qty} Dozen (${totalSingleProducts} Single Products • ${totalBoxes} Boxes)`;
-        } else if (unit === 'tray' || unit === 'box') {
-          totalSingleProducts = Math.round(qty * 30);
-          const totalDozens = (totalSingleProducts / 12).toFixed(1).replace(/\.0$/, '');
-          breakdownStr = `${qty} Box (${totalSingleProducts} Single Products • ${totalDozens} Dozen)`;
+        if (unit === 'peti') {
+          const totalTrays = (qty * tPerPeti).toFixed(1).replace(/\.0$/, '');
+          const totalUnits = Math.round(qty * ePerPeti);
+          breakdownStr = `${qty} Box • ${totalTrays} Packs • ${totalUnits.toLocaleString()} Units`;
+        } else if (unit === 'tray') {
+          const totalUnits = Math.round(qty * ePerTray);
+          const totalPetis = (qty / tPerPeti).toFixed(2).replace(/\.00$/, '');
+          breakdownStr = `${qty} Pack • ${totalUnits.toLocaleString()} Units • ${totalPetis} Boxes`;
         } else {
-          totalSingleProducts = qty;
-          const totalDozens = (qty / 12).toFixed(2).replace(/\.00$/, '');
-          breakdownStr = `${qty} Single Product${qty > 1 ? 's' : ''}`;
+          const totalTrays = (qty / ePerTray).toFixed(1).replace(/\.0$/, '');
+          const totalPetis = (qty / ePerPeti).toFixed(2).replace(/\.00$/, '');
+          breakdownStr = `${qty} Unit • ${totalTrays} Packs • ${totalPetis} Boxes`;
         }
 
-        const unitMultiplier = (unit === 'peti' || unit === 'dozen') ? 12 : (unit === 'tray' || unit === 'box') ? 30 : 1;
+        const unitMultiplier = unit === 'peti' ? ePerPeti : unit === 'tray' ? ePerTray : 1;
+        const totalUnits = qty * unitMultiplier;
         const unitPrice = item.unitPrice || getProductUnitPrice(item.product, unit);
         const subtotal = Math.round(unitPrice * qty);
 
         const unitCost = Number(item.product.costPrice) > 0 ? Number(item.product.costPrice) : (Number(item.product.price) || 0) * 0.8;
-        const costPerSingle = (item.product.unitType === 'peti' || item.product.unitType === 'dozen') ? unitCost / 12 : (item.product.unitType === 'tray' || item.product.unitType === 'box') ? unitCost / 30 : unitCost;
-        const itemTotalCost = Math.round(costPerSingle * totalSingleProducts);
+        const costPerEgg = item.product.unitType === 'peti' ? unitCost / ePerPeti : item.product.unitType === 'tray' ? unitCost / ePerTray : unitCost;
+        const itemTotalCost = Math.round(costPerEgg * totalUnits);
         const profit = Math.max(0, subtotal - itemTotalCost);
 
-        const unitLabel = (unit === 'peti' || unit === 'dozen') ? '1 Dozen (12)' : (unit === 'tray' || unit === 'box') ? '1 Box (30)' : 'Single Product';
+        const unitLabel = unit === 'peti' || unit === 'box' ? 'Box' : unit === 'tray' || unit === 'pack' ? 'Pack' : 'Unit';
 
         return {
           productId: item.product._id,
@@ -1161,7 +1244,7 @@ function StoreContent({ shopId }) {
           quantity: qty,
           unit: unit,
           unitLabel: unitLabel,
-          totalEggs: totalSingleProducts,
+          totalUnits: totalUnits,
           price: unitPrice,
           costPrice: unitCost,
           subtotal: subtotal,
@@ -1172,9 +1255,46 @@ function StoreContent({ shopId }) {
       const totalAmount = saleItems.reduce((sum, i) => sum + (Number(i.subtotal) || 0), 0);
       const totalProfit = saleItems.reduce((sum, i) => sum + (Number(i.profit) || 0), 0);
 
-      const cashPaid = walkInPaymentMethod === 'CASH' ? totalAmount : 0;
-      const bankPaid = walkInPaymentMethod === 'BANK_TRANSFER' ? totalAmount : 0;
-      const dueAmount = walkInPaymentMethod === 'CREDIT' ? totalAmount : 0;
+      let cashPaid = 0;
+      let bankPaid = 0;
+      let dueAmount = 0;
+
+      const numPaid = walkInPaidAmount !== '' ? Number(walkInPaidAmount) : null;
+
+      if (walkInPaymentMethod === 'CREDIT') {
+        dueAmount = totalAmount;
+        cashPaid = 0;
+        bankPaid = 0;
+      } else if (walkInPaymentMethod === 'CASH') {
+        const actualPaid = (numPaid !== null && !isNaN(numPaid)) ? Math.min(totalAmount, Math.max(0, numPaid)) : totalAmount;
+        cashPaid = actualPaid;
+        bankPaid = 0;
+        dueAmount = Math.max(0, totalAmount - cashPaid);
+      } else if (walkInPaymentMethod === 'BANK_TRANSFER') {
+        const actualPaid = (numPaid !== null && !isNaN(numPaid)) ? Math.min(totalAmount, Math.max(0, numPaid)) : totalAmount;
+        bankPaid = actualPaid;
+        cashPaid = 0;
+        dueAmount = Math.max(0, totalAmount - bankPaid);
+      } else if (walkInPaymentMethod === 'PARTIAL' || walkInPaymentMethod === 'SPLIT') {
+        const actualPaid = (numPaid !== null && !isNaN(numPaid)) ? Math.min(totalAmount, Math.max(0, numPaid)) : Math.round(totalAmount / 2);
+        if (walkInPartialDestination === 'BANK') {
+          bankPaid = actualPaid;
+          cashPaid = 0;
+        } else {
+          cashPaid = actualPaid;
+          bankPaid = 0;
+        }
+        dueAmount = Math.max(0, totalAmount - actualPaid);
+      } else {
+        cashPaid = totalAmount;
+        dueAmount = 0;
+      }
+
+      const isCreditSale = dueAmount > 0;
+      const finalPaymentMethod = (cashPaid > 0 && bankPaid > 0) ? 'SPLIT' :
+        (dueAmount > 0 && (cashPaid > 0 || bankPaid > 0)) ? 'PARTIAL' :
+        dueAmount === totalAmount ? 'CREDIT' :
+        bankPaid > 0 ? 'BANK_TRANSFER' : 'CASH';
 
       const saleData = {
         shopId,
@@ -1182,28 +1302,37 @@ function StoreContent({ shopId }) {
         totalAmount,
         totalProfit,
         cashierName: user?.fullName || 'Shop Admin',
-        customerName: walkInCustomerName.trim() || (walkInPaymentMethod === 'CREDIT' ? 'Credit Customer' : 'Walk-in Customer'),
+        customerName: walkInCustomerName.trim() || (isCreditSale ? 'Credit Customer' : 'Walk-in Customer'),
         customerPhone: walkInCustomerPhone.trim(),
-        paymentMethod: walkInPaymentMethod,
+        paymentMethod: finalPaymentMethod,
         cashPaid,
         bankPaid,
         dueAmount,
-        isCredit: walkInPaymentMethod === 'CREDIT',
-        paymentReceipt: walkInPaymentProof,
-        paymentProof: walkInPaymentProof,
-        transactionId: walkInTransactionId.trim(),
-        approvalStatus: walkInPaymentMethod === 'BANK_TRANSFER' ? 'PENDING_APPROVAL' : 'APPROVED'
+        isCredit: isCreditSale,
+        paymentReceipt: bankPaid > 0 ? walkInPaymentProof : '',
+        paymentProof: bankPaid > 0 ? walkInPaymentProof : '',
+        transactionId: bankPaid > 0 ? walkInTransactionId.trim() : '',
+        approvalStatus: bankPaid > 0 ? 'PENDING_APPROVAL' : 'APPROVED'
       };
 
       const created = await createSale(saleData);
 
       const billData = {
         ...created,
+        _id: created?._id || created?.sale?._id || `sale_${Date.now()}`,
         customerPhone: walkInCustomerPhone.trim(),
         cashPaid,
         bankPaid,
         dueAmount,
-        isCredit: walkInPaymentMethod === 'CREDIT'
+        isCredit: isCreditSale,
+        paymentMethod: finalPaymentMethod,
+        items: saleItems,
+        totalAmount,
+        totalProfit,
+        cashierName: user?.fullName || 'Shop Admin',
+        customerName: walkInCustomerName.trim() || (isCreditSale ? 'Credit Customer' : 'Walk-in Customer'),
+        createdAt: new Date().toISOString(),
+        saleDate: new Date().toISOString()
       };
 
       setCompletedBill(billData);
@@ -1211,11 +1340,28 @@ function StoreContent({ shopId }) {
       setWalkInCustomerName('');
       setWalkInCustomerPhone('');
       setWalkInPaymentMethod('CASH');
+      setWalkInPaidAmount('');
+      setWalkInPartialDestination('CASH');
       setWalkInTransactionId('');
       setWalkInPaymentProof('');
-      fetchCatalog();
-      fetchDashboardStats();
-      fetchShopSales();
+
+      // Instantly prepend to shopSalesList so POS sales & reports update without refresh
+      setShopSalesList(prev => [billData, ...(prev || []).filter(s => String(s._id) !== String(billData._id))]);
+
+      // Instantly decrement item stock in memory
+      setItems(prev => (prev || []).map(p => {
+        const sold = saleItems.find(si => String(si.productId) === String(p._id));
+        if (!sold) return p;
+        const soldQty = Number(sold.quantity) || 0;
+        return {
+          ...p,
+          stock: Math.max(0, (Number(p.stock) || 0) - soldQty)
+        };
+      }));
+
+      await fetchCatalog();
+      await fetchDashboardStats();
+      await fetchShopSales();
     } catch (err) {
       alert(err.message || 'Failed to complete sale');
     } finally {
@@ -1226,7 +1372,16 @@ function StoreContent({ shopId }) {
   const handleEditProductSubmit = async (productData) => {
     try {
       const role = user?.role || 'shop_admin';
-      await updateItem(editModalProduct._id, productData, '', role);
+      const res = await updateItem(editModalProduct._id, productData, '', role);
+      const updatedItem = res?.item || res?.data || res || { ...editModalProduct, ...productData };
+
+      // Instantly update items in state
+      setItems(prev => (prev || []).map(p => 
+        String(p._id) === String(editModalProduct._id) 
+          ? { ...p, ...productData, ...(updatedItem._id ? updatedItem : {}) } 
+          : p
+      ));
+
       setAddedMsg('✅ Product updated successfully!');
       setEditModalProduct(null);
       await fetchCatalog();
@@ -1244,8 +1399,15 @@ function StoreContent({ shopId }) {
     try {
       const finalImages = (productData.images && productData.images.length > 0)
         ? productData.images
-        : ['/egg2.png'];
-      await createItem({ ...productData, images: finalImages, shopId });
+        : ['/perfume.png'];
+      const res = await createItem({ ...productData, images: finalImages, shopId });
+      const newItem = res?.item || res?.data || res || { ...productData, images: finalImages, shopId, _id: `item_${Date.now()}` };
+
+      // Instantly add to items state
+      if (newItem && newItem._id) {
+        setItems(prev => [newItem, ...(prev || []).filter(p => String(p._id) !== String(newItem._id))]);
+      }
+
       setAddedMsg('✅ Product added successfully!');
       setAddProductModal(false);
       await fetchCatalog();
@@ -1392,7 +1554,7 @@ function StoreContent({ shopId }) {
   const salesReportStats = useMemo(() => {
     let totalRevenue = 0;
     let totalProfit = 0;
-    let totalEggs = 0;
+    let totalUnits = 0;
     let cashSales = 0;
     let bankSales = 0;
     let creditSales = 0;
@@ -1404,40 +1566,49 @@ function StoreContent({ shopId }) {
       totalProfit += profit;
 
       const pMethod = String(s.paymentMethod || 'CASH').toUpperCase();
-      const isBank = pMethod === 'BANK_TRANSFER' || pMethod === 'BANK' || pMethod === 'ONLINE' || pMethod === 'EASYPAISA' || (Number(s.bankPaid) > 0);
-      const isCredit = pMethod === 'CREDIT' || pMethod === 'DUE' || (Number(s.dueAmount) > 0) || s.isCredit;
+      const hasDetailedBreakdown = s.cashPaid !== undefined || s.bankPaid !== undefined || s.dueAmount !== undefined;
 
-      if (isCredit) {
-        creditSales += (Number(s.dueAmount) || amount);
-      } else if (isBank) {
-        bankSales += (Number(s.bankPaid) || amount);
+      if (hasDetailedBreakdown) {
+        cashSales += (Number(s.cashPaid) || 0);
+        bankSales += (Number(s.bankPaid) || 0);
+        creditSales += (Number(s.dueAmount) || 0);
       } else {
-        cashSales += (Number(s.cashPaid) || amount);
+        const isBank = pMethod === 'BANK_TRANSFER' || pMethod === 'BANK' || pMethod === 'ONLINE' || pMethod === 'EASYPAISA';
+        const isCredit = pMethod === 'CREDIT' || pMethod === 'DUE' || s.isCredit;
+
+        if (isCredit) {
+          creditSales += amount;
+        } else if (isBank) {
+          bankSales += amount;
+        } else {
+          cashSales += amount;
+        }
       }
 
       (s.items || []).forEach(i => {
-        totalEggs += Number(i.totalEggs || i.quantity || 0);
+        totalUnits += Number(i.totalUnits || i.quantity || 0);
       });
     });
 
-    const totalPetis = (totalEggs / 360).toFixed(1);
-    const totalTrays = Math.round(totalEggs / 30);
+    const totalPetis = (totalUnits / 360).toFixed(1);
+    const totalTrays = Math.round(totalUnits / 30);
     const totalBills = filteredSalesForReport.length;
     const avgBill = totalBills > 0 ? Math.round(totalRevenue / totalBills) : 0;
 
     return {
-      totalRevenue,
-      totalProfit,
-      totalEggs,
+      totalRevenue: totalRevenue || (reportTimeframe === 'DAY' ? dashStats.todaySales : reportTimeframe === 'MONTH' ? dashStats.monthlySales : reportTimeframe === 'YEAR' ? dashStats.yearlySales : dashStats.totalRevenue),
+      totalProfit: totalProfit || (reportTimeframe === 'DAY' ? dashStats.todayProfit : reportTimeframe === 'MONTH' ? dashStats.monthlyProfit : reportTimeframe === 'YEAR' ? dashStats.yearlyProfit : dashStats.totalProfit),
+      totalUnits,
       totalPetis,
       totalTrays,
       totalBills,
       avgBill,
       cashSales,
       bankSales,
+      onlineSales: bankSales,
       creditSales
     };
-  }, [filteredSalesForReport]);
+  }, [filteredSalesForReport, reportTimeframe, dashStats]);
 
   // Dynamic Manual Expenses Tracking State
   const [expensesList, setExpensesList] = useState([]);
@@ -1584,7 +1755,7 @@ function StoreContent({ shopId }) {
 
   const handlePrintSingleExpense = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1686,7 +1857,7 @@ function StoreContent({ shopId }) {
               </div>
 
               <div class="voucher-footer">
-                PerFume Shop Center • Financial Accounting &amp; Expense Management
+                Maidan Perfume Shop • Financial Accounting &amp; Expense Management
               </div>
             </div>
           </div>
@@ -1700,7 +1871,7 @@ function StoreContent({ shopId }) {
 
   const handleWhatsAppSingleExpense = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1725,7 +1896,7 @@ function StoreContent({ shopId }) {
 
   const handleExportSingleExpenseExcel = (exp, idx = 0) => {
     setActiveExpenseMenuId(null);
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date(exp.expenseDate || exp.createdAt || Date.now()).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
     const voucherNo = `#EXP-${String(idx + 1).padStart(4, '0')}`;
 
@@ -1801,7 +1972,7 @@ function StoreContent({ shopId }) {
           </tr>
           <tr style="height: 12px;"><td colspan="4" style="border:none;"></td></tr>
           <tr>
-            <td colspan="4" class="footer-note">Official Expense Voucher • Generated via PerFume Shop Center Financial System</td>
+            <td colspan="4" class="footer-note">Official Expense Voucher • Generated via Maidan Perfume Shop Financial System</td>
           </tr>
         </table>
       </body>
@@ -1840,7 +2011,7 @@ function StoreContent({ shopId }) {
     unitType: 'egg',
     quantity: '',
     unitPrice: '',
-    reason: 'Egg Breakage / Crack',
+    reason: 'Damaged / Defective Stock',
     damageDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
@@ -1873,7 +2044,7 @@ function StoreContent({ shopId }) {
     const rawQty = Number(damagedFormData.quantity || 0);
 
     if (!damagedFormData.productName || (pQty <= 0 && tQty <= 0 && eQty <= 0 && rawQty <= 0)) {
-      alert('Please enter product name and at least one damaged quantity (Petis, Trays, or Eggs)');
+      alert('Please enter product name and at least one damaged quantity (Boxes, Packs, or Units)');
       return;
     }
 
@@ -1898,14 +2069,14 @@ function StoreContent({ shopId }) {
       eggRate = Number(damagedFormData.unitPrice);
     }
 
-    let totalEggsDmg = 0;
+    let totalUnitsDmg = 0;
     if (pQty > 0 || tQty > 0 || eQty > 0) {
-      totalEggsDmg = Math.round((pQty * ePerP) + (tQty * ePerT) + eQty);
+      totalUnitsDmg = Math.round((pQty * ePerP) + (tQty * ePerT) + eQty);
     } else {
-      totalEggsDmg = Math.round(rawQty);
+      totalUnitsDmg = Math.round(rawQty);
     }
 
-    const calculatedLoss = Math.round(totalEggsDmg * (eggRate || 0));
+    const calculatedLoss = Math.round(totalUnitsDmg * (eggRate || 0));
 
     const newDamagedItem = {
       _id: 'dmg_' + Date.now(),
@@ -1915,8 +2086,8 @@ function StoreContent({ shopId }) {
       petiQuantity: pQty,
       trayQuantity: tQty,
       eggQuantity: eQty,
-      quantity: totalEggsDmg,
-      deductedEggs: totalEggsDmg,
+      quantity: totalUnitsDmg,
+      deductedEggs: totalUnitsDmg,
       unitType: pQty > 0 && tQty === 0 && eQty === 0 ? 'peti' : (tQty > 0 && pQty === 0 && eQty === 0 ? 'tray' : 'egg'),
       unitPrice: Number(damagedFormData.unitPrice) || Math.round(eggRate * 10) / 10,
       totalLoss: calculatedLoss,
@@ -1957,7 +2128,7 @@ function StoreContent({ shopId }) {
       unitType: 'egg',
       quantity: '',
       unitPrice: '',
-      reason: 'Egg Breakage / Crack',
+      reason: 'Damaged / Defective Stock',
       damageDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
@@ -2150,6 +2321,10 @@ function StoreContent({ shopId }) {
       grossProfit = reportTimeframe === 'DAY' ? todayProfitTotal : reportTimeframe === 'MONTH' ? monthProfitTotal : reportTimeframe === 'YEAR' ? yearProfitTotal : allProfitTotal;
     }
 
+    // Fallback to dashStats if sales list was momentarily empty
+    if (totalRevenue === 0) {
+      totalRevenue = reportTimeframe === 'DAY' ? (dashStats.todaySales || 0) : reportTimeframe === 'MONTH' ? (dashStats.monthlySales || 0) : reportTimeframe === 'YEAR' ? (dashStats.yearlySales || 0) : (dashStats.totalRevenue || 0);
+    }
 
     // 3. Filter Purchases / Restocks (items) for active timeframe
     const filteredPurchases = (items || []).filter(p => {
@@ -2264,25 +2439,25 @@ function StoreContent({ shopId }) {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && (d.toISOString().split('T')[0] === todayStr || d.toDateString() === now.toDateString());
     });
-    const todayRevenue = todaySales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
-    const todayOrders = todaySales.length;
+    const todayRevenue = todaySales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.todaySales || 0;
+    const todayOrders = todaySales.length || dashStats.todayOrdersCount || 0;
 
     const monthSales = activeData.filter(s => {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
-    const monthRevenue = monthSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
-    const monthOrders = monthSales.length;
+    const monthRevenue = monthSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.monthlySales || 0;
+    const monthOrders = monthSales.length || dashStats.monthlyOrdersCount || 0;
 
     const yearSales = activeData.filter(s => {
       const d = new Date(s.saleDate || s.createdAt || s.date || 0);
       return !isNaN(d.getTime()) && d.getFullYear() === currentYear;
     });
-    const yearRevenue = yearSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
-    const yearOrders = yearSales.length;
+    const yearRevenue = yearSales.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.yearlySales || 0;
+    const yearOrders = yearSales.length || dashStats.yearlyOrdersCount || 0;
 
-    const totalRevenue = activeData.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0);
-    const totalOrders = activeData.length;
+    const totalRevenue = activeData.reduce((sum, s) => sum + (Number(s.totalAmount) || 0), 0) || dashStats.totalRevenue || 0;
+    const totalOrders = activeData.length || dashStats.totalOrders || 0;
 
     return {
       todayRevenue,
@@ -2294,7 +2469,7 @@ function StoreContent({ shopId }) {
       totalRevenue,
       totalOrders
     };
-  }, [unifiedSalesList, shopSalesList]);
+  }, [unifiedSalesList, shopSalesList, dashStats]);
 
   const purchasesLiveBreakdown = useMemo(() => {
     let totalPurchasesCost = 0;
@@ -2319,21 +2494,21 @@ function StoreContent({ shopId }) {
       dueBalance += Number(p.dueAmount || p.balanceDue || 0);
     });
 
-    const totalPetisPurchased = totalPurchasesEggs > 0 ? Number((totalPurchasesEggs / 360).toFixed(1)) : 0;
-    const totalTraysPurchased = totalPurchasesEggs > 0 ? Math.round(totalPurchasesEggs / 30) : 0;
+    const totalPetisPurchased = totalPurchasesEggs > 0 ? Number((totalPurchasesEggs / 360).toFixed(1)) : (Number(dashStats.totalPetisPurchased) || 0);
+    const totalTraysPurchased = totalPurchasesEggs > 0 ? Math.round(totalPurchasesEggs / 30) : (dashStats.totalTraysPurchased || 0);
 
     return {
       totalPetisPurchased,
       totalTraysPurchased,
-      totalPurchaseCost: totalPurchasesCost,
-      cashPaidToSupplier: cashPaid,
-      bankPaidToSupplier: bankPaid,
-      dueToSupplier: dueBalance,
+      totalPurchaseCost: totalPurchasesCost || dashStats.totalPurchaseCost || 0,
+      cashPaidToSupplier: cashPaid || dashStats.cashPaidToSupplier || 0,
+      bankPaidToSupplier: bankPaid || dashStats.bankPaidToSupplier || 0,
+      dueToSupplier: dueBalance || dashStats.dueToSupplier || 0,
     };
-  }, [items]);
+  }, [items, dashStats]);
 
   const stockLiveBreakdown = useMemo(() => {
-    let totalBottles = 0;
+    let totalUnits = 0;
     let totalValue = 0;
     let lowStockCount = 0;
     let outOfStockCount = 0;
@@ -2343,51 +2518,34 @@ function StoreContent({ shopId }) {
       const peti = Number(item.petiQuantity || 0);
       const tray = Number(item.trayQuantity || 0);
       const itemStock = Number(item.stock || 0);
-      
-      const tPerP = Number(item.traysPerPeti) || 12;
-      const ePerT = Number(item.eggsPerTray) || 30;
-      const ePerP = tPerP * ePerT;
+      const totalItemEggs = (peti * 360) + (tray * 30) + e || (itemStock * 30);
+      totalUnits += totalItemEggs;
 
-      let totalItemUnits = 0;
-      if (peti > 0 || tray > 0 || e > 0) {
-        totalItemUnits = (peti * ePerP) + (tray * ePerT) + e;
-      } else {
-        totalItemUnits = item.unitType === 'peti' ? itemStock * ePerP : item.unitType === 'tray' ? itemStock * ePerT : itemStock;
-      }
+      const price = Number(item.price || item.costPrice || 0);
+      totalValue += (totalItemEggs / 30) * price;
 
-      totalBottles += totalItemUnits;
-
-      const unitCost = Number(item.costPrice || item.price || 0);
-      const itemVal = item.unitType === 'peti'
-        ? (totalItemUnits / ePerP) * unitCost
-        : item.unitType === 'tray'
-          ? (totalItemUnits / ePerT) * unitCost
-          : totalItemUnits * unitCost;
-
-      totalValue += itemVal;
-
-      if (totalItemUnits === 0 || itemStock === 0) {
+      if (totalItemEggs === 0 || itemStock === 0) {
         outOfStockCount++;
-      } else if (totalItemUnits < (item.minStock || 10)) {
+      } else if (totalItemEggs < 300 || itemStock < 10) {
         lowStockCount++;
       }
     });
 
-    const totalPetis = totalBottles > 0 ? Number((totalBottles / 360).toFixed(1)) : 0;
-    const totalTrays = totalBottles > 0 ? Math.round(totalBottles / 30) : 0;
-    const totalStockEggs = totalBottles;
-    const totalInventoryValue = Math.round(totalValue);
+    const totalPetis = totalUnits > 0 ? Number((totalUnits / 360).toFixed(1)) : (dashStats.totalStockPetis || 0);
+    const totalTrays = totalUnits > 0 ? Math.round(totalUnits / 30) : (dashStats.totalStockTrays || 0);
+    const totalStockEggs = totalUnits || dashStats.totalStockEggs || 0;
+    const totalInventoryValue = totalValue > 0 ? Math.round(totalValue) : (dashStats.totalInventoryValue || 0);
 
     return {
       totalPetis,
       totalTrays,
       totalStockEggs,
       totalInventoryValue,
-      totalProducts: (items || []).length,
+      totalProducts: (items || []).length || dashStats.totalProducts || 0,
       lowStockCount,
       outOfStockCount
     };
-  }, [items]);
+  }, [items, dashStats]);
 
   // ─── Executive Net Realized Profit/Loss Breakdown for Main Dashboard ───
   const netStats = useMemo(() => {
@@ -2433,7 +2591,7 @@ function StoreContent({ shopId }) {
 
   // ─── Generate Official Profit PDF via jsPDF & autoTable ───
   const generateProfitReportPDF = (timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -2484,9 +2642,9 @@ function StoreContent({ shopId }) {
     // Income Statement Breakdown Table
     const breakdownData = [
       ['1', '(+) Total Sales Revenue Earned', `${profitReportStats.filteredSalesCount} Sales Invoices`, `+ Rs. ${(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}`],
-      ['2', '(-) Purchased Products / Restocks Cost', `${profitReportStats.totalPurchasesPetis} Petis • ${profitReportStats.totalPurchasesTrays} Trays • ${profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Eggs`, `- Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}`],
+      ['2', '(-) Purchased Products / Restocks Cost', `${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Units`, `- Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}`],
       ['3', '(-) Shop Operational Expenses (Bills, Rent, Misc)', `${profitReportStats.filteredExpensesCount} Expense Logs`, `- Rs. ${(profitReportStats.totalExpenses || 0).toLocaleString('en-PK')}`],
-      ['4', '(-) Damaged / Broken Egg Inventory Loss', `${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Broken Eggs)`, `- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}`],
+      ['4', '(-) Damaged / Defective Stock Loss', `${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Broken Eggs)`, `- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}`],
       ['5', '(=) FINAL PURE REALIZED NET PROFIT', 'Pure Realized Cash Balance', `Rs. ${(profitReportStats.finalNetProfit || 0).toLocaleString('en-PK')}`]
     ];
 
@@ -2509,7 +2667,7 @@ function StoreContent({ shopId }) {
 
   // ─── Generate Official Sales PDF via jsPDF & autoTable ───
   const generateSalesReportPDF = (timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -2540,7 +2698,7 @@ function StoreContent({ shopId }) {
     doc.setTextColor(100, 116, 139);
     doc.text('TOTAL REVENUE', 45, 87);
     doc.text('ORDERS / BILLS', 180, 87);
-    doc.text('EGGS SOLD (P/T)', 320, 87);
+    doc.text('SOLD (BOX/PACK)', 320, 87);
     doc.text('NET PROFIT', 455, 87);
 
     doc.setFontSize(11);
@@ -2549,7 +2707,7 @@ function StoreContent({ shopId }) {
     doc.setTextColor(15, 23, 42);
     doc.text(`${salesReportStats.totalBills} Bills`, 180, 104);
     doc.setTextColor(217, 119, 6);
-    doc.text(`${salesReportStats.totalPetis} P (${salesReportStats.totalTrays} T)`, 320, 104);
+    doc.text(`${salesReportStats.totalPetis} Box (${salesReportStats.totalTrays} Pack)`, 320, 104);
     doc.setTextColor(16, 185, 129);
     doc.text(`Rs. ${(salesReportStats.totalProfit || 0).toLocaleString('en-PK')}`, 455, 104);
 
@@ -2591,7 +2749,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleWhatsAppReportShare = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const periodName = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
 
@@ -2619,7 +2777,7 @@ function StoreContent({ shopId }) {
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `📊 *SUMMARY STATS:*\n`;
       message += `• Manual Expenses: Rs. ${totalManualExp.toLocaleString('en-PK')} (${filteredExp.length} Entries)\n`;
-      message += `• Damaged Egg Losses: Rs. ${damagedLossVal.toLocaleString('en-PK')}\n`;
+      message += `• Damaged / Defect Losses: Rs. ${damagedLossVal.toLocaleString('en-PK')}\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `💵 *TOTAL EXPENSES & LOSS: Rs. ${grandTotalExp.toLocaleString('en-PK')}*\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -2635,7 +2793,7 @@ function StoreContent({ shopId }) {
       }
 
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
-      message += `🙏 *Thank you! Generated via PerFume Shop Center System*`;
+      message += `🙏 *Thank you! Generated via Maidan Perfume Shop System*`;
 
       const encodedText = encodeURIComponent(message);
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
@@ -2657,14 +2815,14 @@ function StoreContent({ shopId }) {
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `📊 *2. NET PROFIT RECONCILIATION:*\n`;
       message += `(+) Total Sales: Rs. ${(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}\n`;
-      message += `(-) Purchases Cost: Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')} (${profitReportStats.totalPurchasesPetis} Petis • ${profitReportStats.totalPurchasesTrays} Trays • ${profitReportStats.totalPurchasesEggs} Eggs)\n`;
+      message += `(-) Purchases Cost: Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')} (${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs} Units)\n`;
       message += `(-) Shop Expenses: Rs. ${(profitReportStats.totalExpenses || 0).toLocaleString('en-PK')}\n`;
-      message += `(-) Damaged Egg Loss: Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')} (${profitReportStats.totalDamagedEggs} Eggs)\n`;
+      message += `(-) Damaged / Defect Loss: Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')} (${profitReportStats.totalDamagedEggs} Eggs)\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `💵 *(=) FINAL PURE REALIZED NET PROFIT: Rs. ${(profitReportStats.finalNetProfit || 0).toLocaleString('en-PK')}*\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `📎 *Official PDF Statement (${pdfFileName}) downloaded to your device.*\n`;
-      message += `_PerFume Shop Center Financial System_`;
+      message += `_Maidan Perfume Shop Financial System_`;
 
       const encodedText = encodeURIComponent(message);
       window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
@@ -2678,7 +2836,7 @@ function StoreContent({ shopId }) {
     message += `===============================\n`;
     message += `💰 *Total Sales Revenue:* Rs. ${(salesReportStats.totalRevenue || 0).toLocaleString('en-PK')}\n`;
     message += `🧾 *Total Invoices / Bills:* ${salesReportStats.totalBills} Bills\n`;
-    message += `📦 *Stock Eggs Sold:* ${salesReportStats.totalPetis} Petis (${salesReportStats.totalTrays} Trays • ${(salesReportStats.totalEggs || 0).toLocaleString('en-PK')} Eggs)\n`;
+    message += `📦 *Stock Sold:* ${salesReportStats.totalPetis} Boxes (${salesReportStats.totalTrays} Packs • ${(salesReportStats.totalUnits || 0).toLocaleString('en-PK')} Units)\n`;
     message += `📈 *Net Profit Earned:* Rs. ${(salesReportStats.totalProfit || 0).toLocaleString('en-PK')}\n`;
     message += `💵 *Cash Received:* Rs. ${(salesReportStats.cashSales || 0).toLocaleString('en-PK')}\n`;
     message += `💳 *Bank / Online Received:* Rs. ${(salesReportStats.onlineSales || 0).toLocaleString('en-PK')}\n`;
@@ -2697,14 +2855,14 @@ function StoreContent({ shopId }) {
 
     message += `===============================\n`;
     message += `📎 *Official PDF Report (${pdfFileName}) downloaded to your device.*\n`;
-    message += `_PerFume Shop Center Sales Management System_`;
+    message += `_Maidan Perfume Shop Sales Management System_`;
 
     const encodedText = encodeURIComponent(message);
     window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
   };
 
   const handlePrintSingleReport = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
 
@@ -2784,7 +2942,7 @@ function StoreContent({ shopId }) {
 
             <div class="stats-grid">
               <div class="stat-card"><label>Operational Expenses</label><div class="val">Rs. ${totalManualExp.toLocaleString('en-PK')}</div></div>
-              <div class="stat-card"><label>Damaged Egg Losses</label><div class="val" style="color:#d97706;">Rs. ${damagedLossVal.toLocaleString('en-PK')}</div></div>
+              <div class="stat-card"><label>Damaged Product Losses</label><div class="val" style="color:#d97706;">Rs. ${damagedLossVal.toLocaleString('en-PK')}</div></div>
               <div class="stat-card"><label>Grand Total Losses</label><div class="val" style="color:#991b1b;">Rs. ${grandTotalExp.toLocaleString('en-PK')}</div></div>
             </div>
 
@@ -2812,7 +2970,7 @@ function StoreContent({ shopId }) {
             </div>
 
             <div class="footer">
-              <div>Generated via PerFume Shop Center Admin System</div>
+              <div>Generated via Maidan Perfume Shop Admin System</div>
               <div class="sign">Authorized Signature &amp; Stamp</div>
             </div>
           </body>
@@ -2901,7 +3059,7 @@ function StoreContent({ shopId }) {
                 <tr>
                   <td style="text-align:center; font-weight:bold;">2</td>
                   <td><strong style="color:#0284c7;">(-) Purchased Products / Restocks Cost</strong></td>
-                  <td style="text-align:center;">${profitReportStats.totalPurchasesPetis} Petis • ${profitReportStats.totalPurchasesTrays} Trays • ${profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Eggs</td>
+                  <td style="text-align:center;">${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Units</td>
                   <td style="text-align:center;">${profitReportStats.filteredPurchasesCount} Restocks</td>
                   <td style="text-align:right; font-weight:bold; color:#0284c7;">- Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}</td>
                 </tr>
@@ -2914,7 +3072,7 @@ function StoreContent({ shopId }) {
                 </tr>
                 <tr>
                   <td style="text-align:center; font-weight:bold;">4</td>
-                  <td><strong style="color:#d97706;">(-) Damaged / Broken Egg Inventory Loss</strong></td>
+                  <td><strong style="color:#d97706;">(-) Damaged / Defective Stock Loss</strong></td>
                   <td style="text-align:center;">Waste &amp; Breakage</td>
                   <td style="text-align:center;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Eggs)</td>
                   <td style="text-align:right; font-weight:bold; color:#d97706;">- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}</td>
@@ -2929,7 +3087,7 @@ function StoreContent({ shopId }) {
             </table>
 
             <div class="footer">
-              <div>Report Generated by PerFume Shop Center Admin System</div>
+              <div>Report Generated by Maidan Perfume Shop Admin System</div>
               <div class="sign">Authorized Signature &amp; Stamp</div>
             </div>
           </body>
@@ -3005,7 +3163,7 @@ function StoreContent({ shopId }) {
           <div class="stats-grid">
             <div class="stat-card"><label>Total Sales Revenue</label><div class="val" style="color:#059669;">Rs. ${(salesReportStats.totalRevenue || 0).toLocaleString('en-PK')}</div></div>
             <div class="stat-card"><label>Total Orders / Bills</label><div class="val">${salesReportStats.totalBills} Bills</div></div>
-            <div class="stat-card"><label>Eggs Sold (Petis)</label><div class="val" style="color:#d97706;">${salesReportStats.totalPetis} Petis</div></div>
+            <div class="stat-card"><label>Sold (Boxes)</label><div class="val" style="color:#d97706;">${salesReportStats.totalPetis} Petis</div></div>
             <div class="stat-card"><label>Net Profit Earned</label><div class="val" style="color:#10b981;">Rs. ${(salesReportStats.totalProfit || 0).toLocaleString('en-PK')}</div></div>
           </div>
           <table>
@@ -3026,13 +3184,13 @@ function StoreContent({ shopId }) {
             <tfoot>
               <tr class="total-row">
                 <td colspan="4" style="text-align:right;">TOTAL SALES REVENUE:</td>
-                <td colspan="2" style="text-align:center;">${salesReportStats.totalBills} Bills (${salesReportStats.totalPetis} Petis)</td>
+                <td colspan="2" style="text-align:center;">${salesReportStats.totalBills} Bills (${salesReportStats.totalPetis} Boxes)</td>
                 <td style="text-align:right; color:#047857; font-size:11px;">Rs. ${(salesReportStats.totalRevenue || 0).toLocaleString('en-PK')}</td>
               </tr>
             </tfoot>
           </table>
           <div class="footer">
-            <div>Report Generated by PerFume Shop Center Admin System</div>
+            <div>Report Generated by Maidan Perfume Shop Admin System</div>
             <div class="sign">Authorized Signature</div>
           </div>
         </body>
@@ -3044,7 +3202,7 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportExcelReport = (type = 'sales', timeframe = reportTimeframe) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const timeLabel = timeframe === 'DAY' ? 'Daily (Today)' : timeframe === 'MONTH' ? 'Monthly (This Month)' : timeframe === 'YEAR' ? 'Yearly (This Year)' : 'All-Time Total';
 
@@ -3131,7 +3289,7 @@ function StoreContent({ shopId }) {
               <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px;">2</td>
               <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #0284c7; padding: 7px;">(-) Purchased Products Cost</td>
               <td style="border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0284c7; padding: 7px;">Restocks</td>
-              <td style="border: 1px solid #cbd5e1; text-align: center; padding: 7px;">${profitReportStats.totalPurchasesPetis} Petis • ${profitReportStats.totalPurchasesTrays} Trays • ${profitReportStats.totalPurchasesEggs} Eggs</td>
+              <td style="border: 1px solid #cbd5e1; text-align: center; padding: 7px;">${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs} Units</td>
               <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: #0284c7; padding: 7px;">- RS ${Number(profitReportStats.totalPurchasesCost || 0).toLocaleString()}</td>
             </tr>
             <tr>
@@ -3143,7 +3301,7 @@ function StoreContent({ shopId }) {
             </tr>
             <tr>
               <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px;">4</td>
-              <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #d97706; padding: 7px;">(-) Damaged Egg Losses</td>
+              <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #d97706; padding: 7px;">(-) Damaged / Defect Losses</td>
               <td style="border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #d97706; padding: 7px;">Stock Breakage</td>
               <td style="border: 1px solid #cbd5e1; text-align: center; padding: 7px;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Eggs)</td>
               <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: #d97706; padding: 7px;">- RS ${Number(profitReportStats.totalDamagedLoss || 0).toLocaleString()}</td>
@@ -3255,7 +3413,7 @@ function StoreContent({ shopId }) {
               <td class="info-label">Total Entries:</td>
               <td class="info-val">${filteredExp.length} Entries</td>
               <td style="border:none;"></td>
-              <td class="info-label">Damaged Egg Loss:</td>
+              <td class="info-label">Damaged / Defect Loss:</td>
               <td colspan="3" class="info-val" style="color: #d97706; font-weight: bold;">Rs. ${damagedLossVal.toLocaleString()}</td>
             </tr>
             <tr style="height: 14px;"><td colspan="7" style="border:none;"></td></tr>
@@ -3311,7 +3469,7 @@ function StoreContent({ shopId }) {
     }
 
     let csvRows = [];
-    csvRows.push([`"PERFUME SHOP CENTER - OFFICIAL NET PROFIT & FINANCIAL REPORT"`]);
+    csvRows.push([`"Maidan Perfume Shop - OFFICIAL NET PROFIT & FINANCIAL REPORT"`]);
     csvRows.push([`"Store Branch"`, `"${shopName}"`]);
     csvRows.push([`"Report Period Filter"`, `"${timeLabel}"`]);
     csvRows.push([`"Generated Date"`, `"${dateStr}"`]);
@@ -3327,9 +3485,9 @@ function StoreContent({ shopId }) {
 
     csvRows.push([`"2. SUPPLIER PURCHASES & RESTOCKS"`, `"QUANTITY / VALUE"`, `"UNIT"`, `"NOTES"`]);
     csvRows.push([`"Restocks Entries Count"`, dashStats.totalPurchasesCount || 0, `"Entries"`, `"Supplier Bills"`]);
-    csvRows.push([`"Total Petis Purchased"`, dashStats.totalPetisPurchased || 0, `"Petis"`, `"1 Peti = 12 Trays = 360 Eggs"`]);
+    csvRows.push([`"Total Boxes Purchased"`, dashStats.totalPetisPurchased || 0, `"Petis"`, `"1 Box = 12 Packs = 360 Units"`]);
     csvRows.push([`"Total Trays Purchased"`, dashStats.totalTraysPurchased || 0, `"Trays"`, `"1 Tray = 30 Eggs"`]);
-    csvRows.push([`"Total Eggs Purchased"`, dashStats.totalEggsPurchased || 0, `"Eggs"`, `"Single Eggs"`]);
+    csvRows.push([`"Total Units Purchased"`, dashStats.totalUnitsPurchased || 0, `"Units"`, `"Single Units"`]);
     csvRows.push([`"Total Purchase Cost Investment"`, dashStats.totalPurchaseCost || 0, `"PKR"`, `"Total Purchase Investment"`]);
     csvRows.push([`"Cash Paid to Supplier"`, dashStats.cashPaidToSupplier || 0, `"PKR"`, `"Cash Paid"`]);
     csvRows.push([`"Remaining Supplier Debt (Due)"`, dashStats.dueToSupplier || 0, `"PKR"`, `"Unpaid Debt"`]);
@@ -3337,14 +3495,14 @@ function StoreContent({ shopId }) {
 
     csvRows.push([`"3. CATALOG PRODUCTS & INVENTORY STOCK"`, `"QUANTITY"`, `"UNIT"`, `"NOTES"`]);
     csvRows.push([`"Total Catalog Products"`, dashStats.totalProducts || 0, `"Items"`, `"Active Catalog"`]);
-    csvRows.push([`"Available Eggs Stock"`, dashStats.totalStockEggs || 0, `"Eggs"`, `"Eggs in Store"`]);
-    csvRows.push([`"Available Petis Stock"`, dashStats.totalStockPetis || 0, `"Petis"`, `"Petis in Store"`]);
-    csvRows.push([`"Sold Petis Stock"`, dashStats.soldPetis || 0, `"Petis"`, `"Petis Sold"`]);
-    csvRows.push([`"Sold Trays Stock"`, dashStats.soldTrays || 0, `"Trays"`, `"Trays Sold"`]);
-    csvRows.push([`"Sold Eggs Stock"`, dashStats.soldEggs || 0, `"Eggs"`, `"Eggs Sold"`]);
-    csvRows.push([`"Total Damaged Loss"`, dashStats.totalDamagedLoss || 0, `"PKR"`, `"Egg Breakage Loss"`]);
+    csvRows.push([`"Available Units Stock"`, dashStats.totalStockEggs || 0, `"Units"`, `"Units in Store"`]);
+    csvRows.push([`"Available Boxes Stock"`, dashStats.totalStockPetis || 0, `"Boxes"`, `"Boxes in Store"`]);
+    csvRows.push([`"Sold Boxes Stock"`, dashStats.soldPetis || 0, `"Boxes"`, `"Boxes Sold"`]);
+    csvRows.push([`"Sold Packs Stock"`, dashStats.soldTrays || 0, `"Packs"`, `"Packs Sold"`]);
+    csvRows.push([`"Sold Units Stock"`, dashStats.soldEggs || 0, `"Units"`, `"Units Sold"`]);
+    csvRows.push([`"Total Damaged Loss"`, dashStats.totalDamagedLoss || 0, `"PKR"`, `"Damaged Stock Loss"`]);
     csvRows.push([]);
-    csvRows.push([`"Generated via PerFume Shop Center Management System"`]);
+    csvRows.push([`"Generated via Maidan Perfume Shop Management System"`]);
 
     const csvString = csvRows.map(e => e.join(",")).join("\n");
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
@@ -3358,9 +3516,9 @@ function StoreContent({ shopId }) {
   };
 
   const handleExportAllSalesExcel = () => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     let csvRows = [];
-    csvRows.push([`"PERFUME SHOP CENTER - ALL SALES & CUSTOMER BILLS REPORT"`]);
+    csvRows.push([`"Maidan Perfume Shop - ALL SALES & CUSTOMER BILLS REPORT"`]);
     csvRows.push([`"Store / Branch"`, `"${shopName}"`]);
     csvRows.push([`"Export Date"`, `"${new Date().toLocaleString()}"`]);
     csvRows.push([`"Total Sales Count"`, shopSalesList.length]);
@@ -3387,7 +3545,7 @@ function StoreContent({ shopId }) {
     });
 
     csvRows.push([]);
-    csvRows.push([`"Generated via PerFume Shop Center Management System"`]);
+    csvRows.push([`"Generated via Maidan Perfume Shop Management System"`]);
 
     const csvString = csvRows.map(e => e.join(",")).join("\n");
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
@@ -3401,7 +3559,7 @@ function StoreContent({ shopId }) {
   };
 
   const handlePrintCustomerSingleRecord = (sale) => {
-    const shopName = shop?.name || 'PerFume Shop Center';
+    const shopName = shop?.name || 'Maidan Perfume Shop';
     const customerName = sale.customerName || 'Walk-in Customer';
     const customerPhone = sale.customerPhone || '';
     const saleDate = new Date(sale.saleDate || sale.createdAt).toLocaleString();
@@ -3477,7 +3635,7 @@ function StoreContent({ shopId }) {
           </div>
           <div class="footer">
             <div class="sign">Customer Signature</div>
-            <div class="sign">PerFume Shop Center Stamp</div>
+            <div class="sign">Maidan Perfume Shop Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }
@@ -3606,7 +3764,7 @@ function StoreContent({ shopId }) {
           </div>
           <div class="footer">
             <div class="sign">Shop Admin / Manager Signature</div>
-            <div class="sign">PerFume Shop Center Stamp</div>
+            <div class="sign">Maidan Perfume Shop Stamp</div>
           </div>
           <script>
             window.onload = function() { window.print(); }
@@ -3698,8 +3856,7 @@ function StoreContent({ shopId }) {
 
           const isCredit = !isOnline && (
             pMethodLower.includes('credit') ||
-            pMethodLower.includes('due') ||
-            pMethodLower.includes('qaraz')
+            pMethodLower.includes('due')
           );
 
           let due = 0;
@@ -3774,7 +3931,7 @@ function StoreContent({ shopId }) {
           expiredProductsList,
           totalPetisPurchased: Number(netPetisPurchased.toFixed(1)),
           totalTraysPurchased: netTraysPurchased,
-          totalEggsPurchased: netEggsPurchased,
+          totalUnitsPurchased: netEggsPurchased,
           totalDamagedPetis,
           totalDamagedTrays,
           totalDamagedEggs,
@@ -4046,7 +4203,7 @@ function StoreContent({ shopId }) {
                 {shop?.logoUrl ? (
                   <img src={shop.logoUrl} alt={shop.name} className="w-full h-full object-cover rounded-lg" />
                 ) : (
-                  <img src={companyLogo} alt="PerFume Shop Center" className="w-full h-full object-cover rounded-lg" />
+                  <img src={companyLogo} alt="Maidan Agri Foods" className="w-full h-full object-cover rounded-lg" />
                 )}
               </button>
               <div className="min-w-0">
@@ -4373,7 +4530,7 @@ function StoreContent({ shopId }) {
                           : "text-white hover:text-zinc-950 hover:bg-gradient-to-r hover:from-amber-400 hover:to-amber-500 border-t border-t-transparent hover:border-t-amber-200 border-b-4 border-b-transparent hover:border-b-amber-800 hover:shadow-[0_8px_22px_rgba(245,158,11,0.6)] hover:translate-x-1.5 hover:scale-105"
                           }`}
                       >
-                        <img src="/egg.png" alt="egg" className={`w-4 h-4 object-contain shrink-0 transition-all ${active ? 'brightness-125 scale-110' : 'brightness-90 group-hover:brightness-0'}`} />
+                        <Package className="w-4 h-4 shrink-0 text-amber-400" />
                         <span className="capitalize truncate text-white">{cat}</span>
                       </button>
                     );
@@ -4517,7 +4674,7 @@ function StoreContent({ shopId }) {
                                 Rs. {(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}
                               </h3>
                               <p className="text-xs text-emerald-200/90 font-bold">
-                                🛒 {profitReportStats.filteredSalesCount || 0} Orders &bull; {profitReportStats.filteredPurchasesEggs > 0 ? `${(profitReportStats.filteredPurchasesEggs / 360).toFixed(1)} Petis Sold` : 'Live POS & Online'}
+                                🛒 {profitReportStats.filteredSalesCount || 0} Orders &bull; {profitReportStats.filteredPurchasesEggs > 0 ? `${(profitReportStats.filteredPurchasesEggs / 360).toFixed(1)} Boxes Sold` : 'Live POS & Online'}
                               </p>
                             </div>
                             <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0 shadow-lg">
@@ -4562,7 +4719,7 @@ function StoreContent({ shopId }) {
                             <span className="text-sm sm:text-base font-black text-white block mt-0.5">
                               - Rs. {(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}
                             </span>
-                            <span className="text-[8px] text-slate-400 font-bold block mt-0.5">{profitReportStats.totalPurchasesPetis || 0} Petis</span>
+                            <span className="text-[8px] text-slate-400 font-bold block mt-0.5">{profitReportStats.totalPurchasesPetis || 0} Boxes</span>
                           </div>
 
                           {/* 3. (-) Expenses */}
@@ -4576,18 +4733,18 @@ function StoreContent({ shopId }) {
 
                           {/* 4. (-) Damaged Stock */}
                           <div className="bg-slate-800/80 border border-amber-500/30 rounded-xl p-3">
-                            <span className="text-[9.5px] font-bold uppercase text-amber-400 block tracking-wider">(-) Damaged Egg Loss</span>
+                            <span className="text-[9.5px] font-bold uppercase text-amber-400 block tracking-wider">(-) Damaged / Defect Loss</span>
                             <span className="text-sm sm:text-base font-black text-white block mt-0.5">
                               - Rs. {(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}
                             </span>
-                            <span className="text-[8px] text-slate-400 font-bold block mt-0.5">{profitReportStats.totalDamagedEggs || 0} Broken Eggs</span>
+                            <span className="text-[8px] text-slate-400 font-bold block mt-0.5">{profitReportStats.totalDamagedEggs || 0} Damaged Units</span>
                           </div>
                         </div>
 
                         {/* Direct Jump to Profit Report */}
                         <div className="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs flex-wrap gap-2">
                           <span className="text-slate-400 text-[10px] font-bold uppercase">
-                            PerFume Shop Center Financial Ledger &bull; Real-time MongoDB Synchronized
+                            Maidan Perfume Shop Financial Ledger &bull; Real-time MongoDB Synchronized
                           </span>
                           <button
                             onClick={() => { setActiveView('report-profit'); }}
@@ -4758,10 +4915,10 @@ function StoreContent({ shopId }) {
                             </span>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                            {/* Boxes */}
+                            {/* Petis (Yellow & Green Gradient As Requested) */}
                             <div className="p-3.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-emerald-600 rounded-xl text-white shadow-md flex items-center justify-between border border-amber-300/40 border-b-4 border-b-emerald-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
-                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-amber-100">Boxes (Cartons)</span>
+                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-amber-100">Boxes</span>
                                 <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{Number(stockLiveBreakdown.totalPetis || 0).toFixed(1)} Boxes</h4>
                                 <span className="text-[8.5px] text-emerald-100/90 font-bold block">{stockLiveBreakdown.totalProducts || 0} Products</span>
                               </div>
@@ -4770,7 +4927,7 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Packs */}
+                            {/* Trays (Gray & Blue Gradient As Requested) */}
                             <div className="p-3.5 bg-gradient-to-r from-slate-600 via-sky-600 to-blue-700 rounded-xl text-white shadow-md flex items-center justify-between border border-sky-300/40 border-b-4 border-b-slate-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
                                 <span className="text-[9.5px] font-bold uppercase tracking-wide block text-sky-100">Packs</span>
@@ -4782,11 +4939,11 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Bottles / Units */}
+                            {/* Eggs (Gray & Blue Gradient As Requested) */}
                             <div className="p-3.5 bg-gradient-to-r from-slate-700 via-blue-600 to-slate-800 rounded-xl text-white shadow-md flex items-center justify-between border border-blue-300/40 border-b-4 border-b-slate-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
-                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-slate-200">Bottles / Pieces</span>
-                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalStockEggs || 0).toLocaleString('en-PK')} Bottles</h4>
+                                <span className="text-[9.5px] font-bold uppercase tracking-wide block text-slate-200">Units</span>
+                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(stockLiveBreakdown.totalStockEggs || 0).toLocaleString('en-PK')} Units</h4>
                                 <span className="text-[8.5px] text-blue-100/90 font-bold block">Available</span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -4794,7 +4951,7 @@ function StoreContent({ shopId }) {
                               </div>
                             </div>
 
-                            {/* Stock Worth */}
+                            {/* Stock Worth (Yellow & Green Gradient As Requested) */}
                             <div className="p-3.5 bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-700 rounded-xl text-white shadow-md flex items-center justify-between border border-amber-300/40 border-b-4 border-b-emerald-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
                                 <span className="text-[9.5px] font-bold text-amber-100 uppercase tracking-wide block">Stock Worth</span>
@@ -4824,7 +4981,13 @@ function StoreContent({ shopId }) {
                               <div>
                                 <span className="text-[9.5px] font-bold text-slate-600 uppercase tracking-wide block">Purchased</span>
                                 <h4 className="text-lg sm:text-xl font-black text-slate-900 mt-0.5">{(Number(purchasesLiveBreakdown.totalPetisPurchased) || 0).toFixed(1)} Boxes</h4>
-                                <span className="text-[8.5px] text-slate-500 font-bold block">{(purchasesLiveBreakdown.totalTraysPurchased || 0)} Packs</span>
+                                <div className="mt-1">
+                                  <div className="inline-flex items-center gap-1.5 text-[8.5px] font-bold text-slate-700 bg-white/80 border border-slate-300/80 px-2.5 py-0.5 rounded-full whitespace-nowrap shadow-xs">
+                                    <span className="flex items-center gap-1">🍱 {(purchasesLiveBreakdown.totalTraysPurchased || 0)} Packs</span>
+                                    <span className="text-slate-400">•</span>
+                                    <span className="flex items-center gap-1">🏷️ {(purchasesLiveBreakdown.totalUnitsPurchased || 0).toLocaleString('en-PK')} Units</span>
+                                  </div>
+                                </div>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-slate-300/80 border border-slate-400/60 flex items-center justify-center text-slate-800 shrink-0">
                                 <Truck className="w-4 h-4" />
@@ -4945,9 +5108,9 @@ function StoreContent({ shopId }) {
                             <div className="p-3.5 bg-gradient-to-r from-rose-600 via-red-600 to-slate-800 rounded-xl text-white shadow-md flex items-center justify-between border border-rose-300/40 border-b-4 border-b-slate-950 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                               <div>
                                 <span className="text-[9.5px] font-bold text-rose-100 uppercase tracking-wide block">Damaged Stock</span>
-                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(Number(dynamicExpenseStats.totalDamagedEggs || 0) / 360).toFixed(1)} Petis</h4>
+                                <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">{(Number(dynamicExpenseStats.totalDamagedEggs || 0) / 360).toFixed(1)} Boxes</h4>
                                 <span className="text-[9px] text-slate-200 font-bold block mt-0.5">
-                                  {Math.round(Number(dynamicExpenseStats.totalDamagedEggs || 0) / 30)} Trays • {(Number(dynamicExpenseStats.totalDamagedEggs || 0)).toLocaleString('en-PK')} Eggs
+                                  {Math.round(Number(dynamicExpenseStats.totalDamagedEggs || 0) / 30)} Packs • {(Number(dynamicExpenseStats.totalDamagedEggs || 0)).toLocaleString('en-PK')} Units
                                 </span>
                               </div>
                               <div className="w-9 h-9 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -5099,6 +5262,10 @@ function StoreContent({ shopId }) {
                     onEditProduct={(p) => setEditModalProduct(p)}
                     onDeleteProduct={handleDirectDeleteProduct}
                     onViewProduct={(p) => setSelectedItem(p)}
+                    onRefresh={async () => {
+                      await fetchCatalog();
+                      await fetchDashboardStats();
+                    }}
                   />
                 </div>
               )}
@@ -5163,7 +5330,7 @@ function StoreContent({ shopId }) {
                           : 'bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 shadow-[0_2px_8px_rgba(15,23,42,0.4)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.5),0_0_10px_rgba(59,130,246,0.25),0_0_6px_rgba(245,158,11,0.15)] hover:border-blue-400/50'
                           }`}
                       >
-                        {cat !== 'All' && <img src="/egg.png" alt="" className="w-3.5 h-3.5 object-contain" />}
+                        {cat !== 'All' && <Package className="w-3.5 h-3.5 text-slate-500" />}
                         {cat}
                       </button>
                     ))}
@@ -5213,7 +5380,7 @@ function StoreContent({ shopId }) {
                                 <img src={item.images[0]} alt={item.name} className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out ${itemOutOfStock ? 'grayscale opacity-60' : ''}`} />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-slate-900">
-                                  <Egg className="w-14 h-14 text-blue-400/40 group-hover:scale-110 group-hover:text-blue-300 transition-all duration-500" />
+                                  <Package className="w-14 h-14 text-blue-400/40 group-hover:scale-110 group-hover:text-blue-300 transition-all duration-500" />
                                 </div>
                               )}
                               {/* Dark to Blue Gradient Overlay on Card Bottom */}
@@ -5400,25 +5567,24 @@ function StoreContent({ shopId }) {
                                 <div className="min-w-0 flex-1">
                                   <h4 className="font-black text-gray-900 text-xs uppercase tracking-tight truncate">{product.name}</h4>
                                   <p className="text-emerald-700 font-extrabold text-[11px] mt-0.5">
-                                    {currency} {eggPrice.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ Single</span>
+                                    {currency} {trayPrice.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ Pack</span>
                                   </p>
                                   <span className={`text-[9px] font-bold uppercase ${product.stock > 0 ? 'text-gray-400' : 'text-rose-500'}`}>
-                                    Stock: {product.stock} Products ({(product.stock / 12).toFixed(1)} Doz • {(product.stock / 30).toFixed(1)} Box)
+                                    Stock: {product.stock} units
                                   </span>
                                 </div>
                               </div>
 
-                              {/* 3 Direct Unit Add Buttons: 1 Dozen (12), 1 Box (30), Single (1) */}
+                              {/* 3 Direct Unit Add Buttons: Box, Pack, Unit */}
                               <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-gray-100">
                                 <button
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'peti')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Dozen (12 Products) - ${currency} ${petiPrice}`}
+                                  className="py-1 px-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Box (${currency} ${petiPrice})`}
                                 >
-                                  <span>📦 1 Dozen</span>
-                                  <span className="text-[7.5px] font-bold text-amber-600">12 Pcs</span>
+                                  <span>📦 Box</span>
                                   <span className="text-[8px] font-extrabold text-amber-900">{currency}{petiPrice}</span>
                                 </button>
 
@@ -5426,11 +5592,10 @@ function StoreContent({ shopId }) {
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'tray')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Box (30 Products) - ${currency} ${trayPrice}`}
+                                  className="py-1 px-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Pack (${currency} ${trayPrice})`}
                                 >
-                                  <span>🍱 1 Box</span>
-                                  <span className="text-[7.5px] font-bold text-emerald-600">30 Pcs</span>
+                                  <span>🍱 Pack</span>
                                   <span className="text-[8px] font-extrabold text-emerald-900">{currency}{trayPrice}</span>
                                 </button>
 
@@ -5438,11 +5603,10 @@ function StoreContent({ shopId }) {
                                   type="button"
                                   onClick={() => product.stock > 0 && addToWalkInCart(product, 'egg')}
                                   disabled={product.stock <= 0}
-                                  className="py-1 px-1 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
-                                  title={`Add 1 Single Product - ${currency} ${eggPrice}`}
+                                  className="py-1 px-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center transition-all cursor-pointer active:scale-95 disabled:opacity-40"
+                                  title={`Add 1 Unit (${currency} ${eggPrice})`}
                                 >
-                                  <span>🧴 Single</span>
-                                  <span className="text-[7.5px] font-bold text-blue-600">1 Pc</span>
+                                  <span>🏷️ Unit</span>
                                   <span className="text-[8px] font-extrabold text-blue-900">{currency}{eggPrice}</span>
                                 </button>
                               </div>
@@ -5492,102 +5656,319 @@ function StoreContent({ shopId }) {
                             />
                           </div>
 
-                          {/* Payment Method - 3 Options: Cash, Bank, Credit / Qaraz */}
-                          <div className="space-y-2">
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Payment Method</p>
-                            <div className="grid grid-cols-3 gap-2">
-                              {/* 1. Cash */}
-                              <button
-                                type="button"
-                                onClick={() => setWalkInPaymentMethod('CASH')}
-                                className={`py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${walkInPaymentMethod === 'CASH'
-                                  ? 'bg-emerald-600 text-white shadow-md border-2 border-emerald-400'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
-                                  }`}
-                              >
-                                <DollarSign className="w-3.5 h-3.5" /> Cash
-                              </button>
+                          {/* Payment Method - 4 Options: Cash, Bank, Split/Partial, Credit */}
+                          {(() => {
+                            const walkInTotal = walkInCart.reduce((sum, i) => {
+                              const rate = i.unitPrice || getProductUnitPrice(i.product, i.selectedUnit || 'tray');
+                              return sum + (rate * (Number(i.quantity) || 1));
+                            }, 0);
 
-                              {/* 2. Bank / Online */}
-                              <button
-                                type="button"
-                                onClick={() => setWalkInPaymentMethod('BANK_TRANSFER')}
-                                className={`py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${walkInPaymentMethod === 'BANK_TRANSFER'
-                                  ? 'bg-amber-500 text-white shadow-md border-2 border-amber-400'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
-                                  }`}
-                              >
-                                <Building2 className="w-3.5 h-3.5" /> Bank
-                              </button>
-
-                              {/* 3. Credit / Qaraz */}
-                              <button
-                                type="button"
-                                onClick={() => setWalkInPaymentMethod('CREDIT')}
-                                className={`py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${walkInPaymentMethod === 'CREDIT'
-                                  ? 'bg-rose-600 text-white shadow-md border-2 border-rose-400'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
-                                  }`}
-                              >
-                                <FileText className="w-3.5 h-3.5" /> Qaraz
-                              </button>
-                            </div>
-
-                            {/* Bank Details & Receipt Upload */}
-                            {walkInPaymentMethod === 'BANK_TRANSFER' && (
-                              <div className="space-y-2 animate-in fade-in duration-200 bg-amber-50/70 border border-amber-200 rounded-2xl p-3">
-                                <div className="space-y-1">
-                                  <p className="text-[9px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1">
-                                    <Building2 className="w-3 h-3" /> Official Bank Account
-                                  </p>
-                                  {(() => {
-                                    const sName = (shop?.name || '').toLowerCase();
-                                    const sAddr = (shop?.address || '').toLowerCase();
-                                    if (sName.includes('mardan') || sAddr.includes('mardan')) {
-                                      return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Bank Al Habib: 2013008100773501</p>;
-                                    }
-                                    if (sName.includes('peshawar') || sAddr.includes('peshawar')) {
-                                      return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Meezan Bank: 07190104740373</p>;
-                                    }
-                                    return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">UBL: 0109000306243543</p>;
-                                  })()}
-                                </div>
-                                <input
-                                  type="text"
-                                  placeholder="Bank Transaction / Ref ID"
-                                  value={walkInTransactionId}
-                                  onChange={e => setWalkInTransactionId(e.target.value)}
-                                  className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-500 shadow-sm"
-                                />
-                                <div>
-                                  <label className="text-[9px] font-black text-amber-900 uppercase tracking-wider block mb-1">Upload Payment Receipt Proof</label>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleReceiptUpload}
-                                    className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer"
-                                  />
-                                  {walkInPaymentProof && (
-                                    <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm relative group">
-                                      <img src={walkInPaymentProof} alt="Receipt" className="w-full h-full object-cover" />
-                                    </div>
+                            return (
+                              <div className="space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Payment Method</p>
+                                  {walkInPaymentMethod === 'PARTIAL' && (
+                                    <span className="text-[9.5px] font-black text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                      ⚡ Split / Partial Active
+                                    </span>
                                   )}
                                 </div>
-                              </div>
-                            )}
 
-                            {/* Credit / Qaraz Notice */}
-                            {walkInPaymentMethod === 'CREDIT' && (
-                              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3 space-y-1 animate-in fade-in duration-200">
-                                <p className="text-[10px] font-black text-rose-800 uppercase tracking-wider flex items-center gap-1">
-                                  <FileText className="w-3.5 h-3.5" /> Credit Sale (Qaraz / Due Balance)
-                                </p>
-                                <p className="text-[11px] text-rose-700 font-medium leading-tight">
-                                  This bill will be logged under <strong className="font-black uppercase">{walkInCustomerName.trim() || 'Credit Customer'}</strong> as an outstanding due balance (Qaraz).
-                                </p>
+                                <div className="grid grid-cols-4 gap-1.5">
+                                  {/* 1. Cash */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setWalkInPaymentMethod('CASH');
+                                      setWalkInPaidAmount('');
+                                    }}
+                                    className={`py-2 px-1 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${walkInPaymentMethod === 'CASH'
+                                      ? 'bg-emerald-600 text-white shadow-md border-2 border-emerald-400 scale-[1.02]'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                                      }`}
+                                  >
+                                    <DollarSign className="w-3.5 h-3.5" />
+                                    <span>Cash</span>
+                                  </button>
+
+                                  {/* 2. Bank / Online */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setWalkInPaymentMethod('BANK_TRANSFER');
+                                      setWalkInPaidAmount('');
+                                    }}
+                                    className={`py-2 px-1 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${walkInPaymentMethod === 'BANK_TRANSFER'
+                                      ? 'bg-amber-500 text-white shadow-md border-2 border-amber-400 scale-[1.02]'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                                      }`}
+                                  >
+                                    <Building2 className="w-3.5 h-3.5" />
+                                    <span>Bank</span>
+                                  </button>
+
+                                  {/* 3. Split / Partial */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setWalkInPaymentMethod('PARTIAL');
+                                      if (!walkInPaidAmount && walkInTotal > 0) {
+                                        setWalkInPaidAmount(Math.round(walkInTotal / 2));
+                                      }
+                                    }}
+                                    className={`py-2 px-1 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${walkInPaymentMethod === 'PARTIAL'
+                                      ? 'bg-indigo-600 text-white shadow-md border-2 border-indigo-400 scale-[1.02]'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                                      }`}
+                                  >
+                                    <CreditCard className="w-3.5 h-3.5" />
+                                    <span>Split/Part</span>
+                                  </button>
+
+                                  {/* 4. Credit */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setWalkInPaymentMethod('CREDIT');
+                                      setWalkInPaidAmount('0');
+                                    }}
+                                    className={`py-2 px-1 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${walkInPaymentMethod === 'CREDIT'
+                                      ? 'bg-rose-600 text-white shadow-md border-2 border-rose-400 scale-[1.02]'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                                      }`}
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span>Credit</span>
+                                  </button>
+                                </div>
+
+                                {/* PARTIAL / SPLIT PAYMENT CONFIGURATION BOX */}
+                                {walkInPaymentMethod === 'PARTIAL' && (
+                                  <div className="space-y-2.5 animate-in fade-in duration-200 bg-gradient-to-br from-indigo-50/90 to-blue-50/70 border-2 border-indigo-200 rounded-2xl p-3 shadow-sm">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-black text-indigo-900 uppercase tracking-widest flex items-center gap-1">
+                                        <CreditCard className="w-3.5 h-3.5 text-indigo-600" /> Partial Split Breakdown
+                                      </span>
+                                      <span className="text-[9.5px] font-black text-indigo-700 bg-white px-2 py-0.5 rounded-md border border-indigo-200">
+                                        Total: {currency} {walkInTotal.toLocaleString()}
+                                      </span>
+                                    </div>
+
+                                    {/* Choose Paid Destination: Cash or Bank */}
+                                    <div>
+                                      <label className="text-[9px] font-black text-gray-600 uppercase tracking-wider block mb-1">
+                                        Paid Upfront via:
+                                      </label>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPartialDestination('CASH')}
+                                          className={`py-1.5 px-2 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${walkInPartialDestination === 'CASH'
+                                            ? 'bg-emerald-600 text-white shadow-sm border border-emerald-400'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                            }`}
+                                        >
+                                          <DollarSign className="w-3 h-3" /> Cash Drawer
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPartialDestination('BANK')}
+                                          className={`py-1.5 px-2 rounded-xl text-[10.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${walkInPartialDestination === 'BANK'
+                                            ? 'bg-amber-600 text-white shadow-sm border border-amber-400'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                            }`}
+                                        >
+                                          <Building2 className="w-3 h-3" /> Bank Account
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Paid Amount Input with Presets */}
+                                    <div className="space-y-1.5">
+                                      <div className="flex justify-between items-center">
+                                        <label className="text-[9px] font-black text-gray-700 uppercase tracking-wider">
+                                          Amount Paid Now ({currency}):
+                                        </label>
+                                        <span className="text-[9.5px] font-black text-emerald-700">
+                                          Paid: {currency} {(Number(walkInPaidAmount) || 0).toLocaleString()}
+                                        </span>
+                                      </div>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max={walkInTotal}
+                                        placeholder={`Enter amount (e.g. ${Math.round(walkInTotal / 2)})`}
+                                        value={walkInPaidAmount}
+                                        onChange={e => setWalkInPaidAmount(e.target.value)}
+                                        className="w-full bg-white border border-indigo-300 rounded-xl px-3 py-2 text-xs font-black text-gray-900 outline-none focus:border-indigo-600 shadow-sm"
+                                      />
+                                      {/* Quick Percentage / Preset Buttons */}
+                                      <div className="grid grid-cols-4 gap-1 pt-0.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPaidAmount(Math.round(walkInTotal * 0.5))}
+                                          className="py-1 px-1 bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[9px] font-black uppercase cursor-pointer"
+                                        >
+                                          50% (Half)
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPaidAmount(Math.round(walkInTotal * 0.25))}
+                                          className="py-1 px-1 bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[9px] font-black uppercase cursor-pointer"
+                                        >
+                                          25%
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPaidAmount(Math.round(walkInTotal * 0.75))}
+                                          className="py-1 px-1 bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[9px] font-black uppercase cursor-pointer"
+                                        >
+                                          75%
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setWalkInPaidAmount(walkInTotal)}
+                                          className="py-1 px-1 bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[9px] font-black uppercase cursor-pointer"
+                                        >
+                                          Full
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Live Dynamic Breakdown Box */}
+                                    {(() => {
+                                      const paid = Math.min(walkInTotal, Math.max(0, Number(walkInPaidAmount) || 0));
+                                      const remainingDue = Math.max(0, walkInTotal - paid);
+                                      return (
+                                        <div className="bg-white/90 border border-indigo-200 rounded-xl p-2.5 space-y-1.5 shadow-sm text-xs">
+                                          <div className="flex justify-between items-center">
+                                            <span className="font-bold text-gray-600 text-[10px] uppercase flex items-center gap-1">
+                                              {walkInPartialDestination === 'BANK' ? <Building2 className="w-3 h-3 text-amber-600" /> : <DollarSign className="w-3 h-3 text-emerald-600" />}
+                                              Paid Now ({walkInPartialDestination}):
+                                            </span>
+                                            <span className="font-black text-emerald-600 text-xs">
+                                              {currency} {paid.toLocaleString()}
+                                            </span>
+                                          </div>
+                                          <div className="flex justify-between items-center pt-1 border-t border-gray-100">
+                                            <span className="font-bold text-rose-700 text-[10px] uppercase flex items-center gap-1">
+                                              <FileText className="w-3 h-3 text-rose-600" /> Remaining Credit (Due):
+                                            </span>
+                                            <span className="font-black text-rose-600 text-xs">
+                                              {currency} {remainingDue.toLocaleString()}
+                                            </span>
+                                          </div>
+                                          {remainingDue > 0 && (
+                                            <p className="text-[9.5px] text-rose-700 font-bold bg-rose-50 border border-rose-200 rounded-lg p-1.5 text-center mt-1">
+                                              ⚠️ {currency} {remainingDue.toLocaleString()} will be logged under <strong className="uppercase">{walkInCustomerName.trim() || 'Credit Customer'}</strong> as credit.
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
+
+                                    {/* If Bank is chosen in Split Mode, show Bank info & Receipt upload */}
+                                    {walkInPartialDestination === 'BANK' && (
+                                      <div className="space-y-2 pt-1 border-t border-indigo-200/60">
+                                        <div className="space-y-1">
+                                          <p className="text-[9px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1">
+                                            <Building2 className="w-3 h-3" /> Branch Bank Account
+                                          </p>
+                                          {(() => {
+                                            const sName = (shop?.name || '').toLowerCase();
+                                            const sAddr = (shop?.address || '').toLowerCase();
+                                            if (sName.includes('mardan') || sAddr.includes('mardan')) {
+                                              return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Bank Al Habib: 2013008100773501</p>;
+                                            }
+                                            if (sName.includes('peshawar') || sAddr.includes('peshawar')) {
+                                              return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Meezan Bank: 07190104740373</p>;
+                                            }
+                                            return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">UBL: 0109000306243543</p>;
+                                          })()}
+                                        </div>
+                                        <input
+                                          type="text"
+                                          placeholder="Bank Ref / Transaction ID (Optional)"
+                                          value={walkInTransactionId}
+                                          onChange={e => setWalkInTransactionId(e.target.value)}
+                                          className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-500 shadow-sm"
+                                        />
+                                        <div>
+                                          <label className="text-[9px] font-black text-amber-900 uppercase tracking-wider block mb-1">Upload Receipt Proof (Optional)</label>
+                                          <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleReceiptUpload}
+                                            className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer"
+                                          />
+                                          {walkInPaymentProof && (
+                                            <div className="mt-2 w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm relative group">
+                                              <img src={walkInPaymentProof} alt="Receipt" className="w-full h-full object-cover" />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Bank Details & Receipt Upload */}
+                                {walkInPaymentMethod === 'BANK_TRANSFER' && (
+                                  <div className="space-y-2 animate-in fade-in duration-200 bg-amber-50/70 border border-amber-200 rounded-2xl p-3">
+                                    <div className="space-y-1">
+                                      <p className="text-[9px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1">
+                                        <Building2 className="w-3 h-3" /> Official Bank Account
+                                      </p>
+                                      {(() => {
+                                        const sName = (shop?.name || '').toLowerCase();
+                                        const sAddr = (shop?.address || '').toLowerCase();
+                                        if (sName.includes('mardan') || sAddr.includes('mardan')) {
+                                          return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Bank Al Habib: 2013008100773501</p>;
+                                        }
+                                        if (sName.includes('peshawar') || sAddr.includes('peshawar')) {
+                                          return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">Meezan Bank: 07190104740373</p>;
+                                        }
+                                        return <p className="text-xs font-mono font-black text-gray-900 bg-white border border-amber-200 px-2.5 py-1.5 rounded-lg shadow-sm">UBL: 0109000306243543</p>;
+                                      })()}
+                                    </div>
+                                    <input
+                                      type="text"
+                                      placeholder="Bank Transaction / Ref ID"
+                                      value={walkInTransactionId}
+                                      onChange={e => setWalkInTransactionId(e.target.value)}
+                                      className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none focus:border-amber-500 shadow-sm"
+                                    />
+                                    <div>
+                                      <label className="text-[9px] font-black text-amber-900 uppercase tracking-wider block mb-1">Upload Payment Receipt Proof</label>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleReceiptUpload}
+                                        className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer"
+                                      />
+                                      {walkInPaymentProof && (
+                                        <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm relative group">
+                                          <img src={walkInPaymentProof} alt="Receipt" className="w-full h-full object-cover" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Credit Notice */}
+                                {walkInPaymentMethod === 'CREDIT' && (
+                                  <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3 space-y-1 animate-in fade-in duration-200">
+                                    <p className="text-[10px] font-black text-rose-800 uppercase tracking-wider flex items-center gap-1">
+                                      <FileText className="w-3.5 h-3.5" /> Full Credit Sale (100% Due Balance)
+                                    </p>
+                                    <p className="text-[11px] text-rose-700 font-medium leading-tight">
+                                      This bill of <strong>{currency} {walkInTotal.toLocaleString()}</strong> will be logged under <strong className="font-black uppercase">{walkInCustomerName.trim() || 'Credit Customer'}</strong> as an outstanding due balance.
+                                    </p>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
+                            );
+                          })()}
 
                           {/* Bill Items List with Peti, Tray, Egg Unit Selectors */}
                           <div className="space-y-2 max-h-[260px] overflow-y-auto">
@@ -5610,7 +5991,7 @@ function StoreContent({ shopId }) {
                                       <div className="min-w-0 flex-1">
                                         <p className="font-black text-gray-900 uppercase truncate text-xs">{item.product.name}</p>
                                         <span className="text-[10px] font-bold text-emerald-700">
-                                          {currency} {itemRate.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ {currentUnit === 'peti' ? 'DOZEN (12)' : currentUnit === 'tray' ? 'BOX (30)' : 'SINGLE'}</span>
+                                          {currency} {itemRate.toLocaleString()} <span className="text-[9px] font-normal text-gray-400">/ {currentUnit.toUpperCase()}</span>
                                         </span>
                                       </div>
 
@@ -5627,14 +6008,14 @@ function StoreContent({ shopId }) {
                                       </div>
                                     </div>
 
-                                    {/* Unit Selection Pills (1 Dozen (12), 1 Box (30), Single (1)) & Qty Counter */}
+                                    {/* Unit Selection Pills (Peti, Tray, Egg) & Qty Counter */}
                                     <div className="flex items-center justify-between gap-2 pt-1 border-t border-gray-200/60">
                                       {/* Unit Pills */}
                                       <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-gray-200">
                                         {[
-                                          { id: 'peti', label: '📦 1 Doz (12)' },
-                                          { id: 'tray', label: '🍱 1 Box (30)' },
-                                          { id: 'egg', label: '🧴 Single' },
+                                          { id: 'peti', label: '📦 Box' },
+                                          { id: 'tray', label: '🍱 Pack' },
+                                          { id: 'egg', label: '🏷️ Unit' },
                                         ].map(u => (
                                           <button
                                             key={u.id}
@@ -5670,32 +6051,31 @@ function StoreContent({ shopId }) {
                                       </div>
                                     </div>
 
-                                    {/* Live Dynamic Breakdown: 1 Dozen = 12 Products • 1 Box = 30 Products */}
+                                    {/* Live Dynamic Breakdown: 1 Peti = 12 Trays • 360 Eggs */}
                                     {(() => {
+                                      const tPerPeti = item.product?.traysPerPeti || 12;
+                                      const ePerTray = item.product?.eggsPerTray || 30;
+                                      const ePerPeti = tPerPeti * ePerTray;
                                       const qty = Number(item.quantity) || 1;
                                       let breakdownStr = '';
-                                      let unitTitle = '';
                                       if (currentUnit === 'peti') {
-                                        const totalSingle = qty * 12;
-                                        const totalBoxes = (totalSingle / 30).toFixed(1).replace(/\.0$/, '');
-                                        unitTitle = `${qty} DOZEN`;
-                                        breakdownStr = `${totalSingle} Single Products • ${totalBoxes} Boxes`;
+                                        const totalTrays = (qty * tPerPeti).toFixed(1).replace(/\.0$/, '');
+                                        const totalUnits = Math.round(qty * ePerPeti).toLocaleString();
+                                        breakdownStr = `${totalTrays} Packs • ${totalUnits} Units`;
                                       } else if (currentUnit === 'tray') {
-                                        const totalSingle = qty * 30;
-                                        const totalDozens = (totalSingle / 12).toFixed(1).replace(/\.0$/, '');
-                                        unitTitle = `${qty} BOX`;
-                                        breakdownStr = `${totalSingle} Single Products • ${totalDozens} Dozen`;
+                                        const totalUnits = Math.round(qty * ePerTray).toLocaleString();
+                                        const totalPetis = (qty / tPerPeti).toFixed(2).replace(/\.00$/, '');
+                                        breakdownStr = `${totalUnits} Units • ${totalPetis} Boxes`;
                                       } else {
-                                        const totalDoz = (qty / 12).toFixed(2).replace(/\.00$/, '');
-                                        const totalBox = (qty / 30).toFixed(2).replace(/\.00$/, '');
-                                        unitTitle = `${qty} SINGLE`;
-                                        breakdownStr = `${qty} Single Product${qty > 1 ? 's' : ''} (${totalDoz} Doz • ${totalBox} Box)`;
+                                        const totalTrays = (qty / ePerTray).toFixed(1).replace(/\.0$/, '');
+                                        const totalPetis = (qty / ePerPeti).toFixed(2).replace(/\.00$/, '');
+                                        breakdownStr = `${totalTrays} Packs • ${totalPetis} Boxes`;
                                       }
 
                                       return (
                                         <div className="flex items-center justify-between px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-lg text-[10px] font-black text-emerald-800">
                                           <span className="uppercase text-emerald-700 flex items-center gap-1 font-bold">
-                                            <span>⚡</span> {unitTitle} =
+                                            <span>⚡</span> {qty} {currentUnit.toUpperCase()} =
                                           </span>
                                           <span className="font-extrabold text-emerald-900 tracking-tight">{breakdownStr}</span>
                                         </div>
@@ -6101,7 +6481,7 @@ function StoreContent({ shopId }) {
                           Sales Analytics Report
                         </h2>
                         <p className="text-slate-400 text-[10.5px] font-medium leading-none mt-0.5 hidden sm:block truncate">
-                          Real-time Revenue, Orders, Egg Quantities &amp; Invoices
+                          Real-time Revenue, Orders, Product Quantities &amp; Invoices
                         </p>
                       </div>
                     </div>
@@ -6194,11 +6574,11 @@ function StoreContent({ shopId }) {
                       </span>
                     </div>
 
-                    {/* Card 3: Blue - 📋 Credit / Qaraz Sales */}
+                    {/* Card 3: Blue - 📋 Credit Sales */}
                     <div className="bg-white border-2 border-blue-400/80 rounded-2xl p-4 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[9.5px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-1">
-                          📋 Credit / Qaraz (Due)
+                          📋 Credit (Due)
                         </span>
                         <div className="p-1.5 bg-blue-100 rounded-lg text-blue-700">
                           <FileText className="w-3.5 h-3.5" />
@@ -6208,7 +6588,7 @@ function StoreContent({ shopId }) {
                         {currency} {Number(salesReportStats.creditSales || 0).toLocaleString('en-PK')}
                       </h4>
                       <span className="text-[10px] font-black text-blue-600 uppercase mt-1 block">
-                        Customer Outstanding Qaraz
+                        Customer Outstanding Credit
                       </span>
                     </div>
 
@@ -6226,7 +6606,7 @@ function StoreContent({ shopId }) {
                         {currency} {Number(salesReportStats.totalRevenue || 0).toLocaleString('en-PK')}
                       </h4>
                       <span className="text-[10px] font-bold text-gray-400 uppercase mt-1 block">
-                        {salesReportStats.totalBills} Bills • {salesReportStats.totalPetis} Petis ({Number(salesReportStats.totalEggs || 0).toLocaleString('en-PK')} Eggs)
+                        {salesReportStats.totalBills} Bills • {salesReportStats.totalPetis} Boxes ({Number(salesReportStats.totalUnits || 0).toLocaleString('en-PK')} Units)
                       </span>
                     </div>
                   </div>
@@ -6285,7 +6665,7 @@ function StoreContent({ shopId }) {
                               : 'bg-blue-50 text-blue-900 hover:bg-blue-100 border-blue-400'
                           }`}
                         >
-                          📋 Qaraz ({filteredSalesForReport.filter(s => s.paymentMethod === 'CREDIT' || Number(s.dueAmount) > 0 || s.isCredit).length})
+                          📋 Credit ({filteredSalesForReport.filter(s => s.paymentMethod === 'CREDIT' || Number(s.dueAmount) > 0 || s.isCredit).length})
                         </button>
                         <button
                           onClick={() => setSalesReportPaymentFilter('ONLINE')}
@@ -6425,9 +6805,18 @@ function StoreContent({ shopId }) {
                                     <div className="flex items-center justify-between pt-2 border-t border-gray-100 gap-2 flex-wrap">
                                       <div>
                                         {isCredit ? (
-                                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-300">
-                                            <FileText className="w-2.5 h-2.5" /> Due: {currency} {(Number(s.dueAmount) || total).toLocaleString('en-PK')}
-                                          </span>
+                                          <div className="space-y-1">
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-300">
+                                              <FileText className="w-2.5 h-2.5" /> Due: {currency} {(Number(s.dueAmount) || total).toLocaleString('en-PK')}
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleOpenSettleCredit(s)}
+                                              className="block px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[9.5px] font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer"
+                                            >
+                                              💳 Pay Credit
+                                            </button>
+                                          </div>
                                         ) : isBank ? (
                                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-300">
                                             <Building2 className="w-2.5 h-2.5" /> Bank: {currency} {(Number(s.bankPaid) || total).toLocaleString('en-PK')}
@@ -6460,7 +6849,7 @@ function StoreContent({ shopId }) {
                                         </button>
                                         <button
                                           type="button"
-                                          onClick={() => handleDeleteSale(s._id)}
+                                          onClick={() => handleDeleteSale(s._id || s.id || s.orderId)}
                                           className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg transition-all cursor-pointer"
                                           title="Delete Sale"
                                         >
@@ -6543,11 +6932,19 @@ function StoreContent({ shopId }) {
                                           {isCredit ? (
                                             <div className="space-y-1">
                                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-300">
-                                                <FileText className="w-2.5 h-2.5" /> Credit / Qaraz
+                                                <FileText className="w-2.5 h-2.5" /> Credit
                                               </span>
                                               <p className="text-[10px] font-black text-rose-700">
                                                 Due: {currency} {(Number(s.dueAmount) || total).toLocaleString('en-PK')}
                                               </p>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleOpenSettleCredit(s)}
+                                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all cursor-pointer"
+                                                title="Receive / Clear Customer Credit"
+                                              >
+                                                💳 Pay Credit
+                                              </button>
                                             </div>
                                           ) : isBank ? (
                                             <div className="space-y-1">
@@ -6601,7 +6998,7 @@ function StoreContent({ shopId }) {
                                             </button>
                                             <button
                                               type="button"
-                                              onClick={() => handleDeleteSale(s._id)}
+                                              onClick={() => handleDeleteSale(s._id || s.id || s.orderId)}
                                               className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-all cursor-pointer"
                                               title="Delete Sale"
                                             >
@@ -6655,7 +7052,7 @@ function StoreContent({ shopId }) {
                           Pure Realized Net Profit Statement
                         </h2>
                         <p className="text-slate-400 text-[10.5px] font-medium leading-none mt-0.5 hidden sm:block truncate">
-                          Revenue minus Purchases (Petis • Trays • Eggs), Expenses &amp; Damaged Stock Losses.
+                          Revenue minus Purchases (Boxes • Packs • Units), Expenses &amp; Damaged Stock Losses.
                         </p>
                       </div>
                     </div>
@@ -6807,8 +7204,12 @@ function StoreContent({ shopId }) {
                             + {currency} {Number(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}
                           </h4>
                         </div>
-                        <div className="mt-3 pt-2 border-t border-gray-100 text-[10px] font-bold text-gray-500">
-                          {profitReportStats.filteredSalesCount} Invoices
+                        <div className="mt-2.5 pt-2 border-t border-emerald-50">
+                          <div className="w-full flex items-center justify-between px-2 py-0.5 bg-gradient-to-r from-emerald-100 via-teal-100 to-sky-100 text-slate-950 border border-teal-300/80 rounded-full text-[7.5px] font-black tracking-tight shadow-xs">
+                            <span className="flex items-center gap-1">🧾 {profitReportStats.filteredSalesCount} Invoices</span>
+                            <span className="text-teal-600 font-black">•</span>
+                            <span className="flex items-center gap-1">💰 Total Revenue</span>
+                          </div>
                         </div>
                       </div>
 
@@ -6827,17 +7228,13 @@ function StoreContent({ shopId }) {
                             - {currency} {Number(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}
                           </h4>
                         </div>
-                        <div className="mt-2.5 pt-2 border-t border-blue-50 space-y-1">
-                          <div className="flex flex-wrap gap-1 text-[9px] font-black">
-                            <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded">
-                              📦 {profitReportStats.totalPurchasesPetis} P
-                            </span>
-                            <span className="px-1.5 py-0.5 bg-cyan-50 text-cyan-800 border border-cyan-200 rounded">
-                              🍱 {profitReportStats.totalPurchasesTrays} T
-                            </span>
-                            <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                              🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} P
-                            </span>
+                        <div className="mt-2.5 pt-2 border-t border-blue-50">
+                          <div className="w-full flex items-center justify-between px-2 py-0.5 bg-slate-100 text-slate-800 border border-slate-200/90 rounded-full text-[7.5px] font-black tracking-tight shadow-xs">
+                            <span className="flex items-center gap-0.5">📦 {profitReportStats.totalPurchasesPetis} Box</span>
+                            <span className="text-slate-400 font-black">•</span>
+                            <span className="flex items-center gap-0.5">🍱 {profitReportStats.totalPurchasesTrays} Pack</span>
+                            <span className="text-slate-400 font-black">•</span>
+                            <span className="flex items-center gap-0.5">🏷️ {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Unit</span>
                           </div>
                         </div>
                       </div>
@@ -6862,7 +7259,7 @@ function StoreContent({ shopId }) {
                         </div>
                       </div>
 
-                      {/* Card 4: Damaged Egg Loss */}
+                      {/* Card 4: Damaged / Defect Loss */}
                       <div className="bg-white border-2 border-amber-200 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
                         <div>
                           <div className="flex items-center justify-between mb-2">
@@ -6878,7 +7275,7 @@ function StoreContent({ shopId }) {
                           </h4>
                         </div>
                         <div className="mt-3 pt-2 border-t border-gray-100 text-[10px] font-bold text-amber-800">
-                          {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Eggs)
+                          {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Units)
                         </div>
                       </div>
 
@@ -6963,16 +7360,14 @@ function StoreContent({ shopId }) {
                             Cost
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-1 text-[9px] font-black">
-                          <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded">
-                            📦 {profitReportStats.totalPurchasesPetis} Petis
-                          </span>
-                          <span className="px-1.5 py-0.5 bg-cyan-50 text-cyan-800 border border-cyan-200 rounded">
-                            🍱 {profitReportStats.totalPurchasesTrays} Trays
-                          </span>
-                          <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                            🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Perfumes
-                          </span>
+                        <div>
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200/90 rounded-full text-[8.5px] font-black tracking-tight whitespace-nowrap shadow-xs">
+                            <span className="flex items-center gap-0.5">📦 {profitReportStats.totalPurchasesPetis} Boxes</span>
+                            <span className="text-slate-400 font-black">•</span>
+                            <span className="flex items-center gap-0.5">🍱 {profitReportStats.totalPurchasesTrays} Packs</span>
+                            <span className="text-slate-400 font-black">•</span>
+                            <span className="flex items-center gap-0.5">🏷️ {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Units</span>
+                          </div>
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-blue-200/60">
                           <span className="text-[11px] font-bold text-gray-600">
@@ -7009,7 +7404,7 @@ function StoreContent({ shopId }) {
                         </div>
                       </div>
 
-                      {/* Card 4: Damaged Perfume Loss */}
+                      {/* Card 4: Damaged / Defect Loss */}
                       <div className="bg-amber-50/50 border-2 border-amber-200 rounded-2xl p-3.5 shadow-sm space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
@@ -7017,7 +7412,7 @@ function StoreContent({ shopId }) {
                               #4
                             </span>
                             <span className="font-black text-amber-950 text-xs uppercase">
-                              (-) Damaged Perfume Loss
+                              (-) Damaged / Defect Loss
                             </span>
                           </div>
                           <span className="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[8.5px] font-black uppercase">
@@ -7026,7 +7421,7 @@ function StoreContent({ shopId }) {
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-amber-200/60">
                           <span className="text-[11px] font-bold text-gray-600">
-                            {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Perfumes)
+                            {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Units)
                           </span>
                           <span className="text-base font-black text-amber-700">
                             - {currency} {Number(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}
@@ -7101,16 +7496,12 @@ function StoreContent({ shopId }) {
                               </div>
                             </td>
                             <td className="p-3.5 text-center">
-                              <div className="inline-flex items-center gap-1">
-                                <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded text-[9px] font-black">
-                                  📦 {profitReportStats.totalPurchasesPetis} Petis
-                                </span>
-                                <span className="px-2 py-0.5 bg-cyan-50 text-cyan-800 border border-cyan-200 rounded text-[9px] font-black">
-                                  🍱 {profitReportStats.totalPurchasesTrays} Trays
-                                </span>
-                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[9px] font-black">
-                                  🧴 {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Perfumes
-                                </span>
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200/90 rounded-full text-[8.5px] font-black tracking-tight whitespace-nowrap shadow-xs">
+                                <span className="flex items-center gap-0.5">📦 {profitReportStats.totalPurchasesPetis} Boxes</span>
+                                <span className="text-slate-400 font-black">•</span>
+                                <span className="flex items-center gap-0.5">🍱 {profitReportStats.totalPurchasesTrays} Packs</span>
+                                <span className="text-slate-400 font-black">•</span>
+                                <span className="flex items-center gap-0.5">🏷️ {profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Units</span>
                               </div>
                             </td>
                             <td className="p-3.5 text-center text-gray-600">
@@ -7143,13 +7534,13 @@ function StoreContent({ shopId }) {
                             </td>
                           </tr>
 
-                          {/* Row 4: Damaged Egg Loss */}
+                          {/* Row 4: Damaged / Defect Loss */}
                           <tr className="hover:bg-gray-50/80 transition-colors">
                             <td className="p-3.5 text-center text-gray-400 font-bold">4</td>
                             <td className="p-3.5 text-amber-800 font-extrabold">
                               <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                                (-) Damaged / Broken Egg Inventory Loss
+                                (-) Damaged / Defective Stock Loss
                               </div>
                             </td>
                             <td className="p-3.5 text-center">
@@ -7158,7 +7549,7 @@ function StoreContent({ shopId }) {
                               </span>
                             </td>
                             <td className="p-3.5 text-center text-gray-600">
-                              {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Eggs)
+                              {profitReportStats.filteredDamagedCount} Logs ({profitReportStats.totalDamagedEggs} Units)
                             </td>
                             <td className="p-3.5 text-right text-amber-700 font-black text-sm">
                               - {currency} {Number(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}
@@ -7200,7 +7591,7 @@ function StoreContent({ shopId }) {
                           Business Expenses &amp; Loss Report
                         </h2>
                         <p className="text-slate-400 text-[10.5px] font-medium leading-none mt-0.5 hidden sm:block truncate">
-                          Track operating overheads, bills, rent, transport, and egg breakage losses.
+                          Track operating overheads, bills, rent, transport, and product damage losses.
                         </p>
                       </div>
                     </div>
@@ -7319,17 +7710,17 @@ function StoreContent({ shopId }) {
                           </div>
                         </div>
 
-                        {/* Card 4: Orange - Damaged Egg Loss */}
+                        {/* Card 4: Orange - Damaged / Defect Loss */}
                         <div className="bg-white border-2 border-orange-300 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
                           <div className="flex items-center justify-between text-orange-700 text-[10px] font-black uppercase tracking-widest mb-2">
-                            <span className="flex items-center gap-1"><PackageX className="w-3.5 h-3.5 text-orange-600" /> Damaged Egg Loss</span>
+                            <span className="flex items-center gap-1"><PackageX className="w-3.5 h-3.5 text-orange-600" /> Damaged / Defect Loss</span>
                             <span className="px-2 py-0.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-full text-[9px] font-black">BREAKAGE</span>
                           </div>
                           <h4 className="text-2xl font-black text-orange-600 tracking-tight">
                             {currency} {timeframeDamaged.toLocaleString('en-PK')}
                           </h4>
                           <p className="text-[11px] text-slate-500 mt-1.5 pt-1.5 border-t border-orange-100 font-medium">
-                            {dynamicExpenseStats.totalDamagedEggs} egg cracked/broken stock losses
+                            {dynamicExpenseStats.totalDamagedEggs} damaged/broken stock losses
                           </p>
                         </div>
                       </div>
@@ -7508,7 +7899,7 @@ function StoreContent({ shopId }) {
                                   expensePaymentFilter === 'BANK' ? 'No Bank expenses logged for this period.' :
                                     'No manual expenses logged for this period.'}
                               </p>
-                              <p className="text-[11px] text-slate-400 mt-1">Click "+ Log Entry" above to add shop rent, electricity, packaging, or egg damage expenses.</p>
+                              <p className="text-[11px] text-slate-400 mt-1">Click "+ Log Entry" above to add shop rent, electricity, packaging, or product damage expenses.</p>
                               <button
                                 onClick={() => setShowAddExpenseModal(true)}
                                 className="mt-3 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase rounded-xl shadow cursor-pointer inline-flex items-center gap-1.5"
@@ -7539,7 +7930,7 @@ function StoreContent({ shopId }) {
                                             <span className={`px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider ${exp.category === 'Rent' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
                                               exp.category === 'Utilities / Bills' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
                                                 exp.category === 'Salaries' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-                                                  exp.category === 'Egg Damage / Loss' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                                                  exp.category === 'Damaged / Defective Loss' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
                                                     exp.category === 'Transport & Freight' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
                                                       'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                               }`}>
@@ -7666,7 +8057,7 @@ function StoreContent({ shopId }) {
                                             <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${exp.category === 'Rent' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
                                               exp.category === 'Utilities / Bills' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
                                                 exp.category === 'Salaries' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-                                                  exp.category === 'Egg Damage / Loss' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                                                  exp.category === 'Damaged / Defective Loss' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
                                                     exp.category === 'Transport & Freight' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
                                                       'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                               }`}>
@@ -7809,7 +8200,7 @@ function StoreContent({ shopId }) {
                           Damaged Products Loss Report
                         </h2>
                         <p className="text-slate-400 text-[10.5px] font-medium leading-none mt-0.5 hidden sm:block truncate">
-                          Log egg breakages, cracked eggs, expired inventory, and transport losses dynamically.
+                          Log damages, defective items, expired inventory, and transport losses dynamically.
                         </p>
                       </div>
                     </div>
@@ -8012,7 +8403,7 @@ function StoreContent({ shopId }) {
                       {damagedProductsList.length === 0 ? (
                         <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-300 rounded-2xl">
                           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">No damaged products or stock losses logged yet.</p>
-                          <p className="text-[10px] text-slate-400 mt-1">Click "+ Log Damaged Product" to record egg breakage, cracked eggs, or spoiled stock losses.</p>
+                          <p className="text-[10px] text-slate-400 mt-1">Click "+ Log Damaged Product" to record damaged, expired, or spoiled stock losses.</p>
                           <button
                             onClick={() => setShowAddDamagedModal(true)}
                             className="mt-3 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase rounded-xl shadow cursor-pointer inline-flex items-center gap-1.5"
@@ -8039,7 +8430,7 @@ function StoreContent({ shopId }) {
                                     </div>
                                     <div className="mt-1">
                                       <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-[8.5px] font-black uppercase tracking-wider border border-amber-200">
-                                        {dmg.reason || 'Egg Breakage'}
+                                        {dmg.reason || 'Damaged Stock'}
                                       </span>
                                     </div>
                                   </div>
@@ -8131,7 +8522,7 @@ function StoreContent({ shopId }) {
                                     </td>
                                     <td className="p-3.5">
                                       <span className="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-[9px] font-black uppercase tracking-wider">
-                                        {dmg.reason || 'Egg Breakage'}
+                                        {dmg.reason || 'Damaged Stock'}
                                       </span>
                                     </td>
                                     <td className="p-3.5 text-center font-black text-slate-900">
@@ -8209,7 +8600,7 @@ function StoreContent({ shopId }) {
                 <img src={selectedItem.images[0]} alt={selectedItem.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-slate-900">
-                  <Egg className="w-16 h-16 text-blue-400/40" />
+                  <Package className="w-16 h-16 text-blue-400/40" />
                 </div>
               )}
               {/* Subtle Blue/Dark Overlay */}
@@ -8217,7 +8608,7 @@ function StoreContent({ shopId }) {
 
               {/* Category Pill */}
               <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-900/90 border border-blue-400/40 text-blue-300 text-[9.5px] font-black uppercase tracking-wider backdrop-blur-md shadow-md">
-                {selectedItem.category || 'Egg Product'}
+                {selectedItem.category || 'Product'}
               </div>
 
               {/* Close Button */}
@@ -8242,7 +8633,7 @@ function StoreContent({ shopId }) {
                   </p>
                 ) : (
                   <p className="text-slate-400 text-[11px] font-medium mt-0.5">
-                    Fresh egg category: {selectedItem.category || 'Standard'}
+                    Category: {selectedItem.category || 'Standard'}
                   </p>
                 )}
               </div>
@@ -8280,15 +8671,15 @@ function StoreContent({ shopId }) {
                 return (
                   <div className="grid grid-cols-3 gap-1.5 pt-0.5">
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-amber-300 block uppercase">📦 1 Dozen (12)</span>
+                      <span className="text-[8.5px] font-bold text-amber-300 block uppercase">📦 1 Box</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {pPrice.toLocaleString()}</span>
                     </div>
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-sky-300 block uppercase">🍱 1 Box (30)</span>
+                      <span className="text-[8.5px] font-bold text-sky-300 block uppercase">🍱 1 Pack</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {tPrice.toLocaleString()}</span>
                     </div>
                     <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 text-center">
-                      <span className="text-[8.5px] font-bold text-emerald-300 block uppercase">🧴 Single Product</span>
+                      <span className="text-[8.5px] font-bold text-emerald-300 block uppercase">🏷️ 1 Unit</span>
                       <span className="text-[11px] font-black text-white mt-0.5 block">{currency} {ePrice}</span>
                     </div>
                   </div>
@@ -8434,7 +8825,7 @@ function StoreContent({ shopId }) {
                     <option value="Packaging & Bags">Packaging & Bags</option>
                     <option value="Transport & Freight">Transport & Freight</option>
                     <option value="Salaries">Worker Salaries</option>
-                    <option value="Egg Damage / Loss">Egg Damage / Loss</option>
+                    <option value="Damaged / Defective Loss">Damaged / Defective Loss</option>
                     <option value="Other">Other Expenses</option>
                   </select>
                 </div>
@@ -8643,7 +9034,7 @@ function StoreContent({ shopId }) {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Loman Brown Eggs, Golden Eggs..."
+                      placeholder="e.g. Royal Oud, Amber Musk..."
                       value={damagedFormData.productName}
                       onChange={e => setDamagedFormData(prev => ({ ...prev, productName: e.target.value }))}
                       className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500"
@@ -8653,12 +9044,12 @@ function StoreContent({ shopId }) {
                   {/* ─── 3 SEPARATE DAMAGED QUANTITY INPUTS: PETI, TRAY, EGG ─── */}
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-wider text-zinc-600 block mb-1.5">
-                      Damaged Quantities (Petis / Trays / Eggs) *
+                      Damaged Quantities (Boxes / Packs / Units) *
                     </label>
                     <div className="grid grid-cols-3 gap-2.5">
                       {/* Petis Damaged */}
                       <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-2.5 text-center focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-amber-900 uppercase block tracking-wider">Petis</span>
+                        <span className="text-[9.5px] font-black text-amber-900 uppercase block tracking-wider">Boxes</span>
                         <input
                           type="number"
                           min="0"
@@ -8669,13 +9060,13 @@ function StoreContent({ shopId }) {
                           className="w-full text-center text-sm font-black text-amber-950 bg-transparent focus:outline-none mt-1"
                         />
                         <span className="text-[8.5px] text-amber-700 font-bold block mt-0.5">
-                          {petiPrice > 0 ? `Rs. ${petiPrice}/Peti` : '360 Eggs'}
+                          {petiPrice > 0 ? `Rs. ${petiPrice}/Box` : '360 Units'}
                         </span>
                       </div>
 
                       {/* Trays Damaged */}
                       <div className="bg-sky-50/70 border border-sky-200/90 rounded-2xl p-2.5 text-center focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-sky-900 uppercase block tracking-wider">Trays</span>
+                        <span className="text-[9.5px] font-black text-sky-900 uppercase block tracking-wider">Packs</span>
                         <input
                           type="number"
                           min="0"
@@ -8686,13 +9077,13 @@ function StoreContent({ shopId }) {
                           className="w-full text-center text-sm font-black text-sky-950 bg-transparent focus:outline-none mt-1"
                         />
                         <span className="text-[8.5px] text-sky-700 font-bold block mt-0.5">
-                          {trayPrice > 0 ? `Rs. ${trayPrice}/Tray` : '30 Eggs'}
+                          {trayPrice > 0 ? `Rs. ${trayPrice}/Pack` : '30 Units'}
                         </span>
                       </div>
 
                       {/* Eggs Damaged */}
                       <div className="bg-emerald-50/70 border border-emerald-200/90 rounded-2xl p-2.5 text-center focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-emerald-900 uppercase block tracking-wider">Eggs</span>
+                        <span className="text-[9.5px] font-black text-emerald-900 uppercase block tracking-wider">Units</span>
                         <input
                           type="number"
                           min="0"
@@ -8703,7 +9094,7 @@ function StoreContent({ shopId }) {
                           className="w-full text-center text-sm font-black text-emerald-950 bg-transparent focus:outline-none mt-1"
                         />
                         <span className="text-[8.5px] text-emerald-700 font-bold block mt-0.5">
-                          {eggPrice > 0 ? `Rs. ${eggPrice}/Egg` : '1 Egg'}
+                          {eggPrice > 0 ? `Rs. ${eggPrice}/Unit` : '1 Unit'}
                         </span>
                       </div>
                     </div>
@@ -8716,7 +9107,7 @@ function StoreContent({ shopId }) {
                       onChange={e => setDamagedFormData(prev => ({ ...prev, reason: e.target.value }))}
                       className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500"
                     >
-                      <option value="Egg Breakage / Crack">Egg Breakage / Crack</option>
+                      <option value="Damaged / Defective Stock">Damaged / Defective Stock</option>
                       <option value="Spoiled / Expired">Spoiled / Expired</option>
                       <option value="Transport Damage">Transport Damage</option>
                       <option value="Storage Loss">Storage Loss</option>
@@ -8739,7 +9130,7 @@ function StoreContent({ shopId }) {
                             <span className="text-sm">RS {totalLossCalc.toLocaleString('en-PK')}</span>
                             {totalDmgE > 0 && (
                               <span className="text-[9.5px] text-amber-900 font-bold block">
-                                Total {totalDmgE} Eggs ({(totalDmgE / ePerP).toFixed(1)} Petis / {(totalDmgE / ePerT).toFixed(1)} Trays)
+                                Total {totalDmgE} Units ({(totalDmgE / ePerP).toFixed(1)} Boxes / {(totalDmgE / ePerT).toFixed(1)} Packs)
                               </span>
                             )}
                           </div>
@@ -8763,7 +9154,7 @@ function StoreContent({ shopId }) {
                     <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Notes / Remarks (Optional)</label>
                     <textarea
                       rows="2"
-                      placeholder="e.g. Cracked during transport tray unloading..."
+                      placeholder="e.g. Damaged during transport or handling..."
                       value={damagedFormData.notes}
                       onChange={e => setDamagedFormData(prev => ({ ...prev, notes: e.target.value }))}
                       className="w-full px-4 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
@@ -8822,6 +9213,174 @@ function StoreContent({ shopId }) {
         </div>
       )}
 
+      {/* Settle / Pay Credit (Due) Modal */}
+      {settlingCreditSale && (
+        <div className="fixed inset-0 z-[400] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#1E293B] border border-slate-700/80 rounded-[2rem] max-w-md w-full p-6 text-white space-y-5 shadow-2xl relative">
+            <button
+              onClick={() => setSettlingCreditSale(null)}
+              className="absolute top-5 right-5 p-2 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/30">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black uppercase tracking-wider text-white">Receive Credit Payment</h3>
+                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                  {settlingCreditSale.invoiceNumber || 'Credit Bill'} • Outstanding Due
+                </p>
+              </div>
+            </div>
+
+            {/* Customer & Due Summary Card */}
+            <div className="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-4 space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-400 font-bold uppercase text-[10px]">Customer Name:</span>
+                <span className="font-black text-white uppercase">{settlingCreditSale.customerName || 'Credit Customer'}</span>
+              </div>
+              {settlingCreditSale.customerPhone && (
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-400 font-bold uppercase text-[10px]">Phone / WhatsApp:</span>
+                  <span className="font-bold text-teal-400">{settlingCreditSale.customerPhone}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-slate-700/50">
+                <span className="text-rose-400 font-black uppercase text-[11px]">Total Outstanding Due:</span>
+                <span className="text-xl font-black text-rose-400">
+                  {currency} {(Number(settlingCreditSale.dueAmount) > 0 ? Number(settlingCreditSale.dueAmount) : Number(settlingCreditSale.totalAmount) || 0).toLocaleString('en-PK')}
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitSettleCredit} className="space-y-4">
+              {/* Payment Destination (Cash or Bank Transfer) */}
+              <div>
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-2">
+                  Select Payment Destination:
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSettleMethod('CASH')}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                      settleMethod === 'CASH'
+                        ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg'
+                        : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <DollarSign className="w-4 h-4" /> Cash Drawer
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSettleMethod('BANK')}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                      settleMethod === 'BANK'
+                        ? 'bg-amber-600 border-amber-400 text-white shadow-lg'
+                        : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <Building2 className="w-4 h-4" /> Bank Account
+                  </button>
+                </div>
+              </div>
+
+              {/* Amount being paid */}
+              <div>
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">
+                  Payment Amount Received ({currency}):
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  max={Number(settlingCreditSale.dueAmount) > 0 ? Number(settlingCreditSale.dueAmount) : Number(settlingCreditSale.totalAmount)}
+                  value={settleAmount}
+                  onChange={e => setSettleAmount(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm font-black outline-none focus:border-emerald-500 shadow-inner"
+                  placeholder="Enter amount paid"
+                />
+              </div>
+
+              {/* If Bank: Show bank account & optional transaction info */}
+              {settleMethod === 'BANK' && (
+                <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3.5 space-y-2.5 animate-in fade-in duration-200">
+                  <p className="text-[10px] font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5" /> Official Branch Bank Account
+                  </p>
+                  {(() => {
+                    const sName = (shop?.name || '').toLowerCase();
+                    const sAddr = (shop?.address || '').toLowerCase();
+                    if (sName.includes('mardan') || sAddr.includes('mardan')) {
+                      return <p className="text-xs font-mono font-black text-amber-200 bg-black/40 border border-amber-400/30 px-3 py-1.5 rounded-lg">Bank Al Habib: 2013008100773501</p>;
+                    }
+                    if (sName.includes('peshawar') || sAddr.includes('peshawar')) {
+                      return <p className="text-xs font-mono font-black text-amber-200 bg-black/40 border border-amber-400/30 px-3 py-1.5 rounded-lg">Meezan Bank: 07190104740373</p>;
+                    }
+                    return <p className="text-xs font-mono font-black text-amber-200 bg-black/40 border border-amber-400/30 px-3 py-1.5 rounded-lg">UBL: 0109000306243543</p>;
+                  })()}
+
+                  <input
+                    type="text"
+                    placeholder="Bank Transaction ID / Ref No (Optional)"
+                    value={settleTxId}
+                    onChange={e => setSettleTxId(e.target.value)}
+                    className="w-full bg-slate-900 border border-amber-400/40 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-amber-400"
+                  />
+
+                  <div>
+                    <label className="text-[9px] font-black text-amber-300 uppercase tracking-wider block mb-1">
+                      Upload Bank Receipt Proof (Optional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onloadend = () => setSettleReceiptProof(reader.result);
+                        reader.readAsDataURL(file);
+                      }}
+                      className="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer"
+                    />
+                    {settleReceiptProof && (
+                      <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm">
+                        <img src={settleReceiptProof} alt="Receipt Proof" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-700/60">
+                <button
+                  type="button"
+                  onClick={() => setSettlingCreditSale(null)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSettlingCredit}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {isSettlingCredit ? 'Processing...' : settleMethod === 'BANK' ? 'Deposit into Bank' : 'Deposit into Cash'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -8856,10 +9415,10 @@ function ShopsList() {
 
         <div className="text-center mb-8 space-y-2">
           <div className="inline-flex p-2 bg-white rounded-2xl mb-1 shadow-xl">
-            <img src={companyLogo} alt="PerFume Shop Center" className="h-14 sm:h-16 w-auto object-contain drop-shadow-md" />
+            <img src={companyLogo} alt="Maidan Perfume Shop" className="h-14 sm:h-16 w-auto object-contain drop-shadow-md" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase italic">
-            PERFUME SHOP CENTER
+            Maidan Perfume Shop
           </h1>
           <p className="text-emerald-400 font-black uppercase tracking-[0.25em] text-[11px]">
             Multi-Branch Portal (Peshawar, Attock, Mardan & All Branches)
@@ -8884,7 +9443,7 @@ function ShopsList() {
                       {s.logoUrl ? (
                         <img src={s.logoUrl} alt={s.name} className="w-7 h-7 object-contain rounded-lg" />
                       ) : (
-                        <img src={companyLogo} alt="PerFume Shop Center" className="w-7 h-7 object-contain rounded-lg" />
+                        <img src={companyLogo} alt="Maidan Perfume Shop" className="w-7 h-7 object-contain rounded-lg" />
                       )}
                     </div>
                     <div className="bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1">

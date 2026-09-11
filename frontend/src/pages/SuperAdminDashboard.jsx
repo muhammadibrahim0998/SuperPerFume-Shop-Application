@@ -347,8 +347,8 @@ export function SuperAdminDashboard() {
             {activeTab === 'overview' ? (
                 /* Overview Content (Integrated from SuperAdminOverview) */
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-                    {/* Primary Network & Customer Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Primary Network Stats */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div className="bg-white border border-zinc-100 rounded-2xl p-6 shadow-rich flex items-center gap-5 group">
                             <div className="p-4 bg-green-500/10 rounded-2xl border border-green-500/20 group-hover:scale-110 transition-transform">
                                 <Building2 className="w-7 h-7 text-green-600" />
@@ -362,8 +362,6 @@ export function SuperAdminDashboard() {
                             </div>
                         </div>
                     </div>
-
-
 
                     <div className="bg-white border border-zinc-100 rounded-[2.5rem] p-8 sm:p-10 shadow-rich">
                         <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-[0.2em] mb-10">Registered Store Network</h3>

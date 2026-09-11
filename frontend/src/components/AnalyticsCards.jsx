@@ -39,7 +39,7 @@ export function AnalyticsCards({
     >
       <motion.div variants={itemVariants}>
         <StatCard
-          title="Total Boxes"
+          title="Total Boxes / Cartons"
           value={`${(totalPetis || 0).toLocaleString('en-PK')} Boxes`}
           icon={Box}
           color="orange"
@@ -50,10 +50,10 @@ export function AnalyticsCards({
       <motion.div variants={itemVariants}>
         <StatCard
           title="Available Stock"
-          value={`${(totalStockUnits || 0).toLocaleString('en-PK')} Bottles`}
+          value={`${(totalStockUnits || 0).toLocaleString('en-PK')} Units`}
           icon={Package}
           color="green"
-          sub={`Total Units`}
+          sub={`Total Inventory Units`}
         />
       </motion.div>
 

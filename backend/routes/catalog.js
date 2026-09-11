@@ -6,8 +6,6 @@ import { resolveShopId } from '../utils/shopResolver.js';
 
 const router = express.Router();
 
-
-
 // GET /api/catalog/:shopId  — public, no auth needed
 router.get('/:shopId', async (req, res) => {
   try {
@@ -22,7 +20,6 @@ router.get('/:shopId', async (req, res) => {
 
     const realShopId = shop._id;
     const settings = await Settings.findOne({ shopId: realShopId }).select('shopName logoUrl currency address phone');
-
 
     const filter = { shopId: realShopId };
     if (search) {
@@ -52,7 +49,7 @@ router.get('/:shopId', async (req, res) => {
       
       itemObj.totalPurchaseCost = Math.round(calculatedCost);
 
-      const isCreditMethod = pMethod.includes('credit') || pMethod.includes('due') || pMethod.includes('qaraz') || pMethod.includes('partial');
+      const isCreditMethod = pMethod.includes('credit') || pMethod.includes('due') || pMethod.includes('partial');
       const hasExplicitDue = itemObj.dueAmountToSupplier !== undefined && itemObj.dueAmountToSupplier !== null && Number(itemObj.dueAmountToSupplier) > 0;
 
       if (hasExplicitDue || isCreditMethod) {
@@ -60,7 +57,7 @@ router.get('/:shopId', async (req, res) => {
         itemObj.dueAmountToSupplier = Math.min(itemObj.totalPurchaseCost, Math.max(0, rawDue));
         itemObj.amountPaidToSupplier = Math.max(0, itemObj.totalPurchaseCost - itemObj.dueAmountToSupplier);
       } else {
-        // 100% Cash / Bank Paid (No Qaraz)
+        // 100% Cash / Bank Paid (No Credit)
         itemObj.amountPaidToSupplier = itemObj.totalPurchaseCost;
         itemObj.dueAmountToSupplier = 0;
       }
@@ -68,10 +65,10 @@ router.get('/:shopId', async (req, res) => {
       return itemObj;
     });
 
-    // Get unique categories dynamically from items
+    // Get unique categories strictly from existing items in this shop
     const allItems = await Item.find({ shopId: realShopId }).select('category');
-    const existingCats = allItems.map(i => i.category).filter(Boolean);
-    const categories = ['All', ...new Set(existingCats)];
+    const existingCats = Array.from(new Set(allItems.map(i => i.category?.trim()).filter(Boolean)));
+    const categories = ['All', ...existingCats];
 
     res.json({
       shop: {

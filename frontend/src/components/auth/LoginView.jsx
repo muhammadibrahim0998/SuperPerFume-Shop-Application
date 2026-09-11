@@ -39,10 +39,10 @@ export function LoginView() {
         {/* Logo Section */}
         <div className="text-center mb-6">
           <div className="inline-flex p-2 bg-white rounded-2xl shadow-premium mb-3 group hover:scale-105 transition-transform duration-500 border border-[var(--color-border-subtle)]">
-            <img src={companyLogo} alt="Attock Shop Logo" className="h-14 w-auto object-contain drop-shadow-md" />
+            <img src={companyLogo} alt="Maidan Perfume Shop Logo" className="h-14 w-auto object-contain drop-shadow-md" />
           </div>
           <p className="text-[var(--color-text-muted)] font-bold tracking-[0.12em] uppercase text-[8px] mt-2 opacity-70">
-            PerFume Shop Center
+            Maidan Perfume Shop - Inventory Management
           </p>
         </div>
 

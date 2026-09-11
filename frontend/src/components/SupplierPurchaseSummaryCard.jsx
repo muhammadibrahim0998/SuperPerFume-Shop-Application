@@ -60,12 +60,11 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
 
       const isCredit = !isOnline && (
         pMethodLower.includes('credit') || 
-        pMethodLower.includes('due') || 
-        pMethodLower.includes('qaraz')
+        pMethodLower.includes('due')
       );
 
-      // Strict Routed Paid vs Due (Qaraz) calculation (No overlap)
-      const isCreditMethod = isCredit || pMethodLower.includes('credit') || pMethodLower.includes('due') || pMethodLower.includes('qaraz') || pMethodLower.includes('partial');
+      // Strict Routed Paid vs Due (Credit) calculation (No overlap)
+      const isCreditMethod = isCredit || pMethodLower.includes('credit') || pMethodLower.includes('due') || pMethodLower.includes('partial');
       const hasExplicitDue = p.dueAmountToSupplier !== undefined && p.dueAmountToSupplier !== null && Number(p.dueAmountToSupplier) > 0;
       
       let due = 0;
@@ -76,7 +75,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
         due = Math.min(cost, Math.max(0, rawDue));
         paid = Math.max(0, cost - due);
       } else {
-        // 100% Cash / Bank Paid (No Qaraz)
+        // 100% Cash / Bank Paid (No Credit)
         paid = cost;
         due = 0;
       }
@@ -122,14 +121,14 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
               Supplier Inventory Purchases &amp; Payments
             </h3>
             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-              Live Peti (Box) Stock &amp; Payment Ledger
+              Live Stock &amp; Payment Ledger
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5">
-            <Box className="w-3.5 h-3.5 text-amber-600" /> Total {stats.totalPetisCount} Petis (Boxes)
+            <Box className="w-3.5 h-3.5 text-amber-600" /> Total {stats.totalPetisCount} Boxes
           </span>
         </div>
       </div>
@@ -137,19 +136,19 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
       {/* Grand Summary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Total Petis Stock */}
+        {/* Total Boxes Stock */}
         <div className="p-5 bg-amber-500 text-zinc-950 rounded-2xl border border-amber-400 shadow-md flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900">
-              Total Stock (Boxes / Petis)
+              Total Stock (Boxes / Cartons)
             </span>
             <Box className="w-5 h-5 text-zinc-950" />
           </div>
           <h4 className="text-2xl font-black tracking-tight text-zinc-950">
-            <CountUpNumber value={stats.totalPetisCount} /> Petis
+            <CountUpNumber value={stats.totalPetisCount} /> Boxes
           </h4>
           <span className="text-[9px] font-black text-zinc-900 uppercase mt-1 block">
-            = {stats.totalTraysCount.toLocaleString()} Trays ({stats.totalEggsCount.toLocaleString()} Eggs)
+            = {stats.totalTraysCount.toLocaleString()} Packs / Dozens ({stats.totalEggsCount.toLocaleString()} Units)
           </span>
         </div>
 
@@ -203,7 +202,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h4 className="text-xs font-black text-zinc-800 uppercase tracking-wider">
-            Purchased Petis (Boxes) &amp; Payment Details
+            Purchased Stock (Boxes &amp; Units) &amp; Payment Details
           </h4>
           <span className="text-[9px] text-zinc-400 font-bold uppercase">
             {supplierItems.length} Product Record(s)
@@ -213,7 +212,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
         {supplierItems.length === 0 ? (
           <div className="p-6 bg-zinc-50 border border-zinc-100 rounded-2xl text-center">
             <p className="text-xs font-bold text-zinc-400">
-              No supplier purchase records yet. Add a product with Peti stock to track payments automatically.
+              No supplier purchase records yet. Add a product with stock to track payments automatically.
             </p>
           </div>
         ) : (
@@ -234,7 +233,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
                     <div>
                       <h5 className="text-xs font-black text-zinc-900 line-clamp-1">{item.name}</h5>
                       <p className="text-[10px] text-teal-700 font-bold uppercase mt-0.5">
-                        Supplier: <span className="text-zinc-800 font-black">{item.supplierName || 'Supplier / Wholesaler'}</span>
+                        Supplier: <span className="text-zinc-800 font-black">{item.supplierName || 'Farm / Wholesaler'}</span>
                       </p>
                     </div>
 
@@ -247,7 +246,7 @@ export function SupplierPurchaseSummaryCard({ products = [] }) {
                         Method: {item.paymentMethod || 'Cash'}
                       </span>
                       <span className="text-[9px] font-black text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200">
-                        📦 {itemPetis} Petis ({itemTrays} Trays)
+                        📦 {itemPetis} Boxes ({itemTrays} Packs)
                       </span>
                     </div>
                   </div>

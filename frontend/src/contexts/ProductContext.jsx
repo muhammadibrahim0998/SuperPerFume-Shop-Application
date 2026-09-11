@@ -100,9 +100,9 @@ export function ProductProvider({ children }) {
     }
   };
 
-  // Derived State: Filtering & Sorting
+  // Derived State: Filtering & Sorting (100% Dynamic from actual shop products)
   const categories = useMemo(() => {
-    const productCats = (products || []).map((p) => p.category).filter(Boolean);
+    const productCats = (products || []).map((p) => p.category?.trim()).filter(Boolean);
     return ["All", ...Array.from(new Set(productCats))];
   }, [products]);
 
