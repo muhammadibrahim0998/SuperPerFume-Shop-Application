@@ -538,6 +538,8 @@ export function OrdersManagement({ shopId = null }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
     </div>
   );
 }
