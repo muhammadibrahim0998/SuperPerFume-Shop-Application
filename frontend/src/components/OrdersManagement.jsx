@@ -117,15 +117,26 @@ export function OrdersManagement({ shopId = null }) {
       return;
     }
 
-    let itemsHtml = items.map((item, idx) => `
+    let itemsHtml = items.map((item, idx) => {
+      const cleanName = (item.name || item.title || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .replace(/\begge\b/gi, 'Product')
+        .replace(/\(Peti\)/gi, '(Box)')
+        .replace(/\(Tray\)/gi, '(Pack)')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return `
       <tr>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:center;">${idx + 1}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; font-weight:bold;">${item.name}</td>
+        <td style="padding:10px; border:1px solid #cbd5e1; font-weight:bold;">${cleanName}</td>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; font-weight:bold; color:#059669;">${item.quantity}</td>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:right;">RS ${(item.price || 0).toLocaleString()}</td>
         <td style="padding:10px; border:1px solid #cbd5e1; text-align:right; font-weight:bold;">RS ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
 
     printWin.document.write(`
       <!DOCTYPE html>
@@ -363,7 +374,7 @@ export function OrdersManagement({ shopId = null }) {
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-2xs"
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <span>{(item.name || '').replace(/\(Egg\)/gi, '')}</span>
+                            <span>{(item.name || item.title || '').replace(/\(Egg\)/gi, '(Product)').replace(/\bEgg\b/gi, 'Product')}</span>
                             <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                               x{item.quantity}
                             </span>

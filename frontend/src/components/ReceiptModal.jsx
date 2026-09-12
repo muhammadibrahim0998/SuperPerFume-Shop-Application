@@ -141,7 +141,7 @@ export function ReceiptModal({ isOpen, onClose, sale }) {
               <tbody>
                 {sale.items.map((item, idx) => (
                   <tr key={idx} className="border-b border-dotted border-[var(--color-border-subtle)]">
-                    <td className="py-3 text-[11px] font-black text-[var(--color-text-primary)] max-w-[120px] truncate uppercase tracking-tight">{item.name}</td>
+                    <td className="py-3 text-[11px] font-black text-[var(--color-text-primary)] max-w-[120px] truncate uppercase tracking-tight">{(item.name || item.title || '').replace(/\(Egg\)/gi, '(Product)').replace(/\bEgg\b/gi, 'Product')}</td>
                     <td className="py-3 text-center text-[11px] font-black text-[var(--color-text-primary)]">{item.quantity}</td>
                     <td className="py-3 text-right text-[11px] text-[var(--color-text-secondary)]">{currency} {item.price?.toLocaleString('en-PK')}</td>
                     <td className="py-3 text-right text-[12px] font-black text-[var(--color-primary)]">{currency} {item.subtotal?.toLocaleString('en-PK')}</td>

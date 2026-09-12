@@ -455,7 +455,7 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
     return fileName;
   };
 
-  // ── Clean Compact HTML Print Preview ──
+  // ── Clean Compact Luxury HTML Print Preview ──
   const handlePrintPurchasesReport = () => {
     const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const timeTitle = timeframe === 'DAY' ? 'Today (Day)' : timeframe === 'MONTH' ? 'This Month' : timeframe === 'YEAR' ? 'This Year' : 'All-Time';
@@ -469,23 +469,34 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
     const tableRows = purchaseItems.map((item, idx) => {
       const petis = item.petiQuantity || (item.stock ? (item.stock / 360).toFixed(1) : 0);
       const trays = item.trayQuantity || (item.stock ? Math.round(item.stock / 30) : 0);
-      const eggs = item.stock || 0;
+      const products = item.stock || item.eggQuantity || 0;
       const cost = item.totalPurchaseCost || 0;
       const paid = item.amountPaidToSupplier || 0;
       const due = item.dueAmountToSupplier || 0;
+      const cleanName = (item.name || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .replace(/\(Peti\)/gi, '(Box)')
+        .replace(/\(Tray\)/gi, '(Pack)')
+        .trim();
 
       return `
-      <tr>
-        <td style="text-align:center;">${idx + 1}</td>
-        <td><strong>${item.name}</strong></td>
-        <td>${item.supplierName || 'Farm Supplier'}</td>
-        <td style="text-align:center;">${petis} Box</td>
-        <td style="text-align:center;">${trays} Pack</td>
-        <td style="text-align:center;">${Number(eggs).toLocaleString()}</td>
-        <td style="text-align:right; font-weight:bold;">Rs. ${fmt(cost)}</td>
-        <td style="text-align:right; color:#059669; font-weight:bold;">Rs. ${fmt(paid)}</td>
-        <td style="text-align:right; color:${due > 0 ? '#e11d48' : '#64748b'}; font-weight:bold;">Rs. ${fmt(due)}</td>
-        <td style="text-align:center;"><span class="badge ${due > 0 ? 'badge-due' : 'badge-paid'}">${due > 0 ? 'Credit' : 'Cash'}</span></td>
+      <tr style="background-color: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+        <td style="text-align:center; padding:8px 6px; border:1px solid #e2e8f0; font-weight:700; color:#64748b;">${idx + 1}</td>
+        <td style="padding:8px 10px; border:1px solid #e2e8f0; font-weight:800; color:#0f172a;">${cleanName}</td>
+        <td style="padding:8px 10px; border:1px solid #e2e8f0; color:#475569; font-weight:600;">${item.supplierName || 'Distributor'}</td>
+        <td style="text-align:center; padding:8px 6px; border:1px solid #e2e8f0; font-weight:700;">${petis} Box</td>
+        <td style="text-align:center; padding:8px 6px; border:1px solid #e2e8f0; font-weight:700;">${trays} Pack</td>
+        <td style="text-align:center; padding:8px 6px; border:1px solid #e2e8f0; font-weight:800; color:#0f172a;">${Number(products).toLocaleString()}</td>
+        <td style="text-align:right; padding:8px 10px; border:1px solid #e2e8f0; font-weight:800; color:#0f172a;">Rs. ${fmt(cost)}</td>
+        <td style="text-align:right; padding:8px 10px; border:1px solid #e2e8f0; color:#059669; font-weight:800;">Rs. ${fmt(paid)}</td>
+        <td style="text-align:right; padding:8px 10px; border:1px solid #e2e8f0; color:${due > 0 ? '#e11d48' : '#64748b'}; font-weight:800;">Rs. ${fmt(due)}</td>
+        <td style="text-align:center; padding:8px 6px; border:1px solid #e2e8f0;">
+          <span style="display:inline-block; padding:3px 8px; border-radius:6px; font-size:8.5px; font-weight:900; text-transform:uppercase; ${due > 0 ? 'background:#fff1f2; color:#e11d48; border:1px solid #fecdd3;' : 'background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;'}">
+            ${due > 0 ? 'Credit' : 'Paid'}
+          </span>
+        </td>
       </tr>`;
     }).join('');
 
@@ -494,78 +505,103 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
       <html>
         <head>
           <title>Purchases Ledger Report - ${timeTitle}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
           <style>
-            @page { size: portrait; margin: 8mm 10mm; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 15px; color: #0f172a; background: #ffffff; font-size: 11px; margin: 0; }
-            .header { text-align: center; border-bottom: 2px solid #059669; padding-bottom: 8px; margin-bottom: 12px; }
-            .header h1 { margin: 0; color: #047857; text-transform: uppercase; font-size: 18px; letter-spacing: 1px; font-weight: 900; }
-            .header p { margin: 2px 0 0; color: #64748b; font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; }
-            .meta { display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; margin-bottom: 10px; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0; }
-            .stats-grid { display: flex; flex-direction: row; gap: 8px; margin-bottom: 12px; }
-            .stat-card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 8px; border-radius: 8px; text-align: center; }
-            .stat-card label { font-size: 8px; font-weight: 900; color: #64748b; text-transform: uppercase; display: block; }
-            .stat-card .val { font-size: 13px; font-weight: 900; color: #0f172a; margin-top: 1px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-            th, td { border: 1px solid #cbd5e1; padding: 4.5px 6px; font-size: 9.5px; text-align: left; }
-            th { background: #f1f5f9; text-transform: uppercase; font-weight: 900; font-size: 8px; color: #475569; }
-            .badge { padding: 1.5px 5px; border-radius: 4px; font-size: 7.5px; font-weight: 900; text-transform: uppercase; }
-            .badge-paid { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
-            .badge-due { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
-            .total-row { background: #f8fafc; font-weight: 900; font-size: 10px; }
-            .footer { margin-top: 25px; display: flex; justify-content: space-between; font-size: 8.5px; font-weight: 800; color: #64748b; }
-            .sign { border-top: 1.5px solid #94a3b8; width: 140px; text-align: center; padding-top: 4px; }
+            @page { size: portrait; margin: 10mm 12mm; }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 20px; color: #0f172a; background: #ffffff; font-size: 11px; margin: 0; }
+            .header-banner { background: linear-gradient(135deg, #090d16 0%, #0f172a 45%, #064e3b 100%); color: #ffffff; padding: 18px 24px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #10b981; margin-bottom: 16px; }
+            .header-banner h1 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; }
+            .header-banner p { margin: 3px 0 0; font-size: 9px; font-weight: 800; color: #34d399; letter-spacing: 1.2px; text-transform: uppercase; }
+            .tag { background: #f59e0b; color: #0f172a; font-weight: 900; font-size: 10px; padding: 6px 12px; border-radius: 8px; text-transform: uppercase; }
+            
+            .meta { display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; margin-bottom: 14px; background: #f8fafc; padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; color: #475569; }
+            .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+            .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 10px; text-align: center; }
+            .stat-card label { font-size: 8.5px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px; }
+            .stat-card .val { font-size: 14px; font-weight: 900; color: #0f172a; }
+            
+            table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+            th { background: #0f172a; color: #ffffff; text-transform: uppercase; font-weight: 900; font-size: 9px; letter-spacing: 0.5px; padding: 8px 10px; border: none; text-align: left; }
+            .total-row { background: #f8fafc; font-weight: 900; font-size: 10.5px; }
+            .total-row td { padding: 10px 8px; border-top: 2px solid #0f172a; }
+            .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; color: #64748b; }
+            .sign { border-top: 1.5px solid #94a3b8; width: 160px; text-align: center; padding-top: 6px; text-transform: uppercase; font-size: 9px; }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>Maidan Perfume Shop</h1>
-            <p>Purchases &amp; Restock Ledger Report</p>
+          <div class="header-banner">
+            <div>
+              <h1>MAIDAN PERFUME SHOP</h1>
+              <p>OFFICIAL STOCK PURCHASES &amp; RESTOCK LEDGER</p>
+            </div>
+            <div class="tag">
+              ${timeTitle}
+            </div>
           </div>
           <div class="meta">
-            <span>Generated: ${dateStr}</span>
-            <span>Filter: ${timeTitle}</span>
-            <span>Items: ${purchaseItems.length} Products</span>
+            <span>📅 Generated: ${dateStr}</span>
+            <span>🔍 Filter Period: ${timeTitle}</span>
+            <span>📦 Total Items: ${purchaseItems.length} Products</span>
           </div>
           <div class="stats-grid">
-            <div class="stat-card"><label>Stock Purchased</label><div class="val">${stats.totalPetis} Boxes</div></div>
-            <div class="stat-card"><label>Total Investment</label><div class="val" style="color:#059669;">Rs. ${fmt(stats.totalPurchasesCost)}</div></div>
-            <div class="stat-card"><label>Cash Paid</label><div class="val" style="color:#10b981;">Rs. ${fmt(stats.cashPaid)}</div></div>
-            <div class="stat-card"><label>Credit (Due)</label><div class="val" style="color:#e11d48;">Rs. ${fmt(stats.totalDue)}</div></div>
+            <div class="stat-card">
+              <label>Stock Restocked</label>
+              <div class="val">${stats.totalPetis} Boxes (${stats.totalEggs} Products)</div>
+            </div>
+            <div class="stat-card">
+              <label>Total Investment</label>
+              <div class="val" style="color:#059669;">Rs. ${fmt(stats.totalPurchasesCost)}</div>
+            </div>
+            <div class="stat-card">
+              <label>Cash / Bank Paid</label>
+              <div class="val" style="color:#10b981;">Rs. ${fmt(stats.cashPaid + stats.bankPaid)}</div>
+            </div>
+            <div class="stat-card">
+              <label>Credit (Due)</label>
+              <div class="val" style="color:#e11d48;">Rs. ${fmt(stats.totalDue)}</div>
+            </div>
           </div>
           <table>
             <thead>
               <tr>
-                <th style="width:20px; text-align:center;">#</th>
+                <th style="width:25px; text-align:center;">#</th>
                 <th>Product Name</th>
-                <th>Supplier</th>
-                <th style="text-align:center;">Boxes</th>
-                <th style="text-align:center;">Packs</th>
-                <th style="text-align:center;">Units</th>
-                <th style="text-align:right;">Cost</th>
-                <th style="text-align:right;">Cash Paid</th>
-                <th style="text-align:right;">Credit</th>
-                <th style="text-align:center;">Status</th>
+                <th>Supplier / Distributor</th>
+                <th style="text-align:center; width:65px;">Boxes</th>
+                <th style="text-align:center; width:65px;">Packs</th>
+                <th style="text-align:center; width:75px;">Products (Units)</th>
+                <th style="text-align:right; width:90px;">Cost</th>
+                <th style="text-align:right; width:90px;">Paid</th>
+                <th style="text-align:right; width:90px;">Credit</th>
+                <th style="text-align:center; width:60px;">Status</th>
               </tr>
             </thead>
             <tbody>
-              ${tableRows || '<tr><td colspan="10" style="text-align:center; padding:15px;">No purchases recorded for this period.</td></tr>'}
+              ${tableRows || '<tr><td colspan="10" style="text-align:center; padding:20px; color:#64748b; font-weight:bold;">No purchases recorded for this period.</td></tr>'}
             </tbody>
             <tfoot>
               <tr class="total-row">
-                <td colspan="3" style="text-align:right;">TOTALS:</td>
-                <td style="text-align:center;">${stats.totalPetis} Box</td>
-                <td style="text-align:center;">${stats.totalTrays} Pack</td>
-                <td style="text-align:center;">${fmt(stats.totalEggs)} Unit</td>
-                <td style="text-align:right; color:#059669;">Rs. ${fmt(stats.totalPurchasesCost)}</td>
-                <td style="text-align:right; color:#10b981;">Rs. ${fmt(stats.cashPaid)}</td>
-                <td style="text-align:right; color:#e11d48;">Rs. ${fmt(stats.totalDue)}</td>
-                <td style="text-align:center;"><span class="badge ${stats.totalDue > 0 ? 'badge-due' : 'badge-paid'}">${stats.totalDue > 0 ? 'Credit' : 'Cash'}</span></td>
+                <td colspan="3" style="text-align:right; font-weight:900; color:#0f172a;">GRAND TOTALS:</td>
+                <td style="text-align:center; font-weight:900;">${stats.totalPetis} Box</td>
+                <td style="text-align:center; font-weight:900;">${stats.totalTrays} Pack</td>
+                <td style="text-align:center; font-weight:900; color:#0f172a;">${fmt(stats.totalEggs)} Products</td>
+                <td style="text-align:right; color:#059669; font-weight:900;">Rs. ${fmt(stats.totalPurchasesCost)}</td>
+                <td style="text-align:right; color:#10b981; font-weight:900;">Rs. ${fmt(stats.cashPaid + stats.bankPaid)}</td>
+                <td style="text-align:right; color:#e11d48; font-weight:900;">Rs. ${fmt(stats.totalDue)}</td>
+                <td style="text-align:center;">
+                  <span style="font-weight:900; color:${stats.totalDue > 0 ? '#e11d48' : '#059669'};">
+                    ${stats.totalDue > 0 ? 'Credit Due' : 'Fully Paid'}
+                  </span>
+                </td>
               </tr>
             </tfoot>
           </table>
           <div class="footer">
-            <div>Report Generated by Maidan Perfume Shop Admin System</div>
-            <div class="sign">Authorized Signature</div>
+            <div>Official Purchases Audit Report • Maidan Perfume Shop Financial Ledger</div>
+            <div class="sign">Authorized Signature &amp; Stamp</div>
           </div>
         </body>
       </html>
@@ -587,7 +623,7 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
     let message = `📄 *Maidan Perfume Shop - PURCHASES REPORT*\n`;
     message += `📅 *Timeframe:* ${timeTitle} (${dateStr})\n`;
     message += `===============================\n`;
-    message += `📦 *Stock Restocked:* ${stats.totalPetis} Boxes (${stats.totalTrays} Packs • ${fmt(stats.totalEggs)} Units)\n`;
+    message += `📦 *Stock Restocked:* ${stats.totalPetis} Boxes (${stats.totalTrays} Packs • ${fmt(stats.totalEggs)} Products)\n`;
     message += `💰 *Total Investment:* Rs. ${fmt(stats.totalPurchasesCost)}\n`;
     message += `💵 *Cash Paid:* Rs. ${fmt(stats.cashPaid)}\n`;
     if (stats.bankPaid > 0) {
@@ -601,7 +637,12 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
       const petis = item.petiQuantity || (item.stock ? (item.stock / 360).toFixed(1) : 0);
       const paid = item.amountPaidToSupplier || 0;
       const due = item.dueAmountToSupplier || 0;
-      message += `${idx + 1}. *${item.name}* (${petis} Boxes)\n`;
+      const cleanName = (item.name || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .trim();
+      message += `${idx + 1}. *${cleanName}* (${petis} Boxes)\n`;
       message += `   • Cost: Rs. ${fmt(item.totalPurchaseCost)} | Paid: Rs. ${fmt(paid)} | Due: Rs. ${fmt(due)}\n`;
     });
 
@@ -617,31 +658,158 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
     window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
   };
 
-  // Excel CSV Export Handler
+  // ── Luxury Styled Excel (.xls) Export Handler ──
   const handleExportPurchasesExcel = () => {
-    const timeTitle = timeframe === 'DAY' ? 'Today' : timeframe === 'MONTH' ? 'ThisMonth' : timeframe === 'YEAR' ? 'ThisYear' : 'AllTime';
+    const timeTitle = timeframe === 'DAY' ? 'Today' : timeframe === 'MONTH' ? 'This_Month' : timeframe === 'YEAR' ? 'This_Year' : 'All_Time';
+    const dateStr = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    let csvContent = `Product Name,Supplier Name,Peti Quantity,Tray Quantity,Egg Quantity,Total Purchase Cost (Rs),Amount Paid To Supplier (Rs),Due Balance (Rs),Payment Method\n`;
-
-    purchaseItems.forEach((item) => {
-      const petis = item.petiQuantity || (item.stock ? (item.stock / 360).toFixed(1) : 0);
-      const trays = item.trayQuantity || (item.stock ? Math.round(item.stock / 30) : 0);
-      const eggs = item.stock || 0;
-      const name = `"${(item.name || '').replace(/"/g, '""')}"`;
-      const supplier = `"${(item.supplierName || 'Farm Supplier').replace(/"/g, '""')}"`;
-      const cost = item.totalPurchaseCost || 0;
-      const paid = item.amountPaidToSupplier || 0;
-      const due = item.dueAmountToSupplier || Math.max(0, cost - paid);
+    const formattedRowsHtml = purchaseItems.length > 0 ? purchaseItems.map((item, idx) => {
+      const petis = Number(item.petiQuantity || (item.stock ? (item.stock / 360).toFixed(1) : 0));
+      const trays = Number(item.trayQuantity || (item.stock ? Math.round(item.stock / 30) : 0));
+      const products = Number(item.stock || item.eggQuantity || 0);
+      const cost = Number(item.totalPurchaseCost || 0);
+      const paid = Number(item.amountPaidToSupplier || 0);
+      const due = Number(item.dueAmountToSupplier || Math.max(0, cost - paid));
       const method = item.paymentMethod || 'Cash';
+      const cleanName = (item.name || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .replace(/\(Peti\)/gi, '(Box)')
+        .replace(/\(Tray\)/gi, '(Pack)')
+        .trim();
 
-      csvContent += `${name},${supplier},${petis},${trays},${eggs},${cost},${paid},${due},${method}\n`;
-    });
+      return `
+        <tr style="background-color: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+          <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px 10px; vertical-align: middle;">${idx + 1}</td>
+          <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a; padding: 7px 12px; vertical-align: middle;">${cleanName}</td>
+          <td style="border: 1px solid #cbd5e1; color: #475569; padding: 7px 12px; vertical-align: middle;">${item.supplierName || 'Distributor / Supplier'}</td>
+          <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px 10px; vertical-align: middle;">${petis}</td>
+          <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px 10px; vertical-align: middle;">${trays}</td>
+          <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: 900; color: #0f172a; padding: 7px 10px; vertical-align: middle;">${products.toLocaleString()}</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: #0f172a; padding: 7px 12px; vertical-align: middle;">RS ${cost.toLocaleString()}</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: #047857; padding: 7px 12px; vertical-align: middle;">RS ${paid.toLocaleString()}</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: ${due > 0 ? '#dc2626' : '#64748b'}; padding: 7px 12px; vertical-align: middle;">RS ${due.toLocaleString()}</td>
+          <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; color: ${method.toLowerCase().includes('bank') ? '#0284c7' : '#047857'}; padding: 7px 10px; vertical-align: middle;">${method}</td>
+        </tr>
+      `;
+    }).join('') : `
+      <tr>
+        <td colspan="10" style="text-align: center; padding: 20px; border: 1px solid #cbd5e1; color: #64748b; font-weight: bold; background-color: #f8fafc;">
+          No purchase records found for this period
+        </td>
+      </tr>
+    `;
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const excelTemplate = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Purchases_${timeTitle}</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; font-size: 11pt; }
+          .header-banner { background-color: #0f172a; color: #ffffff; font-size: 16pt; font-weight: bold; text-align: center; height: 40px; border: 1px solid #0f172a; vertical-align: middle; }
+          .sub-banner { background-color: #1e293b; color: #34d399; font-size: 10pt; text-align: center; font-weight: bold; height: 24px; border: 1px solid #1e293b; vertical-align: middle; }
+          .info-label { font-weight: bold; color: #475569; background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 7px 12px; }
+          .info-val { font-weight: bold; color: #0f172a; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 7px 12px; }
+          .col-header { background-color: #0f172a; color: #ffffff; font-weight: bold; font-size: 9.5pt; border: 1px solid #0f172a; padding: 9px 8px; vertical-align: middle; }
+          .tot-lbl { background-color: #0f172a; color: #ffffff; font-weight: 900; font-size: 11pt; text-align: right; border: 1px solid #0f172a; padding: 10px 14px; vertical-align: middle; }
+          .tot-val { background-color: #ecfdf5; color: #047857; font-weight: 900; font-size: 12pt; text-align: right; border: 2px solid #059669; padding: 10px 14px; vertical-align: middle; }
+          .tot-due { background-color: #fef2f2; color: #dc2626; font-weight: 900; font-size: 12pt; text-align: right; border: 2px solid #ef4444; padding: 10px 14px; vertical-align: middle; }
+          .footer-note { color: #64748b; font-size: 9pt; font-style: italic; text-align: center; height: 28px; vertical-align: middle; border: none; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <colgroup>
+            <col width="50" />
+            <col width="220" />
+            <col width="180" />
+            <col width="100" />
+            <col width="100" />
+            <col width="140" />
+            <col width="160" />
+            <col width="160" />
+            <col width="140" />
+            <col width="130" />
+          </colgroup>
+          <tr>
+            <td colspan="10" class="header-banner">MAIDAN PERFUME SHOP</td>
+          </tr>
+          <tr>
+            <td colspan="10" class="sub-banner">OFFICIAL STOCK PURCHASES &amp; RESTOCK AUDIT REPORT (${timeTitle.replace(/_/g, ' ').toUpperCase()})</td>
+          </tr>
+          <tr style="height: 10px;"><td colspan="10" style="border:none;"></td></tr>
+          <tr>
+            <td colspan="2" class="info-label">Report Period:</td>
+            <td colspan="3" class="info-val" style="color: #0284c7; font-weight: 900;">${timeTitle.replace(/_/g, ' ')}</td>
+            <td colspan="2" class="info-label">Generated Date &amp; Time:</td>
+            <td colspan="3" class="info-val">${dateStr}</td>
+          </tr>
+          <tr>
+            <td colspan="2" class="info-label">Total Stock Purchased:</td>
+            <td colspan="3" class="info-val" style="color: #0f172a; font-weight: 900;">${stats.totalPetis} Boxes (${stats.totalTrays} Packs • ${stats.totalEggs} Products)</td>
+            <td colspan="2" class="info-label">Total Purchases Investment:</td>
+            <td colspan="3" class="info-val" style="color: #047857; font-weight: 900;">RS ${Number(stats.totalPurchasesCost || 0).toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td colspan="2" class="info-label">Total Amount Paid:</td>
+            <td colspan="3" class="info-val" style="color: #047857; font-weight: 900;">RS ${Number((stats.cashPaid || 0) + (stats.bankPaid || 0)).toLocaleString()}</td>
+            <td colspan="2" class="info-label">Total Supplier Credit / Due:</td>
+            <td colspan="3" class="info-val" style="color: ${stats.totalDue > 0 ? '#dc2626' : '#047857'}; font-weight: 900;">RS ${Number(stats.totalDue || 0).toLocaleString()}</td>
+          </tr>
+          <tr style="height: 14px;"><td colspan="10" style="border:none;"></td></tr>
+          <tr style="height: 34px;">
+            <th class="col-header" style="text-align: center;">#</th>
+            <th class="col-header">Product Name</th>
+            <th class="col-header">Supplier / Distributor</th>
+            <th class="col-header" style="text-align: center;">Box Qty</th>
+            <th class="col-header" style="text-align: center;">Pack Qty</th>
+            <th class="col-header" style="text-align: center;">Product Qty (Units)</th>
+            <th class="col-header" style="text-align: right;">Total Purchase Cost</th>
+            <th class="col-header" style="text-align: right;">Amount Paid</th>
+            <th class="col-header" style="text-align: right;">Due Balance</th>
+            <th class="col-header" style="text-align: center;">Payment Method</th>
+          </tr>
+          ${formattedRowsHtml}
+          <tr style="height: 10px;"><td colspan="10" style="border:none;"></td></tr>
+          <tr>
+            <td colspan="3" class="tot-lbl">GRAND TOTALS:</td>
+            <td style="text-align: center; background-color: #f1f5f9; font-weight: 900; border: 1px solid #0f172a; padding: 10px 8px;">${stats.totalPetis}</td>
+            <td style="text-align: center; background-color: #f1f5f9; font-weight: 900; border: 1px solid #0f172a; padding: 10px 8px;">${stats.totalTrays}</td>
+            <td style="text-align: center; background-color: #f1f5f9; font-weight: 900; border: 1px solid #0f172a; padding: 10px 8px;">${Number(stats.totalEggs || 0).toLocaleString()}</td>
+            <td class="tot-val">RS ${Number(stats.totalPurchasesCost || 0).toLocaleString()}</td>
+            <td class="tot-val">RS ${Number((stats.cashPaid || 0) + (stats.bankPaid || 0)).toLocaleString()}</td>
+            <td class="tot-due">RS ${Number(stats.totalDue || 0).toLocaleString()}</td>
+            <td style="text-align: center; background-color: #f1f5f9; font-weight: 900; border: 1px solid #0f172a; padding: 10px 8px;">${stats.totalDue > 0 ? 'DUE' : 'CLEARED'}</td>
+          </tr>
+          <tr style="height: 12px;"><td colspan="10" style="border:none;"></td></tr>
+          <tr>
+            <td colspan="10" class="footer-note">Official Stock Purchases Statement • Generated via Maidan Perfume Shop Financial Ledger</td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `Purchases_Report_${timeTitle}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Purchases_Report_${timeTitle}_${new Date().toISOString().split('T')[0]}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -691,7 +859,7 @@ export function PurchasesManagement({ products: propProducts, onAddProduct, onEd
           <button
             onClick={handleExportPurchasesExcel}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider border border-emerald-600 transition-all cursor-pointer shadow-sm"
-            title="Export Excel (.csv) Report"
+            title="Export Styled Excel (.xls) Report"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-300" />
             <span>Excel</span>

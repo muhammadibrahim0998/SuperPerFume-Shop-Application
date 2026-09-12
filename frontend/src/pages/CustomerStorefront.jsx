@@ -715,16 +715,29 @@ function StoreContent({ shopId }) {
     const totalSpent = salesTotal + ordersTotal;
     const ordersCount = matchingSales.length + standaloneOrders.length;
 
+    const formatItemName = (name, qty) => {
+      const clean = (name || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .replace(/\begge\b/gi, 'Product')
+        .replace(/\(Peti\)/gi, '(Box)')
+        .replace(/\(Tray\)/gi, '(Pack)')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return `${clean} (${qty || 1})`;
+    };
+
     const combinedHistory = [
       ...matchingSales.map(s => ({
         date: s.saleDate || s.createdAt,
-        items: (s.items || []).map(i => `${i.name || 'Product'} (${i.quantity || 1})`).join(', '),
+        items: (s.items || []).map(i => formatItemName(i.name, i.quantity)).join(', '),
         amount: Number(s.totalAmount) || 0,
         type: s.isOnlineOrder ? 'Online Order' : 'POS Sale'
       })),
       ...standaloneOrders.map(o => ({
         date: o.createdAt || o.orderDate,
-        items: (o.items || []).map(i => `${i.name || 'Product'} (${i.quantity || 1})`).join(', '),
+        items: (o.items || []).map(i => formatItemName(i.name, i.quantity)).join(', '),
         amount: Number(o.totalAmount || o.grandTotal) || 0,
         type: 'Online Order'
       }))
@@ -928,20 +941,44 @@ function StoreContent({ shopId }) {
       return;
     }
 
-    let salesRows = combinedHistory.length > 0 ? combinedHistory.map((item, idx) => `
-      <tr style="background-color: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; font-weight:bold; vertical-align:middle;">${idx + 1}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; vertical-align:middle; font-weight:600; color:#334155;">${new Date(item.date).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; vertical-align:middle;">
-          <span style="background:#e0f2fe; color:#0369a1; padding:3px 10px; border-radius:6px; font-weight:900; font-size:10.5px; text-transform:uppercase; border:1px solid #bae6fd;">${item.type}</span>
-        </td>
-        <td style="padding:10px; border:1px solid #cbd5e1; font-weight:bold; text-transform:uppercase; vertical-align:middle; color:#0f172a;">${item.items}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:right; font-weight:900; color:#047857; vertical-align:middle;">RS ${item.amount.toLocaleString('en-PK')}</td>
-      </tr>
-    `).join('') : `
+    let salesRows = combinedHistory.length > 0 ? combinedHistory.map((item, idx) => {
+      // Split items into neat pills if comma separated
+      const itemPills = item.items.split(',').map(s => s.trim()).filter(Boolean);
+      const isOnline = item.type.toLowerCase().includes('online');
+      return `
+        <tr style="background-color: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'}; transition: all 0.2s;">
+          <td style="padding:11px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#64748b; font-size:11px; vertical-align:middle;">
+            #${idx + 1}
+          </td>
+          <td style="padding:11px 12px; border:1px solid #e2e8f0; vertical-align:middle; font-weight:700; color:#1e293b; font-size:11px; white-space:nowrap;">
+            ${new Date(item.date).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })}
+            <div style="font-size:9.5px; font-weight:600; color:#94a3b8; margin-top:2px;">
+              ${new Date(item.date).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </td>
+          <td style="padding:11px 10px; border:1px solid #e2e8f0; text-align:center; vertical-align:middle;">
+            <span style="display:inline-block; padding:4px 9px; border-radius:6px; font-weight:900; font-size:9.5px; letter-spacing:0.4px; text-transform:uppercase; ${isOnline ? 'background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;' : 'background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;'}">
+              ${isOnline ? '🌐 ONLINE ORDER' : '🏪 POS BILL'}
+            </span>
+          </td>
+          <td style="padding:11px 14px; border:1px solid #e2e8f0; vertical-align:middle;">
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+              ${itemPills.map(p => `
+                <span style="display:inline-flex; align-items:center; background:#f1f5f9; color:#0f172a; font-weight:800; font-size:10.5px; padding:3px 8px; border-radius:6px; border:1px solid #e2e8f0; text-transform:uppercase; letter-spacing:0.2px;">
+                  ${p}
+                </span>
+              `).join('')}
+            </div>
+          </td>
+          <td style="padding:11px 14px; border:1px solid #e2e8f0; text-align:right; font-weight:900; color:#047857; font-size:12.5px; vertical-align:middle; white-space:nowrap;">
+            <span style="font-size:10px; font-weight:700; color:#059669; margin-right:2px;">RS</span>${item.amount.toLocaleString('en-PK')}
+          </td>
+        </tr>
+      `;
+    }).join('') : `
       <tr>
-        <td colspan="5" style="padding:26px; text-align:center; color:#64748b; font-weight:bold; background:#f8fafc;">
-          No transaction history recorded yet for this customer.
+        <td colspan="5" style="padding:32px 20px; text-align:center; color:#64748b; font-weight:700; background:#f8fafc; font-size:12px;">
+          No purchase history recorded yet for this customer.
         </td>
       </tr>
     `;
@@ -951,34 +988,254 @@ function StoreContent({ shopId }) {
       <html>
         <head>
           <title>Customer Profile & Statement - ${uniqueId} - ${name}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
           <style>
-            @page { size: A4 portrait; margin: 12mm 15mm; }
-            * { box-sizing: border-box; }
-            body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; padding: 20px; color: #0f172a; background: #f8fafc; font-size: 12px; margin: 0; }
-            .statement-wrapper { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); overflow: hidden; border: 1.5px solid #cbd5e1; }
-            .header-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #065f46 100%); color: #ffffff; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; }
-            .header-title h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: #ffffff; }
-            .header-title p { margin: 4px 0 0; font-size: 10px; font-weight: 800; color: #34d399; letter-spacing: 1.5px; text-transform: uppercase; }
-            .serial-tag { background: #f59e0b; color: #0f172a; padding: 7px 16px; border-radius: 10px; font-weight: 900; font-size: 13px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); text-align: center; }
-            .serial-tag span { display: block; font-size: 8.5px; font-weight: 800; opacity: 0.85; text-transform: uppercase; }
-            .body-content { padding: 26px 28px; }
-            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
-            .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; }
-            .info-card .label { font-size: 9.5px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-            .info-card .value { font-size: 13px; font-weight: 800; color: #0f172a; }
-            .section-title { font-size: 11.5px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; margin: 22px 0 10px 0; display: flex; align-items: center; justify-content: space-between; }
-            table { width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; }
-            th { background: #0f172a; color: #ffffff; text-transform: uppercase; font-weight: 900; font-size: 10px; letter-spacing: 0.5px; padding: 10px 12px; border: 1px solid #0f172a; text-align: left; }
-            .amount-hero { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 16px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; margin: 22px 0 26px 0; }
-            .amount-hero .lbl { font-size: 12px; font-weight: 900; color: #065f46; text-transform: uppercase; letter-spacing: 1px; }
-            .amount-hero .sub { font-size: 9.5px; font-weight: 700; color: #047857; margin-top: 2px; }
-            .amount-hero .val { font-size: 24px; font-weight: 900; color: #047857; letter-spacing: -0.5px; }
-            .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 36px; padding-top: 20px; border-top: 1px dashed #cbd5e1; text-align: center; }
-            .sign-line { border-top: 1.5px solid #94a3b8; padding-top: 6px; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
-            .statement-footer { margin-top: 22px; text-align: center; font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+            @page { size: A4 portrait; margin: 10mm 12mm; }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { 
+              font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+              padding: 24px; 
+              color: #0f172a; 
+              background: #f1f5f9; 
+              font-size: 11.5px; 
+              margin: 0; 
+              line-height: 1.45;
+            }
+            .statement-wrapper { 
+              max-width: 780px; 
+              margin: 0 auto; 
+              background: #ffffff; 
+              border-radius: 18px; 
+              box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+              overflow: hidden; 
+              border: 1px solid #e2e8f0; 
+            }
+            
+            /* Header */
+            .header-banner { 
+              background: linear-gradient(135deg, #090d16 0%, #0f172a 40%, #064e3b 100%); 
+              color: #ffffff; 
+              padding: 22px 26px; 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: center; 
+              border-bottom: 3px solid #10b981;
+            }
+            .header-title {
+              display: flex;
+              align-items: center;
+              gap: 14px;
+            }
+            .header-icon {
+              width: 44px;
+              height: 44px;
+              border-radius: 12px;
+              background: rgba(16, 185, 129, 0.15);
+              border: 1.5px solid rgba(52, 211, 153, 0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 22px;
+            }
+            .header-title h1 { 
+              margin: 0; 
+              font-size: 20px; 
+              font-weight: 900; 
+              letter-spacing: 0.8px; 
+              text-transform: uppercase; 
+              color: #ffffff; 
+            }
+            .header-title p { 
+              margin: 3px 0 0; 
+              font-size: 9.5px; 
+              font-weight: 800; 
+              color: #34d399; 
+              letter-spacing: 1.2px; 
+              text-transform: uppercase; 
+            }
+            
+            .serial-tag { 
+              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+              color: #0f172a; 
+              padding: 8px 18px; 
+              border-radius: 12px; 
+              font-weight: 900; 
+              font-size: 13px; 
+              letter-spacing: 0.5px; 
+              box-shadow: 0 4px 12px rgba(217,119,6,0.25); 
+              text-align: right; 
+              border: 1px solid rgba(255,255,255,0.4);
+            }
+            .serial-tag span { 
+              display: block; 
+              font-size: 8.5px; 
+              font-weight: 800; 
+              color: #451a03; 
+              letter-spacing: 1px;
+              text-transform: uppercase; 
+              margin-bottom: 1px;
+            }
+            
+            /* Body */
+            .body-content { padding: 24px 26px; }
+            
+            /* Customer Info Grid */
+            .info-grid { 
+              display: grid; 
+              grid-template-columns: repeat(3, 1fr); 
+              gap: 12px; 
+              margin-bottom: 20px; 
+            }
+            .info-card { 
+              background: #f8fafc; 
+              border: 1px solid #e2e8f0; 
+              border-radius: 12px; 
+              padding: 10px 14px; 
+              transition: all 0.2s;
+            }
+            .info-card .label { 
+              font-size: 9px; 
+              font-weight: 900; 
+              color: #64748b; 
+              text-transform: uppercase; 
+              letter-spacing: 0.6px; 
+              margin-bottom: 4px; 
+              display: flex;
+              align-items: center;
+              gap: 5px;
+            }
+            .info-card .value { 
+              font-size: 12.5px; 
+              font-weight: 800; 
+              color: #0f172a; 
+            }
+            
+            /* Section header */
+            .section-title { 
+              font-size: 11px; 
+              font-weight: 900; 
+              color: #0f172a; 
+              text-transform: uppercase; 
+              letter-spacing: 0.8px; 
+              margin: 20px 0 10px 0; 
+              display: flex; 
+              align-items: center; 
+              justify-content: space-between; 
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 6px;
+            }
+            .section-badge {
+              font-size: 9.5px;
+              font-weight: 800;
+              background: #0f172a;
+              color: #ffffff;
+              padding: 2px 8px;
+              border-radius: 6px;
+            }
+            
+            /* Table */
+            table { 
+              width: 100%; 
+              border-collapse: separate; 
+              border-spacing: 0;
+              border: 1px solid #cbd5e1; 
+              border-radius: 12px; 
+              overflow: hidden; 
+            }
+            th { 
+              background: #0f172a; 
+              color: #ffffff; 
+              text-transform: uppercase; 
+              font-weight: 900; 
+              font-size: 9.5px; 
+              letter-spacing: 0.6px; 
+              padding: 10px 12px; 
+              border: none;
+              text-align: left; 
+            }
+            
+            /* Hero Total Box */
+            .amount-hero { 
+              background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); 
+              border: 2px solid #059669; 
+              border-radius: 14px; 
+              padding: 16px 22px; 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: center; 
+              margin: 20px 0; 
+              box-shadow: 0 4px 12px rgba(5,150,105,0.1);
+            }
+            .amount-hero .lbl { 
+              font-size: 12px; 
+              font-weight: 900; 
+              color: #065f46; 
+              text-transform: uppercase; 
+              letter-spacing: 0.8px; 
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+            .amount-hero .sub { 
+              font-size: 9.5px; 
+              font-weight: 700; 
+              color: #047857; 
+              margin-top: 2px; 
+            }
+            .amount-hero .val { 
+              font-size: 24px; 
+              font-weight: 900; 
+              color: #047857; 
+              letter-spacing: -0.5px; 
+            }
+            
+            /* Signatures */
+            .signatures { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 40px; 
+              margin-top: 28px; 
+              padding-top: 18px; 
+              border-top: 1px dashed #cbd5e1; 
+              text-align: center; 
+            }
+            .sign-box {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            .sign-line { 
+              width: 80%;
+              border-top: 1.5px solid #64748b; 
+              padding-top: 6px; 
+              font-size: 9.5px; 
+              font-weight: 800; 
+              color: #475569; 
+              text-transform: uppercase; 
+              letter-spacing: 0.6px; 
+            }
+            
+            /* Footer */
+            .statement-footer { 
+              margin-top: 18px; 
+              text-align: center; 
+              font-size: 9px; 
+              font-weight: 700; 
+              color: #94a3b8; 
+              text-transform: uppercase; 
+              letter-spacing: 0.5px; 
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-top: 1px solid #f1f5f9;
+              padding-top: 10px;
+            }
+            
             @media print {
               body { background: #ffffff; padding: 0; }
-              .statement-wrapper { box-shadow: none; border: 1.5px solid #94a3b8; }
+              .statement-wrapper { box-shadow: none; border: 1px solid #cbd5e1; border-radius: 0; }
             }
           </style>
         </head>
@@ -986,8 +1243,11 @@ function StoreContent({ shopId }) {
           <div class="statement-wrapper">
             <div class="header-banner">
               <div class="header-title">
-                <h1>${shopName.toUpperCase()}</h1>
-                <p>OFFICIAL REGISTERED CUSTOMER STATEMENT &amp; TRANSACTION RECORD</p>
+                <div class="header-icon">✨</div>
+                <div>
+                  <h1>${shopName.toUpperCase()}</h1>
+                  <p>OFFICIAL REGISTERED CUSTOMER STATEMENT &amp; TRANSACTION RECORD</p>
+                </div>
               </div>
               <div class="serial-tag">
                 <span>CUSTOMER ID</span>
@@ -998,40 +1258,40 @@ function StoreContent({ shopId }) {
             <div class="body-content">
               <div class="info-grid">
                 <div class="info-card">
-                  <div class="label">Customer Full Name</div>
-                  <div class="value" style="text-transform: uppercase;">${name}</div>
+                  <div class="label">👤 Customer Full Name</div>
+                  <div class="value" style="text-transform: uppercase; color:#0f172a;">${name}</div>
                 </div>
                 <div class="info-card">
-                  <div class="label">Registration Date</div>
-                  <div class="value">${regDate}</div>
+                  <div class="label">📅 Registration Date</div>
+                  <div class="value" style="color:#0f172a;">${regDate}</div>
                 </div>
                 <div class="info-card">
-                  <div class="label">Contact Phone / WhatsApp</div>
-                  <div class="value" style="color: #047857;">${phone}</div>
-                </div>
-                <div class="info-card">
-                  <div class="label">Total Orders Placed</div>
+                  <div class="label">🛍️ Total Orders Placed</div>
                   <div class="value" style="color: #0284c7;">${ordersCount} ${ordersCount === 1 ? 'Order' : 'Orders'}</div>
                 </div>
+                <div class="info-card">
+                  <div class="label">📞 Phone / WhatsApp</div>
+                  <div class="value" style="color: #047857;">${phone || 'N/A'}</div>
+                </div>
                 <div class="info-card" style="grid-column: span 2;">
-                  <div class="label">Email Address</div>
-                  <div class="value" style="color: #334155;">${email}</div>
+                  <div class="label">✉️ Email Address</div>
+                  <div class="value" style="color: #334155; word-break: break-all;">${email || 'N/A'}</div>
                 </div>
               </div>
 
               <div class="section-title">
                 <span>All Purchases &amp; Transaction History</span>
-                <span style="font-size: 9.5px; color: #64748b;">${combinedHistory.length} Transactions</span>
+                <span class="section-badge">${combinedHistory.length} Transactions Recorded</span>
               </div>
 
               <table>
                 <thead>
                   <tr>
                     <th style="text-align:center; width:45px;">#</th>
-                    <th style="width:170px;">Transaction Date</th>
-                    <th style="width:120px; text-align:center;">Order Type</th>
+                    <th style="width:140px;">Date &amp; Time</th>
+                    <th style="width:130px; text-align:center;">Order Type</th>
                     <th>Items Purchased</th>
-                    <th style="text-align:right; width:150px;">Paid Amount</th>
+                    <th style="text-align:right; width:130px;">Paid Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1041,19 +1301,29 @@ function StoreContent({ shopId }) {
 
               <div class="amount-hero">
                 <div>
-                  <div class="lbl">TOTAL PURCHASES AMOUNT:</div>
-                  <div class="sub">Total Lifetime Cumulative Shopping</div>
+                  <div class="lbl">
+                    <span>💳</span>
+                    <span>TOTAL PURCHASES AMOUNT:</span>
+                  </div>
+                  <div class="sub">Total Lifetime Cumulative Shopping Spend</div>
                 </div>
                 <div class="val">RS ${totalSpent.toLocaleString('en-PK')}</div>
               </div>
 
               <div class="signatures">
-                <div class="sign-line">Customer Signature</div>
-                <div class="sign-line">${shopName} Authorized Stamp</div>
+                <div class="sign-box">
+                  <div style="height: 32px;"></div>
+                  <div class="sign-line">Customer Signature</div>
+                </div>
+                <div class="sign-box">
+                  <div style="height: 32px;"></div>
+                  <div class="sign-line">${shopName} Authorized Stamp</div>
+                </div>
               </div>
 
               <div class="statement-footer">
-                Maidan Perfume Shop • Official Customer Management &amp; Accounts Ledger
+                <span>Maidan Perfume Shop • Official Financial Ledger</span>
+                <span>Printed on: ${new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
               </div>
             </div>
           </div>
@@ -3573,47 +3843,63 @@ function StoreContent({ shopId }) {
       return;
     }
 
-    let itemsHtml = items.map((item, idx) => `
+    let itemsHtml = items.map((item, idx) => {
+      const cleanName = (item.name || item.title || 'Perfume Product')
+        .replace(/\(Egg\)/gi, '(Product)')
+        .replace(/\bEgg\b/gi, 'Product')
+        .replace(/\bEggs\b/gi, 'Products')
+        .replace(/\begge\b/gi, 'Product')
+        .replace(/\(Peti\)/gi, '(Box)')
+        .replace(/\(Tray\)/gi, '(Pack)')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return `
       <tr>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:center;">${idx + 1}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; font-weight:bold;">${item.name}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:center; font-weight:bold; color:#059669;">${item.quantity}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:right;">RS ${(item.price || 0).toLocaleString()}</td>
-        <td style="padding:10px; border:1px solid #cbd5e1; text-align:right; font-weight:bold;">RS ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}</td>
+        <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#64748b;">${idx + 1}</td>
+        <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0; font-weight:800; color:#0f172a;">${cleanName}</td>
+        <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:900; color:#059669;">${item.quantity}</td>
+        <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:700; color:#334155;">RS ${(item.price || 0).toLocaleString()}</td>
+        <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:900; color:#0f172a;">RS ${((item.quantity || 1) * (item.price || 0)).toLocaleString()}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
 
     printWin.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
           <title>Customer Bill Statement - ${customerName}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
           <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #0f172a; background: #ffffff; }
-            .header { text-align: center; border-bottom: 3px double #059669; padding-bottom: 15px; margin-bottom: 25px; }
-            .header h1 { margin: 0; color: #047857; text-transform: uppercase; font-size: 24px; font-weight: 900; }
-            .header p { margin: 4px 0 0; color: #475569; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
-            .meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; margin-bottom: 20px; background: #f8fafc; padding: 14px 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th { background: #f1f5f9; text-transform: uppercase; font-weight: 900; font-size: 11px; color: #475569; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
-            .total-bar { margin-top: 20px; padding: 15px 20px; background: #ecfdf5; border: 2px solid #a7f3d0; border-radius: 12px; display: flex; justify-content: space-between; font-weight: 900; font-size: 16px; color: #047857; }
-            .footer { margin-top: 50px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #64748b; }
-            .sign { border-top: 2px solid #cbd5e1; width: 200px; text-align: center; padding-top: 6px; }
+            @page { size: A4 portrait; margin: 12mm 15mm; }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; color: #0f172a; background: #ffffff; font-size: 12px; }
+            .header { text-align: center; border-bottom: 2.5px solid #059669; padding-bottom: 16px; margin-bottom: 22px; }
+            .header h1 { margin: 0; color: #047857; text-transform: uppercase; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+            .header p { margin: 4px 0 0; color: #64748b; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.5px; }
+            .meta { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 800; margin-bottom: 20px; background: #f8fafc; padding: 14px 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+            table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+            th { background: #0f172a; text-transform: uppercase; font-weight: 900; font-size: 10px; letter-spacing: 0.5px; color: #ffffff; padding: 10px 12px; border: none; text-align: left; }
+            .total-bar { margin-top: 20px; padding: 16px 20px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #059669; border-radius: 12px; display: flex; justify-content: space-between; font-weight: 900; font-size: 16px; color: #047857; }
+            .footer { margin-top: 45px; display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 800; color: #64748b; }
+            .sign { border-top: 1.5px solid #94a3b8; width: 200px; text-align: center; padding-top: 6px; }
           </style>
         </head>
         <body>
           <div class="header">
             <h1>${shopName}</h1>
-            <p>Customer Sales Record & Bill Statement</p>
+            <p>Official Customer Sales Record &amp; Bill Statement</p>
           </div>
           <div class="meta">
             <div>
-              <span style="color:#059669; text-transform:uppercase;">Customer Name:</span> <strong style="font-size:14px;">${customerName}</strong><br/>
-              ${customerPhone ? `<span style="color:#475569;">Phone / Contact: ${customerPhone}</span>` : ''}
+              <span style="color:#059669; text-transform:uppercase; font-size:10px;">Customer Name:</span> <strong style="font-size:13.5px; display:block; color:#0f172a; text-transform:uppercase;">${customerName}</strong>
+              ${customerPhone ? `<span style="color:#64748b; font-size:11px; display:block; margin-top:2px;">📞 ${customerPhone}</span>` : ''}
             </div>
             <div style="text-align:right;">
-              <span>Date: ${saleDate}</span><br/>
-              <span>Invoice ID: #${(sale._id || '').slice(-8).toUpperCase()}</span>
+              <span style="color:#64748b;">Date: ${saleDate}</span><br/>
+              <span style="font-weight:900; color:#059669;">Invoice: #${(sale._id || '').slice(-8).toUpperCase()}</span>
             </div>
           </div>
           <table>
@@ -6766,11 +7052,19 @@ function StoreContent({ shopId }) {
                                       <div>
                                         <span className="text-[9.5px] font-black text-gray-400 uppercase tracking-wider block mb-1">Items Purchased:</span>
                                         <div className="flex flex-wrap gap-1">
-                                          {s.items.map((i, iIdx) => (
-                                            <span key={iIdx} className="bg-gray-100 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-gray-200">
-                                              {i.name || i.title} (x{i.quantity})
-                                            </span>
-                                          ))}
+                                          {s.items.map((i, iIdx) => {
+                                            const cleanItemTitle = (i.name || i.title || 'Product')
+                                              .replace(/\(Egg\)/gi, '(Product)')
+                                              .replace(/\bEgg\b/gi, 'Product')
+                                              .replace(/\(Peti\)/gi, '(Box)')
+                                              .replace(/\(Tray\)/gi, '(Pack)')
+                                              .trim();
+                                            return (
+                                              <span key={iIdx} className="bg-gray-100 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-gray-200">
+                                                {cleanItemTitle} (x{i.quantity})
+                                              </span>
+                                            );
+                                          })}
                                         </div>
                                       </div>
                                     )}
