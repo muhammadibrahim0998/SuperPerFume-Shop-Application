@@ -23,6 +23,7 @@ import { PurchasesManagement } from '../components/PurchasesManagement.jsx';
 import { SupplierPurchaseSummaryCard } from '../components/SupplierPurchaseSummaryCard.jsx';
 import { CountUpNumber } from '../components/CountUpNumber.jsx';
 import { ShopAdminCharts } from '../components/ShopAdminCharts.jsx';
+import { ProductHeroSlider, CustomerDashboardCharts } from '../components/CustomerDashboardCharts.jsx';
 import { updateItem, deleteItem as apiDeleteItem, createItem, createSale, getSales, getShopOrders, deleteSale, settleCreditSale } from '../services/api.js';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -461,23 +462,29 @@ function StoreContent({ shopId }) {
   }, [activeView]);
 
   useEffect(() => {
-    if (isAdminUser && shopId) {
-      // Parallel fast fetch of all financial records for real-time instant dashboard sync
-      fetchShopSales();
-      fetchExpenses();
-      fetchDamagedProducts();
-      fetchRegisteredCustomers();
-      fetchDashboardStats();
+    if (shopId) {
+      if (isAdminUser) {
+        // Parallel fast fetch of all financial records for real-time instant dashboard sync
+        fetchShopSales();
+        fetchExpenses();
+        fetchDamagedProducts();
+        fetchRegisteredCustomers();
+        fetchDashboardStats();
+      } else {
+        // Fetch registered customer history and storefront orders for customer dashboard
+        fetchShopSales();
+        fetchRegisteredCustomers();
+        fetchDashboardStats();
+      }
     }
   }, [shopId, isAdminUser]);
 
   useEffect(() => {
-    if (!isAdminUser) return;
     if (activeView === 'sales' || activeView === 'report-sales' || activeView === 'report-profit' || activeView === 'dashboard') {
       fetchShopSales();
       fetchRegisteredCustomers();
     }
-    if (activeView === 'report-expenses' || activeView === 'damaged-products' || activeView === 'dashboard') {
+    if (isAdminUser && (activeView === 'report-expenses' || activeView === 'damaged-products' || activeView === 'dashboard')) {
       fetchExpenses();
       fetchDamagedProducts();
     }
@@ -5452,61 +5459,90 @@ function StoreContent({ shopId }) {
                   ) : (
                     /* ─── CUSTOMER DASHBOARD ─── */
                     <>
-                      {/* Customer Stat Cards (Clean White & Gray Theme) */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4">
-                        {[
-                          { label: 'Items in Cart', value: cartCount, icon: <ShoppingCart className="w-4 h-4 text-blue-600" />, iconBg: 'bg-blue-50 border-blue-100', valColor: 'text-slate-900', sub: 'Ready to Order' },
-                          { label: 'My Orders', value: dashStats.totalOrders, icon: <Truck className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-100', valColor: 'text-slate-900', sub: 'Placed Orders' },
-                          { label: 'Total Spent', value: `RS ${dashStats.totalSpent.toLocaleString('en-PK')}`, icon: <DollarSign className="w-4 h-4 text-amber-600" />, iconBg: 'bg-amber-50 border-amber-100', valColor: 'text-amber-600', sub: 'All-Time Purchases' },
-                          { label: 'Products Available', value: dashStats.totalProducts, icon: <Package className="w-4 h-4 text-purple-600" />, iconBg: 'bg-purple-50 border-purple-100', valColor: 'text-slate-900', sub: 'In Shop Catalog' },
-                          { label: 'In Stock', value: dashStats.totalStock > 0 ? dashStats.totalStock.toLocaleString('en-PK') : '—', icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-100', valColor: 'text-emerald-600', sub: 'Units Available' },
-                          { label: 'Shop', value: shop?.name || 'My Shop', icon: <Store className="w-4 h-4 text-slate-600" />, iconBg: 'bg-slate-100 border-slate-200', valColor: 'text-slate-900', sub: shop?.address || 'Your Store' },
-                        ].map(({ label, value, icon, iconBg, valColor, sub }) => (
-                          <div key={label} className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
-                              <div className={`w-8 h-8 rounded-xl ${iconBg} border flex items-center justify-center shrink-0`}>
-                                {icon}
+                      {(() => {
+                        const activeCustomerObj = customer || user || {};
+                        const { totalSpent: calculatedSpent, ordersCount: calculatedOrders, combinedHistory } = getCustomerStats(activeCustomerObj);
+                        const finalTotalSpent = calculatedSpent || dashStats.totalSpent || 0;
+                        const finalOrdersCount = calculatedOrders || dashStats.totalOrders || (combinedHistory?.length || 0);
+
+                        return (
+                          <div className="space-y-4 animate-in fade-in duration-300">
+                            {/* ─── 0. TOP HERO: 3D 2-Second Dynamic Product Slider ─── */}
+                            <ProductHeroSlider
+                              products={items}
+                              currency={shop?.currency || 'RS'}
+                              onSelectProduct={(p) => setSelectedItem(p)}
+                              onAddToCart={(p) => handleAddToCart(p, 'egg')}
+                            />
+
+                            {/* Customer Stat Cards (Gray Theme with 3D Blue Border & Shadow) */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                              {[
+                                { label: 'Items in Cart', value: cartCount, icon: <ShoppingCart className="w-4 h-4 text-blue-600" />, iconBg: 'bg-blue-50 border-blue-200', valColor: 'text-slate-900', sub: 'Ready to Order' },
+                                { label: 'My Orders', value: finalOrdersCount, icon: <Truck className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-200', valColor: 'text-slate-900', sub: 'Placed Orders' },
+                                { label: 'Total Spent', value: `RS ${finalTotalSpent.toLocaleString('en-PK')}`, icon: <DollarSign className="w-4 h-4 text-amber-600" />, iconBg: 'bg-amber-50 border-amber-200', valColor: 'text-amber-600', sub: 'All-Time Purchases' },
+                                { label: 'Products Available', value: dashStats.totalProducts || items.length, icon: <Package className="w-4 h-4 text-purple-600" />, iconBg: 'bg-purple-50 border-purple-200', valColor: 'text-slate-900', sub: 'In Shop Catalog' },
+                                { label: 'In Stock', value: dashStats.totalStock > 0 ? dashStats.totalStock.toLocaleString('en-PK') : (items.reduce((s, i) => s + (Number(i.stock) || 0), 0) || '—'), icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-200', valColor: 'text-emerald-600', sub: 'Units Available' },
+                                { label: 'Shop', value: shop?.name || 'My Shop', icon: <Store className="w-4 h-4 text-slate-600" />, iconBg: 'bg-slate-200 border-slate-300', valColor: 'text-slate-900', sub: shop?.address || 'Your Store' },
+                              ].map(({ label, value, icon, iconBg, valColor, sub }) => (
+                                <div key={label} className="bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200/90 border-2 border-blue-400/40 rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-[0_8px_20px_-4px_rgba(59,130,246,0.25),0_3px_6px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_12px_28px_-2px_rgba(59,130,246,0.38),0_0_15px_rgba(59,130,246,0.25)] hover:border-blue-500/70 hover:-translate-y-0.5 transition-all duration-300">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
+                                    <div className={`w-8 h-8 rounded-xl ${iconBg} border flex items-center justify-center shrink-0 shadow-sm`}>
+                                      {icon}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xl sm:text-2xl font-black ${valColor} tracking-tight`}>{value}</p>
+                                    <span className="text-[9.5px] text-slate-500 font-bold uppercase tracking-wider block mt-0.5">{sub}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Customer Quick Actions (Gray Container with 3D Blue Border & Shadow) */}
+                            <div className="bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200/90 border-2 border-blue-400/40 rounded-2xl p-4 sm:p-5 shadow-[0_8px_20px_-4px_rgba(59,130,246,0.25),0_3px_6px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:shadow-[0_12px_28px_-2px_rgba(59,130,246,0.38)] transition-all space-y-3">
+                              <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Actions
+                              </h3>
+                              <div className="flex flex-wrap gap-2.5">
+                                <button
+                                  onClick={() => { setActiveView('products'); setActiveCategory('All'); }}
+                                  className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                                >
+                                  <ShoppingBag className="w-4 h-4" /> Browse Products
+                                </button>
+                                {canBuy && (
+                                  <>
+                                    <button
+                                      onClick={() => setCartOpen(true)}
+                                      className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                                    >
+                                      <ShoppingCart className="w-4 h-4" /> My Cart ({cartCount})
+                                    </button>
+                                    <button
+                                      onClick={() => setOrderOpen(true)}
+                                      className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer active:scale-95"
+                                    >
+                                      <Truck className="w-4 h-4 text-slate-600" /> My Orders
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </div>
-                            <div>
-                              <p className={`text-xl sm:text-2xl font-black ${valColor} tracking-tight`}>{value}</p>
-                              <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">{sub}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
 
-                      {/* Customer Quick Actions (Clean White & Gray Container) */}
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
-                        <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Actions
-                        </h3>
-                        <div className="flex flex-wrap gap-2.5">
-                          <button
-                            onClick={() => { setActiveView('products'); setActiveCategory('All'); }}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
-                          >
-                            <ShoppingBag className="w-4 h-4" /> Browse Products
-                          </button>
-                          {canBuy && (
-                            <>
-                              <button
-                                onClick={() => setCartOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
-                              >
-                                <ShoppingCart className="w-4 h-4" /> My Cart ({cartCount})
-                              </button>
-                              <button
-                                onClick={() => setOrderOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer active:scale-95"
-                              >
-                                <Truck className="w-4 h-4 text-slate-600" /> My Orders
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
+                            {/* ─── BOTTOM SECTION: Dynamic Graphs & Charts (Lande Tolo Na) ─── */}
+                            <CustomerDashboardCharts
+                              customer={activeCustomerObj}
+                              history={combinedHistory}
+                              products={items}
+                              totalSpent={finalTotalSpent}
+                              ordersCount={finalOrdersCount}
+                              currency={shop?.currency || 'RS'}
+                            />
+                          </div>
+                        );
+                      })()}
                     </>
                   )}
                 </div>
