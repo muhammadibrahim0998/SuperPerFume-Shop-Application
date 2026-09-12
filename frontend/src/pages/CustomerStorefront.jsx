@@ -4,7 +4,7 @@ import {
   Search, ShoppingBag, MapPin, Phone, Package,
   ChevronDown, X, ArrowLeft, ShoppingCart,
   Plus, Minus, Trash2, User, Lock, Mail, LogOut, Eye, EyeOff,
-  CheckCircle, AlertCircle, Sparkles, UserCircle2, Store,
+  CheckCircle, CheckCircle2, AlertCircle, Sparkles, UserCircle2, Store,
   Layers, ShoppingBasket, Shirt, Home, Watch, Smartphone, Footprints,
   Menu, Filter, HelpCircle, LayoutDashboard,
   Truck, Edit2, Edit, Receipt, Printer, DollarSign, FileText, Send, TrendingUp, TrendingDown, PackageX, AlertTriangle, FileSpreadsheet, Users, RefreshCw, Building2, Calendar, CreditCard, Banknote, ShieldCheck, Box, MoreVertical,
@@ -4556,35 +4556,32 @@ function StoreContent({ shopId }) {
           </div>
         </aside>
 
-        {/* ─── Main Content Pane with White/Light Background for Admin ──────── */}
-        <div className={`flex-1 w-full min-w-0 flex flex-col overflow-hidden relative ${isAdminUser ? 'bg-slate-100 text-zinc-900' : 'bg-[#0f172a] text-white'}`}>
-          <main id="main-store-content" className={`flex-1 w-full overflow-y-auto p-3 sm:p-4 lg:p-6 scroll-smooth ${isAdminUser ? 'bg-slate-100 text-zinc-900' : 'bg-[#0f172a] text-white'}`}>
+        {/* ─── Main Content Pane with Clean White & Gray Background ──────── */}
+        <div className="flex-1 w-full min-w-0 flex flex-col overflow-hidden relative bg-slate-100 text-slate-900">
+          <main id="main-store-content" className="flex-1 w-full overflow-y-auto p-3 sm:p-4 lg:p-6 scroll-smooth bg-slate-100 text-slate-900">
             <div className="max-w-7xl mx-auto space-y-3">
 
-              {/* ─── Header Banner (always visible) ─── */}
-              <div className={`relative border rounded-xl sm:rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-md flex items-center justify-between gap-4 overflow-hidden w-full ${isAdminUser ? 'bg-white border-zinc-200 text-zinc-900 shadow-xl' : 'bg-gradient-to-r from-[#1E293B] via-[#1B3817] to-[#0f172a] border-slate-700/60 text-white'}`}>
-                <div className="absolute -top-4 -right-4 p-4 opacity-[0.03] pointer-events-none">
-                  <ShoppingBag className="w-24 h-24 sm:w-32 sm:h-32 text-emerald-400" />
-                </div>
+              {/* ─── Header Banner (Clean White & Gray Aesthetic) ─── */}
+              <div className="relative border border-slate-200 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm flex items-center justify-between gap-4 overflow-hidden w-full bg-white text-slate-900">
                 <div className="relative z-10 flex items-center justify-between w-full gap-4 flex-wrap">
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-700 text-[10px] font-black uppercase tracking-wider shrink-0 shadow-sm">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> {user?.fullName || customer?.fullName || 'Shop Admin'}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-black uppercase tracking-wider shrink-0 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" /> {user?.fullName || customer?.fullName || 'Customer'}
                     </span>
-                    <h1 className="text-xs sm:text-sm font-black tracking-tight uppercase text-zinc-900 truncate">
-                      {activeView === 'dashboard' ? '📊 Executive Business Dashboard' : '📦 Products & Inventory Catalog'}
+                    <h1 className="text-xs sm:text-sm font-black tracking-tight uppercase text-slate-900 truncate">
+                      {activeView === 'dashboard' ? '📊 Customer Dashboard' : '📦 Products & Inventory Catalog'}
                     </h1>
                   </div>
 
-                  {/* Right-Aligned 3D Action Buttons with Tabs */}
+                  {/* Right-Aligned Action Buttons with Tabs */}
                   <div className="flex items-center gap-2 ml-auto flex-wrap">
                     {/* View Switcher Tabs */}
-                    <div className="flex items-center p-1 bg-zinc-100 rounded-2xl border border-zinc-200">
+                    <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200">
                       <button
                         onClick={() => setActiveView('dashboard')}
                         className={`px-3.5 py-1.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeView === 'dashboard'
-                          ? 'bg-zinc-900 text-white shadow-md'
-                          : 'text-zinc-600 hover:text-zinc-950'
+                          ? 'bg-slate-900 text-white shadow-md'
+                          : 'text-slate-600 hover:text-slate-950'
                           }`}
                       >
                         <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
@@ -4592,8 +4589,8 @@ function StoreContent({ shopId }) {
                       <button
                         onClick={() => setActiveView('products')}
                         className={`px-3.5 py-1.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${activeView === 'products'
-                          ? 'bg-zinc-900 text-white shadow-md'
-                          : 'text-zinc-600 hover:text-zinc-950'
+                          ? 'bg-slate-900 text-white shadow-md'
+                          : 'text-slate-600 hover:text-slate-950'
                           }`}
                       >
                         <ShoppingBag className="w-3.5 h-3.5" /> Products
@@ -5199,34 +5196,40 @@ function StoreContent({ shopId }) {
                   ) : (
                     /* ─── CUSTOMER DASHBOARD ─── */
                     <>
-                      {/* Customer Stat Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {/* Customer Stat Cards (Clean White & Gray Theme) */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4">
                         {[
-                          { label: 'Items in Cart', value: cartCount, icon: '🛒', color: 'from-blue-900/60 to-blue-800/40 border-blue-700/60', textColor: 'text-blue-300', sub: 'Ready to Order' },
-                          { label: 'My Orders', value: dashStats.totalOrders, icon: '📋', color: 'from-emerald-900/60 to-emerald-800/40 border-emerald-700/60', textColor: 'text-emerald-300', sub: 'Placed Orders' },
-                          { label: 'Total Spent', value: `RS ${dashStats.totalSpent.toLocaleString('en-PK')}`, icon: '💰', color: 'from-amber-900/60 to-amber-800/40 border-amber-700/60', textColor: 'text-amber-300', sub: 'All-Time Purchases' },
-                          { label: 'Products Available', value: dashStats.totalProducts, icon: '📦', color: 'from-violet-900/60 to-violet-800/40 border-violet-700/60', textColor: 'text-violet-300', sub: 'In Shop Catalog' },
-                          { label: 'In Stock', value: dashStats.totalStock > 0 ? dashStats.totalStock.toLocaleString('en-PK') : '—', icon: '✅', color: 'from-green-900/60 to-green-800/40 border-green-700/60', textColor: 'text-green-300', sub: 'Units Available' },
-                          { label: 'Shop', value: shop?.name || 'My Shop', icon: '🏪', color: 'from-slate-800/80 to-slate-700/60 border-slate-600/60', textColor: 'text-white', sub: shop?.address || 'Your Store' },
-                        ].map(({ label, value, icon, color, textColor, sub }) => (
-                          <div key={label} className={`bg-gradient-to-br ${color} border rounded-2xl p-5 flex flex-col gap-2`}>
+                          { label: 'Items in Cart', value: cartCount, icon: <ShoppingCart className="w-4 h-4 text-blue-600" />, iconBg: 'bg-blue-50 border-blue-100', valColor: 'text-slate-900', sub: 'Ready to Order' },
+                          { label: 'My Orders', value: dashStats.totalOrders, icon: <Truck className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-100', valColor: 'text-slate-900', sub: 'Placed Orders' },
+                          { label: 'Total Spent', value: `RS ${dashStats.totalSpent.toLocaleString('en-PK')}`, icon: <DollarSign className="w-4 h-4 text-amber-600" />, iconBg: 'bg-amber-50 border-amber-100', valColor: 'text-amber-600', sub: 'All-Time Purchases' },
+                          { label: 'Products Available', value: dashStats.totalProducts, icon: <Package className="w-4 h-4 text-purple-600" />, iconBg: 'bg-purple-50 border-purple-100', valColor: 'text-slate-900', sub: 'In Shop Catalog' },
+                          { label: 'In Stock', value: dashStats.totalStock > 0 ? dashStats.totalStock.toLocaleString('en-PK') : '—', icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />, iconBg: 'bg-emerald-50 border-emerald-100', valColor: 'text-emerald-600', sub: 'Units Available' },
+                          { label: 'Shop', value: shop?.name || 'My Shop', icon: <Store className="w-4 h-4 text-slate-600" />, iconBg: 'bg-slate-100 border-slate-200', valColor: 'text-slate-900', sub: shop?.address || 'Your Store' },
+                        ].map(({ label, value, icon, iconBg, valColor, sub }) => (
+                          <div key={label} className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{label}</span>
-                              <span className="text-xl">{icon}</span>
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+                              <div className={`w-8 h-8 rounded-xl ${iconBg} border flex items-center justify-center shrink-0`}>
+                                {icon}
+                              </div>
                             </div>
-                            <p className={`text-xl sm:text-2xl font-black ${textColor} tracking-tight`}>{value}</p>
-                            <span className="text-[9px] text-white/30 font-bold uppercase tracking-wider">{sub}</span>
+                            <div>
+                              <p className={`text-xl sm:text-2xl font-black ${valColor} tracking-tight`}>{value}</p>
+                              <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">{sub}</span>
+                            </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Customer Quick Actions */}
-                      <div className="bg-[#1E293B] border border-slate-700/60 rounded-2xl p-5">
-                        <h3 className="text-xs font-black text-white/60 uppercase tracking-widest mb-4">⚡ Quick Actions</h3>
-                        <div className="flex flex-wrap gap-3">
+                      {/* Customer Quick Actions (Clean White & Gray Container) */}
+                      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+                        <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Actions
+                        </h3>
+                        <div className="flex flex-wrap gap-2.5">
                           <button
                             onClick={() => { setActiveView('products'); setActiveCategory('All'); }}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700/60 hover:bg-emerald-600/80 text-white text-xs font-black uppercase tracking-wider rounded-xl border border-emerald-600/40 transition-all"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
                           >
                             <ShoppingBag className="w-4 h-4" /> Browse Products
                           </button>
@@ -5234,15 +5237,15 @@ function StoreContent({ shopId }) {
                             <>
                               <button
                                 onClick={() => setCartOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-blue-700/60 hover:bg-blue-600/80 text-white text-xs font-black uppercase tracking-wider rounded-xl border border-blue-600/40 transition-all"
+                                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
                               >
                                 <ShoppingCart className="w-4 h-4" /> My Cart ({cartCount})
                               </button>
                               <button
                                 onClick={() => setOrderOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-violet-700/60 hover:bg-violet-600/80 text-white text-xs font-black uppercase tracking-wider rounded-xl border border-violet-600/40 transition-all"
+                                className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer active:scale-95"
                               >
-                                <Truck className="w-4 h-4" /> My Orders
+                                <Truck className="w-4 h-4 text-slate-600" /> My Orders
                               </button>
                             </>
                           )}
