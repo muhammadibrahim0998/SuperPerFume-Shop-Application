@@ -11,8 +11,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
   const { register, handleSubmit, reset, setValue, getValues, watch, control, formState: { errors } } = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: "", category: "Perfumes", stock: 0, minStock: 0, price: 0, costPrice: 0,
-      unitType: "piece", traysPerPeti: 12, eggsPerTray: 30,
+      name: "", category: "", stock: 0, minStock: 0, price: 0, costPrice: 0,
+      unitType: "box", traysPerPeti: 12, eggsPerTray: 30,
       petiQuantity: 0, trayQuantity: 0, eggQuantity: 0,
       supplierName: "", totalPurchaseCost: 0, amountPaidToSupplier: 0, dueAmountToSupplier: 0, paymentMethod: "Cash",
       paymentReceipt: "", images: [], description: "", mfgDate: "", expiryDate: ""
@@ -112,8 +112,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
         reset({
           name: product.name || "",
-          category: product.category || "Eggs",
-          unitType: product.unitType || "peti",
+          category: (product.category && !product.category.toLowerCase().includes('egg')) ? product.category : "",
+          unitType: product.unitType || "box",
           traysPerPeti: tPerP,
           eggsPerTray: ePerT,
           petiQuantity: initialPeti,
@@ -142,8 +142,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
       } else {
         reset({
           name: "",
-          category: product?.category || "Eggs",
-          unitType: "peti",
+          category: "",
+          unitType: "box",
           traysPerPeti: 12,
           eggsPerTray: 30,
           petiQuantity: 0,
@@ -447,7 +447,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                 name="category"
                 control={control}
                 render={({ field }) => {
-                  const existingCats = Array.from(new Set((categories || []).filter(c => c && c !== "All" && c.toLowerCase() !== "eggs")));
+                  const existingCats = Array.from(new Set((categories || []).filter(c => c && c !== "All" && !c.toLowerCase().includes("egg"))));
                   return (
                     <CreatableSelect
                       {...field}
@@ -457,7 +457,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                       onChange={(val) => field.onChange(val ? val.value : "")}
                       onCreateOption={(inputValue) => field.onChange(inputValue)}
                       value={field.value ? { label: field.value, value: field.value } : null}
-                      placeholder="Category..."
+                      placeholder="Enter category..."
                       styles={{
                         control: (base, state) => ({
                           ...base,
