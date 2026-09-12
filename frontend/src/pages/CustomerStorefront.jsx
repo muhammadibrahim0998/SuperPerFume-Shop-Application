@@ -1142,9 +1142,10 @@ function StoreContent({ shopId }) {
 
   const handleAddToCart = async (product, unit = 'egg') => {
     const unitPrice = getProductUnitPrice(product, unit);
+    const unitText = unit === 'peti' ? 'Box' : unit === 'tray' ? 'Pack' : 'Product';
     try {
       await addToCart(product, 1, unit, unitPrice);
-      setAddedMsg(`Added 1 ${unit.toUpperCase()} of ${product.name} (${currency} ${unitPrice.toLocaleString()}) to cart!`);
+      setAddedMsg(`Added 1 ${unitText} of ${product.name} (${currency} ${unitPrice.toLocaleString()}) to cart!`);
       setTimeout(() => setAddedMsg(''), 2500);
     } catch (err) {
       alert(err.message || 'Failed to add item to cart');
@@ -5141,37 +5142,6 @@ function StoreContent({ shopId }) {
                           </div>
                         </div>
 
-                        {/* ─── BILLTEN ALERT ROW (3 ALERT PANELS AT BOTTOM) ─── */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-
-                          {/* Alert 1: Low Stock Items */}
-                          <div className="bg-white border border-rose-200 rounded-2xl p-4 shadow-sm flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full bg-rose-500 shrink-0 animate-pulse" />
-                            <div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">LOW STOCK ITEMS</span>
-                              <span className="text-lg font-black text-slate-900">{stockLiveBreakdown.lowStockCount || 0}</span>
-                            </div>
-                          </div>
-
-                          {/* Alert 2: Negative / Damaged Stock */}
-                          <div className="bg-white border border-rose-200 rounded-2xl p-4 shadow-sm flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full bg-rose-500 shrink-0 animate-pulse" />
-                            <div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">DAMAGED STOCK</span>
-                              <span className="text-lg font-black text-slate-900">{damagedProductsList.length || (dynamicExpenseStats.totalDamaged > 0 ? 1 : 0)}</span>
-                            </div>
-                          </div>
-
-                          {/* Alert 3: Expiring Products */}
-                          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full bg-slate-300 shrink-0" />
-                            <div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">EXPIRING PRODUCTS</span>
-                              <span className="text-lg font-black text-slate-900">{items.filter(i => i.expiryDate && new Date(i.expiryDate) <= new Date(Date.now() + 7 * 86400000)).length}</span>
-                            </div>
-                          </div>
-
-                        </div>
 
                         {/* ─── DYNAMIC CHARTS & GRAPHS FOR SHOP ADMIN ─── */}
                         <div className="pt-4">

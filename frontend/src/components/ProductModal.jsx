@@ -291,39 +291,39 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Sleek Professional Responsive Form Card */}
-      <div className="relative w-full max-w-[540px] bg-[#1E293B] border border-slate-700/80 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden z-10 mx-auto flex flex-col max-h-[92vh] text-white">
+      {/* Sleek Compact Professional Form Card */}
+      <div className="relative w-full max-w-[460px] bg-[#1E293B] border border-slate-700/80 rounded-2xl sm:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden z-10 mx-auto flex flex-col max-h-[90vh] text-white">
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-700/60 bg-slate-900/80 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400">
-              <Package className="w-5 h-5" />
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-700/60 bg-slate-900/90 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-400">
+              <Package className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-black tracking-tight text-white uppercase italic">
+              <h2 className="text-sm font-black tracking-tight text-white uppercase">
                 {mode === "add" ? "Add Product & Stock" : mode === "edit" ? "Edit Product" : "View Product"}
               </h2>
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Maidan Perfume Shop • Stock Entry</p>
+              <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Perfume Shop • Stock Entry</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-800 rounded-xl transition-all text-slate-400 hover:text-white border border-slate-700/60"
+            className="p-1 hover:bg-slate-800 rounded-lg transition-all text-slate-400 hover:text-white border border-slate-700/60 cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Form Body - Increased Text Sizes & Clear Product Picture Box */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-5 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-slate-700 flex-1 text-sm">
+        {/* Form Body - Compact & Clean Layout */}
+        <form onSubmit={handleSubmit(onSubmit)} className="p-3.5 overflow-y-auto space-y-2.5 scrollbar-thin scrollbar-thumb-slate-700 flex-1 text-xs">
 
           {/* COMPACT PRODUCT PICTURE SECTION */}
-          <div className="p-2.5 bg-slate-900/90 rounded-2xl border border-emerald-500/40 space-y-2">
+          <div className="p-2 bg-slate-900/90 rounded-xl border border-emerald-500/30 space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-emerald-400" />
+              <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                <Camera className="w-3 h-3 text-emerald-400" />
                 Product Picture ({images.length}/5)
               </label>
               {mode !== "view" && images.length < 5 && (
@@ -331,16 +331,16 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[9px] uppercase rounded-lg tracking-wider flex items-center gap-1 shadow transition-all active:scale-95 cursor-pointer"
+                  className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[8.5px] uppercase rounded-md tracking-wider flex items-center gap-1 shadow transition-all active:scale-95 cursor-pointer"
                 >
-                  {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
-                  <span>+ Upload Picture</span>
+                  {uploading ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Upload className="w-2.5 h-2.5" />}
+                  <span>+ Upload</span>
                 </button>
               )}
             </div>
 
             {/* Compact Picture Display Box */}
-            <div className="relative w-full h-20 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 flex items-center justify-center group">
+            <div className="relative w-full h-16 bg-slate-800 rounded-lg overflow-hidden border border-slate-700 flex items-center justify-center group">
               {images.length > 0 && images[selectedImageIndex] ? (
                 <>
                   <img
@@ -356,25 +356,25 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                         setValue("images", newImages);
                         setSelectedImageIndex(Math.max(0, selectedImageIndex - 1));
                       }}
-                      className="absolute top-1.5 right-1.5 p-1 bg-rose-600/90 hover:bg-rose-600 text-white rounded-lg shadow transition-all cursor-pointer"
+                      className="absolute top-1 right-1 p-0.5 bg-rose-600/90 hover:bg-rose-600 text-white rounded-md shadow transition-all cursor-pointer"
                       title="Remove Picture"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-3 h-3" />
                     </button>
                   )}
                 </>
               ) : (
                 <div
                   onClick={() => mode !== "view" && fileInputRef.current?.click()}
-                  className="flex items-center justify-center gap-2 text-slate-400 cursor-pointer hover:text-emerald-300 transition-colors p-2 text-center"
+                  className="flex items-center justify-center gap-1.5 text-slate-400 cursor-pointer hover:text-emerald-300 transition-colors p-1 text-center"
                 >
                   {uploading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
                   ) : (
-                    <Camera className="w-5 h-5 text-slate-500" />
+                    <Camera className="w-4 h-4 text-slate-500" />
                   )}
-                  <span className="text-[11px] font-black uppercase tracking-wider">
-                    {uploading ? "Uploading Picture..." : "+ Click to Upload Product Picture"}
+                  <span className="text-[10px] font-black uppercase tracking-wider">
+                    {uploading ? "Uploading..." : "+ Click to Upload Picture"}
                   </span>
                 </div>
               )}
@@ -382,12 +382,12 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
             {/* Gallery Thumbnails & URL Option Row */}
             {images.length > 1 && (
-              <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+              <div className="flex gap-1 overflow-x-auto pb-0.5">
                 {images.map((img, idx) => (
                   <div
                     key={idx}
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative w-8 h-8 rounded-lg overflow-hidden border-2 cursor-pointer transition-all ${
+                    className={`relative w-6 h-6 rounded-md overflow-hidden border cursor-pointer transition-all ${
                       selectedImageIndex === idx ? 'border-emerald-500 shadow scale-105' : 'border-slate-700 opacity-60 hover:opacity-100'
                     }`}
                   >
@@ -399,8 +399,8 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
 
             {/* Image URL Input Option */}
             {mode !== "view" && images.length < 5 && (
-              <div className="flex gap-1.5 relative">
-                <LinkIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+              <div className="flex gap-1 relative">
+                <LinkIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500" />
                 <input
                   type="text"
                   value={imageUrlInput}
@@ -411,42 +411,43 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                       handleAddImageUrl();
                     }
                   }}
-                  placeholder="Or paste image URL (http://...)"
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg py-1 pl-8 pr-2 text-[10.5px] font-bold text-white outline-none focus:border-emerald-500 transition-all placeholder:text-slate-500"
+                  placeholder="Paste image URL (http://...)"
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-md py-0.5 pl-6 pr-1.5 text-[9.5px] font-bold text-white outline-none focus:border-emerald-500 placeholder:text-slate-500"
                 />
                 <button
                   type="button"
                   onClick={handleAddImageUrl}
                   disabled={!imageUrlInput.trim()}
-                  className="px-2.5 bg-slate-700 hover:bg-slate-600 text-white font-black text-[10px] uppercase tracking-wider rounded-lg border border-slate-600 transition-all disabled:opacity-40"
+                  className="px-2 bg-slate-700 hover:bg-slate-600 text-white font-black text-[9px] uppercase tracking-wider rounded-md border border-slate-600 disabled:opacity-40 cursor-pointer"
                 >
-                  Add URL
+                  Add
                 </button>
               </div>
             )}
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" multiple className="hidden" />
           </div>
 
-          {/* Section 1: Basic Product Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="sm:col-span-2 space-y-1">
-              <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Product Name *</label>
-              <input
-                {...register("name")}
-                disabled={mode === "view"}
-                className={`w-full bg-slate-800 border ${errors.name ? 'border-rose-500' : 'border-slate-700'} rounded-xl py-2 px-3 text-sm font-bold text-white outline-none focus:border-emerald-500 placeholder:text-slate-500`}
-                placeholder="e.g. Amber Oud Perfume 100ml"
-              />
-              {errors.name && <p className="text-rose-400 text-xs font-bold uppercase">{errors.name.message}</p>}
-            </div>
+          {/* Section 1: Product Name */}
+          <div className="space-y-1">
+            <label className="text-[10.5px] font-black text-slate-300 uppercase tracking-wider">Product Name *</label>
+            <input
+              {...register("name")}
+              disabled={mode === "view"}
+              className={`w-full bg-slate-800 border ${errors.name ? 'border-rose-500' : 'border-slate-700'} rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 placeholder:text-slate-500`}
+              placeholder="e.g. Amber Oud Perfume 100ml"
+            />
+            {errors.name && <p className="text-rose-400 text-[10px] font-bold uppercase">{errors.name.message}</p>}
+          </div>
 
+          {/* Category & Primary Unit Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Category (Select or Type New)</label>
+              <label className="text-[10.5px] font-black text-slate-300 uppercase tracking-wider">Category</label>
               <Controller
                 name="category"
                 control={control}
                 render={({ field }) => {
-                  const existingCats = Array.from(new Set((categories || []).filter(c => c && c !== "All")));
+                  const existingCats = Array.from(new Set((categories || []).filter(c => c && c !== "All" && c.toLowerCase() !== "eggs")));
                   return (
                     <CreatableSelect
                       {...field}
@@ -456,35 +457,35 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                       onChange={(val) => field.onChange(val ? val.value : "")}
                       onCreateOption={(inputValue) => field.onChange(inputValue)}
                       value={field.value ? { label: field.value, value: field.value } : null}
-                      placeholder="Select or type new category..."
-                    styles={{
-                      control: (base, state) => ({
-                        ...base,
-                        backgroundColor: '#1e293b',
-                        borderRadius: "0.75rem",
-                        minHeight: "38px",
-                        fontSize: "12px",
-                        borderColor: state.isFocused ? '#10b981' : '#334155',
-                        fontWeight: 'bold',
-                        color: '#fff',
-                        boxShadow: 'none'
-                      }),
-                      menu: (base) => ({
-                        ...base,
-                        backgroundColor: '#0f172a',
-                        borderRadius: "0.75rem",
-                        fontSize: "12px",
-                        border: '1px solid #334155'
-                      }),
-                      option: (base, state) => ({
-                        ...base,
-                        backgroundColor: state.isFocused ? '#065f46' : 'transparent',
-                        color: '#fff',
-                        fontSize: "12px"
-                      }),
-                      singleValue: (base) => ({ ...base, color: '#fff' }),
-                      input: (base) => ({ ...base, color: '#fff' }),
-                    }}
+                      placeholder="Category..."
+                      styles={{
+                        control: (base, state) => ({
+                          ...base,
+                          backgroundColor: '#1e293b',
+                          borderRadius: "0.75rem",
+                          minHeight: "32px",
+                          fontSize: "11px",
+                          borderColor: state.isFocused ? '#10b981' : '#334155',
+                          fontWeight: 'bold',
+                          color: '#fff',
+                          boxShadow: 'none'
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          backgroundColor: '#0f172a',
+                          borderRadius: "0.75rem",
+                          fontSize: "11px",
+                          border: '1px solid #334155'
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          backgroundColor: state.isFocused ? '#065f46' : 'transparent',
+                          color: '#fff',
+                          fontSize: "11px"
+                        }),
+                        singleValue: (base) => ({ ...base, color: '#fff' }),
+                        input: (base) => ({ ...base, color: '#fff' }),
+                      }}
                     />
                   );
                 }}
@@ -492,14 +493,14 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-300 uppercase tracking-wider">Primary Unit</label>
-              <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+              <label className="text-[10.5px] font-black text-slate-300 uppercase tracking-wider">Primary Unit</label>
+              <div className="flex bg-slate-800 p-0.5 rounded-xl border border-slate-700">
                 {['piece', 'bottle', 'box', 'pack'].map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setValue('unitType', type)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
+                    className={`flex-1 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
                       unitType === type ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -511,48 +512,45 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
           </div>
 
           {/* Section 2: Pricing */}
-          <div className="grid grid-cols-2 gap-3 p-3 bg-slate-900/60 rounded-2xl border border-slate-700/60">
-            <div className="space-y-1">
-              <label className="text-xs font-black text-emerald-400 uppercase tracking-wider">Sale Price / {unitType.toUpperCase()} (Rs) *</label>
+          <div className="grid grid-cols-2 gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-700/60">
+            <div className="space-y-0.5">
+              <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">Sale Price / {unitType.toUpperCase()} (Rs) *</label>
               <input
                 type="number"
                 step="any"
                 {...register("price")}
                 disabled={mode === "view"}
-                className={`w-full bg-slate-800 border ${errors.price ? 'border-rose-500' : 'border-slate-700'} rounded-xl py-2 px-3 text-sm font-black text-emerald-400 outline-none focus:border-emerald-500`}
+                className={`w-full bg-slate-800 border ${errors.price ? 'border-rose-500' : 'border-slate-700'} rounded-lg py-1 px-2 text-xs font-black text-emerald-400 outline-none focus:border-emerald-500`}
                 placeholder="0"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-black text-amber-400 uppercase tracking-wider">Cost Price / {unitType.toUpperCase()} (Rs)</label>
+            <div className="space-y-0.5">
+              <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Cost Price / {unitType.toUpperCase()} (Rs)</label>
               <input
                 type="number"
                 step="any"
                 {...register("costPrice")}
                 disabled={mode === "view"}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-sm font-black text-amber-400 outline-none focus:border-emerald-500"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg py-1 px-2 text-xs font-black text-amber-400 outline-none focus:border-emerald-500"
                 placeholder="0"
               />
             </div>
           </div>
 
           {/* Section 3: Stock Inventory Breakdown */}
-          <div className="p-3.5 bg-slate-900/90 rounded-2xl border border-emerald-500/30 space-y-2.5">
+          <div className="p-2.5 bg-slate-900/90 rounded-xl border border-emerald-500/30 space-y-1.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Box className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-black uppercase text-emerald-300 tracking-wider">Stock & Unit Quantities</span>
+              <div className="flex items-center gap-1.5">
+                <Box className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-[10px] font-black uppercase text-emerald-300 tracking-wider">Stock Quantities</span>
               </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">1 Box = 12 Packs = Multi-Units</span>
+              <span className="text-[8.5px] font-bold text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded-full border border-slate-700">1 Box = 12 Packs</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5">
-              <div className="space-y-1">
-                <label className="text-xs font-black text-amber-400 uppercase flex items-center justify-between">
-                  <span>Cartons / Boxes</span>
-                  <span className="text-[9px] text-amber-300/80 font-bold">Boxes</span>
-                </label>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-0.5">
+                <label className="text-[9.5px] font-black text-amber-400 uppercase block">Boxes</label>
                 <input
                   type="number"
                   step="any"
@@ -572,16 +570,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                     }
                   })}
                   disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-amber-500/40 rounded-xl py-1.5 px-2.5 text-center text-sm font-black text-white outline-none focus:border-amber-400"
+                  className="w-full bg-slate-800 border border-amber-500/40 rounded-lg py-1 px-1.5 text-center text-xs font-black text-white outline-none focus:border-amber-400"
                   placeholder="0"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-black text-teal-400 uppercase flex items-center justify-between">
-                  <span>Packs</span>
-                  <span className="text-[9px] text-teal-300/80 font-bold">Packs</span>
-                </label>
+              <div className="space-y-0.5">
+                <label className="text-[9.5px] font-black text-teal-400 uppercase block">Packs</label>
                 <input
                   type="number"
                   step="any"
@@ -601,16 +596,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                     }
                   })}
                   disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-teal-500/40 rounded-xl py-1.5 px-2.5 text-center text-sm font-black text-white outline-none focus:border-teal-400"
+                  className="w-full bg-slate-800 border border-teal-500/40 rounded-lg py-1 px-1.5 text-center text-xs font-black text-white outline-none focus:border-teal-400"
                   placeholder="0"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-black text-emerald-400 uppercase flex items-center justify-between">
-                  <span>Single Units</span>
-                  <span className="text-[9px] text-emerald-300/80 font-bold">Total Units</span>
-                </label>
+              <div className="space-y-0.5">
+                <label className="text-[9.5px] font-black text-emerald-400 uppercase block">Units</label>
                 <input
                   type="number"
                   step="any"
@@ -631,16 +623,16 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                     }
                   })}
                   disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-emerald-500/40 rounded-xl py-1.5 px-2.5 text-center text-sm font-black text-white outline-none focus:border-emerald-400"
+                  className="w-full bg-slate-800 border border-emerald-500/40 rounded-lg py-1 px-1.5 text-center text-xs font-black text-white outline-none focus:border-emerald-400"
                   placeholder="0"
                 />
               </div>
             </div>
 
             {/* Live Calculated Stock Banner */}
-            <div className="p-2 bg-emerald-950/40 border border-emerald-500/20 rounded-xl flex items-center justify-between text-xs font-black text-emerald-300">
-              <span>Total Calculated Stock:</span>
-              <div className="flex gap-2">
+            <div className="p-1.5 bg-emerald-950/40 border border-emerald-500/20 rounded-lg flex items-center justify-between text-[10px] font-black text-emerald-300">
+              <span>Total Stock:</span>
+              <div className="flex gap-1.5">
                 <span className="text-amber-400">{totalPetisCalculated} Boxes</span>
                 <span className="text-slate-500">•</span>
                 <span className="text-teal-400">{totalTraysCalculated} Packs</span>
@@ -650,15 +642,15 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             </div>
           </div>
 
-          {/* Section 4: Supplier Information & Payment Method (Cash & Bank Transfer) */}
-          <div className="p-3.5 bg-slate-900/95 rounded-2xl border border-slate-700/80 space-y-2.5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 flex-wrap gap-2">
-              <span className="text-xs font-black uppercase text-teal-300 flex items-center gap-2 tracking-wider">
-                <UserCheck className="w-4 h-4 text-teal-400" /> Supplier Information &amp; Payment
+          {/* Section 4: Supplier Information & Payment Method */}
+          <div className="p-2.5 bg-slate-900/95 rounded-xl border border-slate-700/80 space-y-1.5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-1 flex-wrap gap-1.5">
+              <span className="text-[10.5px] font-black uppercase text-teal-300 flex items-center gap-1.5 tracking-wider">
+                <UserCheck className="w-3.5 h-3.5 text-teal-400" /> Supplier &amp; Payment
               </span>
               
               {/* Payment Method Switcher (Cash vs Bank Online) */}
-              <div className="flex items-center p-0.5 bg-slate-800 rounded-xl border border-slate-700">
+              <div className="flex items-center p-0.5 bg-slate-800 rounded-lg border border-slate-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -666,13 +658,13 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                     setValue("isOnlinePayment", false);
                   }}
                   disabled={mode === "view"}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
+                  className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
                     !isBankMode
                       ? 'bg-emerald-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Banknote className="w-3 h-3" /> Cash
+                  <Banknote className="w-2.5 h-2.5" /> Cash
                 </button>
                 <button
                   type="button"
@@ -681,74 +673,59 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                     setValue("isOnlinePayment", true);
                   }}
                   disabled={mode === "view"}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
+                  className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
                     isBankMode
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <CreditCard className="w-3 h-3" /> Bank / Online
+                  <CreditCard className="w-2.5 h-2.5" /> Bank
                 </button>
               </div>
             </div>
 
             {/* Supplier Info Inputs */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <div className="space-y-1">
-                <label className="text-xs font-black text-slate-300 uppercase">Supplier / Farm Name</label>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-0.5">
+                <label className="text-[9.5px] font-black text-slate-300 uppercase">Supplier Name</label>
                 <input
                   type="text"
                   {...register("supplierName")}
                   disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Al-Madina Egg Farm"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg py-1 px-2 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
+                  placeholder="e.g. Perfume Supplier"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-black text-teal-400 uppercase">Supplier Phone</label>
+              <div className="space-y-0.5">
+                <label className="text-[9.5px] font-black text-teal-400 uppercase">Supplier Phone</label>
                 <input
                   type="text"
                   {...register("supplierPhone")}
                   disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg py-1 px-2 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
                   placeholder="e.g. 0300-1234567"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-black text-amber-400 uppercase">Farm Location</label>
-                <input
-                  type="text"
-                  {...register("supplierLocation")}
-                  disabled={mode === "view"}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-teal-400 placeholder:text-slate-500"
-                  placeholder="e.g. Multan Farm"
                 />
               </div>
             </div>
 
-            {/* Amount Paid to Supplier (Cash or Bank) with Quick Option Buttons */}
-            <div className="space-y-2 pt-0.5">
+            {/* Amount Paid to Supplier */}
+            <div className="space-y-1 pt-0.5">
               <div className="flex items-center justify-between">
-                <label className={`text-xs font-black uppercase ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
-                  {isBankMode ? '🏦 Bank / Online Paid Amount (Rs.)' : '💵 Cash Paid to Supplier (Rs.)'}
+                <label className={`text-[9.5px] font-black uppercase ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
+                  {isBankMode ? 'Bank Paid (Rs.)' : 'Cash Paid (Rs.)'}
                 </label>
                 {calculatedTotalBill > 0 && mode !== "view" && (
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1">
                     <button
                       type="button"
                       onClick={() => {
                         setValue("amountPaidToSupplier", calculatedTotalBill);
                         setHasUserEditedPayment(true);
                       }}
-                      className={`px-2 py-0.5 rounded-lg text-[10px] font-black border cursor-pointer ${
-                        isBankMode
-                          ? 'bg-indigo-900/60 hover:bg-indigo-800 text-indigo-300 border-indigo-500/40'
-                          : 'bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 border-emerald-500/40'
-                      }`}
+                      className="px-1.5 py-0.5 rounded text-[8.5px] font-black bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 border border-emerald-500/40 cursor-pointer"
                     >
-                      ✓ 100% Paid
+                      100% Paid
                     </button>
                     <button
                       type="button"
@@ -756,9 +733,9 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                         setValue("amountPaidToSupplier", 0);
                         setHasUserEditedPayment(true);
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-300 text-[10px] font-black border border-rose-500/40 cursor-pointer"
+                      className="px-1.5 py-0.5 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-300 text-[8.5px] font-black border border-rose-500/40 cursor-pointer"
                     >
-                      ⚠️ 100% Credit
+                      Credit
                     </button>
                   </div>
                 )}
@@ -770,84 +747,42 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
                   onChange: () => setHasUserEditedPayment(true)
                 })}
                 disabled={mode === "view"}
-                className={`w-full bg-slate-800 border rounded-xl py-2 px-3 text-sm font-black outline-none ${
-                  isBankMode 
-                    ? 'border-indigo-500/40 text-indigo-400 focus:border-indigo-400' 
-                    : 'border-emerald-500/40 text-emerald-400 focus:border-emerald-400'
-                }`}
-                placeholder="Enter paid amount (0 if all credit)"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg py-1 px-2 text-xs font-black text-white outline-none focus:border-emerald-400"
+                placeholder="0"
               />
             </div>
 
-            {/* If Bank Mode Selected, Optional Bank Details input */}
-            {isBankMode && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 animate-in fade-in duration-300">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-indigo-300 uppercase">Bank Name / Online Service</label>
-                  <input
-                    type="text"
-                    {...register("paymentReceipt")}
-                    disabled={mode === "view"}
-                    className="w-full bg-slate-800 border border-indigo-500/30 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-indigo-400 placeholder:text-slate-500"
-                    placeholder="e.g. Meezan Bank / HBL / EasyPaisa"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-indigo-300 uppercase">Bank Ref / Transaction ID</label>
-                  <input
-                    type="text"
-                    {...register("description")}
-                    disabled={mode === "view"}
-                    className="w-full bg-slate-800 border border-indigo-500/30 rounded-xl py-1.5 px-3 text-xs font-bold text-white outline-none focus:border-indigo-400 placeholder:text-slate-500"
-                    placeholder="e.g. TXN-984275923"
-                  />
-                </div>
-              </div>
-            )}
-
             {/* Bill Summary Banner */}
-            <div className="grid grid-cols-3 gap-2 bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-xs">
+            <div className="grid grid-cols-3 gap-1.5 bg-slate-800/90 p-1.5 rounded-lg border border-slate-700 text-[10px]">
               <div className="flex flex-col">
-                <span className="text-[9px] font-black text-slate-400 uppercase">Total Bill:</span>
-                <span className="font-black text-amber-300 text-xs sm:text-sm">Rs. {calculatedTotalBill.toLocaleString()}</span>
+                <span className="text-[8.5px] font-black text-slate-400 uppercase">Total:</span>
+                <span className="font-black text-amber-300 text-xs">Rs. {calculatedTotalBill.toLocaleString()}</span>
               </div>
-              <div className="flex flex-col border-l border-slate-700 pl-2">
-                <span className={`text-[9px] font-black uppercase ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
-                  {isBankMode ? 'Bank Paid:' : 'Cash Paid:'}
+              <div className="flex flex-col border-l border-slate-700 pl-1.5">
+                <span className={`text-[8.5px] font-black uppercase ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
+                  Paid:
                 </span>
-                <span className={`font-black text-xs sm:text-sm ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
+                <span className={`font-black text-xs ${isBankMode ? 'text-indigo-400' : 'text-emerald-400'}`}>
                   Rs. {watchedPaidNum.toLocaleString()}
                 </span>
               </div>
-              <div className="flex flex-col border-l border-slate-700 pl-2">
-                <span className="text-[9px] font-black text-rose-400 uppercase">Credit (Due):</span>
-                <span className={`font-black text-xs sm:text-sm ${calculatedDue > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+              <div className="flex flex-col border-l border-slate-700 pl-1.5">
+                <span className="text-[8.5px] font-black text-rose-400 uppercase">Due:</span>
+                <span className={`font-black text-xs ${calculatedDue > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
                   Rs. {calculatedDue.toLocaleString()}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Section 5: Description */}
-          <div className="space-y-1">
-            <label className="text-xs font-black text-slate-300 uppercase">Product Description &amp; Notes</label>
-            <textarea
-              {...register("description")}
-              disabled={mode === "view"}
-              rows={2}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 resize-none placeholder:text-slate-500"
-              placeholder="Enter product notes or details..."
-            />
-          </div>
-
         </form>
 
         {/* Modal Footer Actions */}
-        <div className="p-4 border-t border-slate-700/60 bg-slate-900/80 flex gap-3 shrink-0">
+        <div className="p-2.5 border-t border-slate-700/60 bg-slate-900/90 flex gap-2 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl font-black text-xs uppercase tracking-wider transition-all"
+            className="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-black text-[11px] uppercase tracking-wider transition-all cursor-pointer"
           >
             {mode === "view" ? "Close" : "Cancel"}
           </button>
@@ -855,7 +790,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, mode, categorie
             <button
               type="button"
               onClick={handleSubmit(onSubmit, (errs) => console.error('[Form Validation Error]', errs))}
-              className="flex-[1.5] py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-950 transition-all active:scale-95 border-t border-emerald-400/30"
+              className="flex-[1.5] py-2 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-black text-[11px] uppercase tracking-wider shadow-md transition-all active:scale-95 border-t border-emerald-400/30 cursor-pointer"
             >
               {mode === "add" ? "Create Product" : "Save Changes"}
             </button>
