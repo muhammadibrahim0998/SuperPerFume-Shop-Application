@@ -60,11 +60,10 @@ const itemSchema = new mongoose.Schema({
   expiryDate: {
     type: Date
   },
-  // Egg Trading Units & Packaging Ratios
+  // Units & Packaging Ratios
   unitType: {
     type: String,
-    enum: ['peti', 'tray', 'egg'],
-    default: 'peti'
+    default: 'box'
   },
   traysPerPeti: {
     type: Number,

@@ -153,8 +153,8 @@ router.post('/cart', authenticateCustomer, async (req, res) => {
       finalPrice = pTray > 0 ? pTray : pPeti > 0 ? Math.round(pPeti / 12) : Math.round(eggRate * 30);
     }
 
-    const unitLabel = unit === 'peti' ? 'Peti' : unit === 'tray' ? 'Tray' : 'Egg';
-    const cleanName = item.name.replace(/\s*\((Peti|Tray|Egg)\)/gi, '').trim();
+    const unitLabel = unit === 'peti' ? 'Box' : unit === 'tray' ? 'Pack' : 'Product';
+    const cleanName = item.name.replace(/\s*\((Peti|Tray|Egg|Box|Pack|Product)\)/gi, '').trim();
 
     const customer = req.customer;
     const existing = customer.cart.find(c => c.itemId.toString() === itemId && (c.unit || 'egg') === unit);
