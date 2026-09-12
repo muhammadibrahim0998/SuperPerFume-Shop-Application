@@ -2644,7 +2644,7 @@ function StoreContent({ shopId }) {
       ['1', '(+) Total Sales Revenue Earned', `${profitReportStats.filteredSalesCount} Sales Invoices`, `+ Rs. ${(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}`],
       ['2', '(-) Purchased Products / Restocks Cost', `${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs.toLocaleString('en-PK')} Units`, `- Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')}`],
       ['3', '(-) Shop Operational Expenses (Bills, Rent, Misc)', `${profitReportStats.filteredExpensesCount} Expense Logs`, `- Rs. ${(profitReportStats.totalExpenses || 0).toLocaleString('en-PK')}`],
-      ['4', '(-) Damaged / Defective Stock Loss', `${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Broken Eggs)`, `- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}`],
+      ['4', '(-) Damaged / Defective Stock Loss', `${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Damaged Products)`, `- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}`],
       ['5', '(=) FINAL PURE REALIZED NET PROFIT', 'Pure Realized Cash Balance', `Rs. ${(profitReportStats.finalNetProfit || 0).toLocaleString('en-PK')}`]
     ];
 
@@ -2817,7 +2817,7 @@ function StoreContent({ shopId }) {
       message += `(+) Total Sales: Rs. ${(profitReportStats.totalRevenue || 0).toLocaleString('en-PK')}\n`;
       message += `(-) Purchases Cost: Rs. ${(profitReportStats.totalPurchasesCost || 0).toLocaleString('en-PK')} (${profitReportStats.totalPurchasesPetis} Boxes • ${profitReportStats.totalPurchasesTrays} Packs • ${profitReportStats.totalPurchasesEggs} Units)\n`;
       message += `(-) Shop Expenses: Rs. ${(profitReportStats.totalExpenses || 0).toLocaleString('en-PK')}\n`;
-      message += `(-) Damaged / Defect Loss: Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')} (${profitReportStats.totalDamagedEggs} Eggs)\n`;
+      message += `(-) Damaged / Defect Loss: Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')} (${profitReportStats.totalDamagedEggs} Products)\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
       message += `💵 *(=) FINAL PURE REALIZED NET PROFIT: Rs. ${(profitReportStats.finalNetProfit || 0).toLocaleString('en-PK')}*\n`;
       message += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -3074,7 +3074,7 @@ function StoreContent({ shopId }) {
                   <td style="text-align:center; font-weight:bold;">4</td>
                   <td><strong style="color:#d97706;">(-) Damaged / Defective Stock Loss</strong></td>
                   <td style="text-align:center;">Waste &amp; Breakage</td>
-                  <td style="text-align:center;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Eggs)</td>
+                  <td style="text-align:center;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Products)</td>
                   <td style="text-align:right; font-weight:bold; color:#d97706;">- Rs. ${(profitReportStats.totalDamagedLoss || 0).toLocaleString('en-PK')}</td>
                 </tr>
               </tbody>
@@ -3303,7 +3303,7 @@ function StoreContent({ shopId }) {
               <td style="text-align: center; border: 1px solid #cbd5e1; font-weight: bold; padding: 7px;">4</td>
               <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #d97706; padding: 7px;">(-) Damaged / Defect Losses</td>
               <td style="border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #d97706; padding: 7px;">Stock Breakage</td>
-              <td style="border: 1px solid #cbd5e1; text-align: center; padding: 7px;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Eggs)</td>
+              <td style="border: 1px solid #cbd5e1; text-align: center; padding: 7px;">${profitReportStats.filteredDamagedCount} Logs (${profitReportStats.totalDamagedEggs} Products)</td>
               <td style="text-align: right; border: 1px solid #cbd5e1; font-weight: 900; color: #d97706; padding: 7px;">- RS ${Number(profitReportStats.totalDamagedLoss || 0).toLocaleString()}</td>
             </tr>
             <tr style="height: 10px;"><td colspan="5" style="border:none;"></td></tr>
@@ -3479,7 +3479,7 @@ function StoreContent({ shopId }) {
     csvRows.push([`"Gross Sales Revenue"`, salesVal, `"PKR"`, timeLabel]);
     csvRows.push([`"(+) Gross Sales Profit"`, grossProfitVal, `"PKR"`, timeLabel]);
     csvRows.push([`"(-) Shop Operational Expenses"`, expensesVal, `"PKR"`, timeLabel]);
-    csvRows.push([`"(-) Damaged / Broken Egg Losses"`, damagedVal, `"PKR"`, timeLabel]);
+    csvRows.push([`"(-) Damaged / Defective Losses"`, damagedVal, `"PKR"`, timeLabel]);
     csvRows.push([`"(=) FINAL REALIZED NET PROFIT"`, finalNetProfitVal, `"PKR"`, timeLabel]);
     csvRows.push([]);
 
@@ -6015,7 +6015,7 @@ function StoreContent({ shopId }) {
                                         {[
                                           { id: 'peti', label: '📦 Box' },
                                           { id: 'tray', label: '🍱 Pack' },
-                                          { id: 'egg', label: '🏷️ Unit' },
+                                          { id: 'egg', label: '🏷️ Product' },
                                         ].map(u => (
                                           <button
                                             key={u.id}
@@ -6057,6 +6057,7 @@ function StoreContent({ shopId }) {
                                       const ePerTray = item.product?.eggsPerTray || 30;
                                       const ePerPeti = tPerPeti * ePerTray;
                                       const qty = Number(item.quantity) || 1;
+                                      const unitName = currentUnit === 'peti' ? (qty > 1 ? 'BOXES' : 'BOX') : currentUnit === 'tray' ? (qty > 1 ? 'PACKS' : 'PACK') : (qty > 1 ? 'PRODUCTS' : 'PRODUCT');
                                       let breakdownStr = '';
                                       if (currentUnit === 'peti') {
                                         const totalTrays = (qty * tPerPeti).toFixed(1).replace(/\.0$/, '');
@@ -6075,7 +6076,7 @@ function StoreContent({ shopId }) {
                                       return (
                                         <div className="flex items-center justify-between px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-lg text-[10px] font-black text-emerald-800">
                                           <span className="uppercase text-emerald-700 flex items-center gap-1 font-bold">
-                                            <span>⚡</span> {qty} {currentUnit.toUpperCase()} =
+                                            <span>⚡</span> {qty} {unitName} =
                                           </span>
                                           <span className="font-extrabold text-emerald-900 tracking-tight">{breakdownStr}</span>
                                         </div>
@@ -8449,9 +8450,9 @@ function StoreContent({ shopId }) {
                                     <span className="text-slate-400 font-bold uppercase text-[9.5px]">Damaged Qty:</span>
                                     {(dmg.petiQuantity > 0 || dmg.trayQuantity > 0 || dmg.eggQuantity > 0) ? (
                                       <div className="flex flex-wrap items-center gap-1 text-[10px]">
-                                        {dmg.petiQuantity > 0 && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded font-black">{dmg.petiQuantity} Petis</span>}
-                                        {dmg.trayQuantity > 0 && <span className="px-1.5 py-0.5 bg-sky-100 text-sky-900 border border-sky-300 rounded font-black">{dmg.trayQuantity} Trays</span>}
-                                        {dmg.eggQuantity > 0 && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded font-black">{dmg.eggQuantity} Eggs</span>}
+                                        {dmg.petiQuantity > 0 && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded font-black">{dmg.petiQuantity} Boxes</span>}
+                                        {dmg.trayQuantity > 0 && <span className="px-1.5 py-0.5 bg-sky-100 text-sky-900 border border-sky-300 rounded font-black">{dmg.trayQuantity} Packs</span>}
+                                        {dmg.eggQuantity > 0 && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded font-black">{dmg.eggQuantity} Single Products</span>}
                                       </div>
                                     ) : (
                                       <span className="font-bold text-slate-800">{dmg.quantity || dmg.deductedEggs || 0} Units</span>
@@ -8528,9 +8529,9 @@ function StoreContent({ shopId }) {
                                     <td className="p-3.5 text-center font-black text-slate-900">
                                       {(dmg.petiQuantity > 0 || dmg.trayQuantity > 0 || dmg.eggQuantity > 0) ? (
                                         <div className="flex flex-wrap items-center justify-center gap-1 text-[11px]">
-                                          {dmg.petiQuantity > 0 && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300/80 rounded font-black">{dmg.petiQuantity} Petis</span>}
-                                          {dmg.trayQuantity > 0 && <span className="px-1.5 py-0.5 bg-sky-100 text-sky-900 border border-sky-300/80 rounded font-black">{dmg.trayQuantity} Trays</span>}
-                                          {dmg.eggQuantity > 0 && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300/80 rounded font-black">{dmg.eggQuantity} Eggs</span>}
+                                          {dmg.petiQuantity > 0 && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300/80 rounded font-black">{dmg.petiQuantity} Boxes</span>}
+                                          {dmg.trayQuantity > 0 && <span className="px-1.5 py-0.5 bg-sky-100 text-sky-900 border border-sky-300/80 rounded font-black">{dmg.trayQuantity} Packs</span>}
+                                          {dmg.eggQuantity > 0 && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300/80 rounded font-black">{dmg.eggQuantity} Single Products</span>}
                                         </div>
                                       ) : (
                                         <span>{dmg.quantity || dmg.deductedEggs || 0} Units</span>
@@ -8939,17 +8940,17 @@ function StoreContent({ shopId }) {
         </div>
       )}
 
-      {/* ─── ADD DAMAGED PRODUCT MODAL ─── */}
+      {/* ─── ADD DAMAGED PRODUCT MODAL (COMPACT) ─── */}
       {showAddDamagedModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-zinc-200 text-zinc-900 space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <div className="flex items-center gap-2 text-amber-600 font-black text-sm uppercase tracking-wider">
-                <PackageX className="w-5 h-5" /> Log Damaged Product / Stock Loss
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm sm:max-w-md rounded-2xl p-4 sm:p-5 shadow-2xl border border-zinc-200 text-zinc-900 space-y-3 animate-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
+              <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider">
+                <PackageX className="w-4 h-4" /> Log Damaged Stock Loss
               </div>
               <button
                 onClick={() => setShowAddDamagedModal(false)}
-                className="w-8 h-8 rounded-full bg-zinc-100 hover:bg-amber-100 text-zinc-500 hover:text-amber-600 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
+                className="w-7 h-7 rounded-full bg-zinc-100 hover:bg-amber-100 text-zinc-500 hover:text-amber-600 flex items-center justify-center font-bold text-xs transition-all cursor-pointer"
               >
                 ✕
               </button>
@@ -8989,9 +8990,9 @@ function StoreContent({ shopId }) {
               }
 
               return (
-                <form onSubmit={handleAddDamagedSubmit} className="space-y-4">
+                <form onSubmit={handleAddDamagedSubmit} className="space-y-2.5">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Product Name *</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Product Name *</label>
                     <select
                       value={damagedFormData.productId || ''}
                       onChange={e => {
@@ -9020,12 +9021,12 @@ function StoreContent({ shopId }) {
                           setDamagedFormData(prev => ({ ...prev, productId: '', productName: '', unitType: 'egg', unitPrice: '' }));
                         }
                       }}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500 mb-2"
+                      className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-xs font-semibold text-zinc-900 focus:outline-none focus:border-amber-500 mb-1"
                     >
                       <option value="">-- Select Catalog Item (Optional) --</option>
                       {(items || []).map(i => (
                         <option key={i._id} value={i._id}>
-                          {i.name} (Stock: {(Number(i.petiQuantity) || 0).toFixed(1)} Petis / {i.eggQuantity || i.stock || 0} Eggs)
+                          {i.name} (Stock: {(Number(i.petiQuantity) || 0).toFixed(1)} Boxes / {i.eggQuantity || i.stock || 0} Single Products)
                         </option>
                       ))}
                       <option value="CUSTOM">Custom Product Name</option>
@@ -9037,19 +9038,19 @@ function StoreContent({ shopId }) {
                       placeholder="e.g. Royal Oud, Amber Musk..."
                       value={damagedFormData.productName}
                       onChange={e => setDamagedFormData(prev => ({ ...prev, productName: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
-                  {/* ─── 3 SEPARATE DAMAGED QUANTITY INPUTS: PETI, TRAY, EGG ─── */}
+                  {/* ─── 3 COMPACT QUANTITY INPUTS ─── */}
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-600 block mb-1.5">
-                      Damaged Quantities (Boxes / Packs / Units) *
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 block mb-1">
+                      Damaged Quantities (Boxes / Packs / Single Products) *
                     </label>
-                    <div className="grid grid-cols-3 gap-2.5">
-                      {/* Petis Damaged */}
-                      <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-2.5 text-center focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-amber-900 uppercase block tracking-wider">Boxes</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* Petis/Boxes Damaged */}
+                      <div className="bg-amber-50/70 border border-amber-200/90 rounded-xl p-1.5 text-center focus-within:border-amber-500 transition-all">
+                        <span className="text-[9px] font-black text-amber-900 uppercase block">Boxes</span>
                         <input
                           type="number"
                           min="0"
@@ -9057,16 +9058,16 @@ function StoreContent({ shopId }) {
                           placeholder="0"
                           value={damagedFormData.petiQuantity}
                           onChange={e => setDamagedFormData(prev => ({ ...prev, petiQuantity: e.target.value }))}
-                          className="w-full text-center text-sm font-black text-amber-950 bg-transparent focus:outline-none mt-1"
+                          className="w-full text-center text-xs font-bold text-amber-950 bg-transparent focus:outline-none mt-0.5 py-0.5"
                         />
-                        <span className="text-[8.5px] text-amber-700 font-bold block mt-0.5">
-                          {petiPrice > 0 ? `Rs. ${petiPrice}/Box` : '360 Units'}
+                        <span className="text-[8px] text-amber-700 font-semibold block">
+                          {petiPrice > 0 ? `Rs. ${petiPrice}` : 'Box'}
                         </span>
                       </div>
 
-                      {/* Trays Damaged */}
-                      <div className="bg-sky-50/70 border border-sky-200/90 rounded-2xl p-2.5 text-center focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-sky-900 uppercase block tracking-wider">Packs</span>
+                      {/* Trays/Packs Damaged */}
+                      <div className="bg-sky-50/70 border border-sky-200/90 rounded-xl p-1.5 text-center focus-within:border-sky-500 transition-all">
+                        <span className="text-[9px] font-black text-sky-900 uppercase block">Packs</span>
                         <input
                           type="number"
                           min="0"
@@ -9074,16 +9075,16 @@ function StoreContent({ shopId }) {
                           placeholder="0"
                           value={damagedFormData.trayQuantity}
                           onChange={e => setDamagedFormData(prev => ({ ...prev, trayQuantity: e.target.value }))}
-                          className="w-full text-center text-sm font-black text-sky-950 bg-transparent focus:outline-none mt-1"
+                          className="w-full text-center text-xs font-bold text-sky-950 bg-transparent focus:outline-none mt-0.5 py-0.5"
                         />
-                        <span className="text-[8.5px] text-sky-700 font-bold block mt-0.5">
-                          {trayPrice > 0 ? `Rs. ${trayPrice}/Pack` : '30 Units'}
+                        <span className="text-[8px] text-sky-700 font-semibold block">
+                          {trayPrice > 0 ? `Rs. ${trayPrice}` : 'Pack'}
                         </span>
                       </div>
 
-                      {/* Eggs Damaged */}
-                      <div className="bg-emerald-50/70 border border-emerald-200/90 rounded-2xl p-2.5 text-center focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-400/20 transition-all">
-                        <span className="text-[9.5px] font-black text-emerald-900 uppercase block tracking-wider">Units</span>
+                      {/* Units/Single Products Damaged */}
+                      <div className="bg-emerald-50/70 border border-emerald-200/90 rounded-xl p-1.5 text-center focus-within:border-emerald-500 transition-all">
+                        <span className="text-[9px] font-black text-emerald-900 uppercase block">Single Products</span>
                         <input
                           type="number"
                           min="0"
@@ -9091,32 +9092,46 @@ function StoreContent({ shopId }) {
                           placeholder="0"
                           value={damagedFormData.eggQuantity}
                           onChange={e => setDamagedFormData(prev => ({ ...prev, eggQuantity: e.target.value }))}
-                          className="w-full text-center text-sm font-black text-emerald-950 bg-transparent focus:outline-none mt-1"
+                          className="w-full text-center text-xs font-bold text-emerald-950 bg-transparent focus:outline-none mt-0.5 py-0.5"
                         />
-                        <span className="text-[8.5px] text-emerald-700 font-bold block mt-0.5">
-                          {eggPrice > 0 ? `Rs. ${eggPrice}/Unit` : '1 Unit'}
+                        <span className="text-[8px] text-emerald-700 font-semibold block">
+                          {eggPrice > 0 ? `Rs. ${eggPrice}` : 'Single Product'}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Reason / Cause</label>
-                    <select
-                      value={damagedFormData.reason}
-                      onChange={e => setDamagedFormData(prev => ({ ...prev, reason: e.target.value }))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500"
-                    >
-                      <option value="Damaged / Defective Stock">Damaged / Defective Stock</option>
-                      <option value="Spoiled / Expired">Spoiled / Expired</option>
-                      <option value="Transport Damage">Transport Damage</option>
-                      <option value="Storage Loss">Storage Loss</option>
-                      <option value="Other">Other Cause</option>
-                    </select>
+                  {/* ─── 2-COLUMN: REASON & DATE ─── */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Reason / Cause</label>
+                      <select
+                        value={damagedFormData.reason}
+                        onChange={e => setDamagedFormData(prev => ({ ...prev, reason: e.target.value }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="Damaged / Defective Stock">Defective Stock</option>
+                        <option value="Spoiled / Expired">Spoiled / Expired</option>
+                        <option value="Transport Damage">Transport Damage</option>
+                        <option value="Storage Loss">Storage Loss</option>
+                        <option value="Other">Other Cause</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Damage Date</label>
+                      <input
+                        type="date"
+                        value={damagedFormData.damageDate}
+                        onChange={e => setDamagedFormData(prev => ({ ...prev, damageDate: e.target.value }))}
+                        className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
+                      >
+                      </input>
+                    </div>
                   </div>
 
+                  {/* ─── TOTAL LOSS BANNER ─── */}
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Total Loss Amount (RS)</label>
                     {(() => {
                       const pQ = Number(damagedFormData.petiQuantity || 0);
                       const tQ = Number(damagedFormData.trayQuantity || 0);
@@ -9125,55 +9140,47 @@ function StoreContent({ shopId }) {
                       const totalLossCalc = Math.round((pQ * petiPrice) + (tQ * trayPrice) + (eQ * eggPrice));
 
                       return (
-                        <div className="w-full px-4 py-2.5 bg-amber-50 border border-amber-300 rounded-xl text-xs font-black text-amber-700 flex items-center justify-between">
+                        <div className="w-full px-3 py-1.5 bg-amber-50/90 border border-amber-200 rounded-lg text-xs font-bold text-amber-700 flex items-center justify-between">
                           <div>
-                            <span className="text-sm">RS {totalLossCalc.toLocaleString('en-PK')}</span>
+                            <span className="text-xs font-black">Rs. {totalLossCalc.toLocaleString('en-PK')}</span>
                             {totalDmgE > 0 && (
-                              <span className="text-[9.5px] text-amber-900 font-bold block">
-                                Total {totalDmgE} Units ({(totalDmgE / ePerP).toFixed(1)} Boxes / {(totalDmgE / ePerT).toFixed(1)} Packs)
+                              <span className="text-[8.5px] text-amber-900 font-semibold block">
+                                {totalDmgE} Single Products ({(totalDmgE / ePerP).toFixed(1)} Boxes / {(totalDmgE / ePerT).toFixed(1)} Packs)
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-amber-800 font-bold">⚠️ Deducted automatically from product stock</span>
+                          <span className="text-[9px] text-amber-800 font-medium">⚠️ Auto-deducted from stock</span>
                         </div>
                       );
                     })()}
                   </div>
 
+                  {/* ─── COMPACT NOTES ─── */}
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Damage Date</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Notes / Remarks (Optional)</label>
                     <input
-                      type="date"
-                      value={damagedFormData.damageDate}
-                      onChange={e => setDamagedFormData(prev => ({ ...prev, damageDate: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-900 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block mb-1">Notes / Remarks (Optional)</label>
-                    <textarea
-                      rows="2"
+                      type="text"
                       placeholder="e.g. Damaged during transport or handling..."
                       value={damagedFormData.notes}
                       onChange={e => setDamagedFormData(prev => ({ ...prev, notes: e.target.value }))}
-                      className="w-full px-4 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
-                    ></textarea>
+                      className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-amber-500"
+                    />
                   </div>
 
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-100">
+                  {/* ─── BUTTONS ─── */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
                     <button
                       type="button"
                       onClick={() => setShowAddDamagedModal(false)}
-                      className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
+                      className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-amber-600/30 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-black uppercase tracking-wider shadow-md shadow-amber-600/20 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Plus className="w-4 h-4" /> Save Damaged Log
+                      <Plus className="w-3.5 h-3.5" /> Save Damaged Log
                     </button>
                   </div>
                 </form>

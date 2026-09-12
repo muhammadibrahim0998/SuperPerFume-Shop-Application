@@ -112,7 +112,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5004;
 
 // Connect to Database
 await connectDB();

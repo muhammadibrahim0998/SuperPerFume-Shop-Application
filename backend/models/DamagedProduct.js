@@ -8,14 +8,13 @@ const damagedProductSchema = new mongoose.Schema({
   petiQuantity: { type: Number, default: 0 },
   trayQuantity: { type: Number, default: 0 },
   eggQuantity: { type: Number, default: 0 },
-  unitType: { type: String, default: 'egg' },
+  unitType: { type: String, default: 'single' },
   deductedEggs: { type: Number, default: 0 },
   unitPrice: { type: Number, required: true, default: 0 },
   totalLoss: { type: Number, required: true, default: 0 },
   reason: { 
     type: String, 
-    enum: ['Egg Breakage / Crack', 'Spoiled / Expired', 'Transport Damage', 'Storage Loss', 'Other'],
-    default: 'Egg Breakage / Crack' 
+    default: 'Defective Stock' 
   },
   damageDate: { type: Date, default: Date.now },
   notes: { type: String, default: '' },
