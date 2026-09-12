@@ -210,16 +210,26 @@ export function ShopAdminCharts({
 
     (sales || []).forEach(s => {
       (s.items || []).forEach(it => {
-        const name = it.name || it.title || 'Egg Product';
+        let name = (it.name || it.title || 'Perfume Product')
+          .replace(/\(Egg\)/gi, '')
+          .replace(/\bEgg\b/gi, 'Product')
+          .replace(/\bEggs\b/gi, 'Products')
+          .replace(/\s+/g, ' ')
+          .trim();
         const qty = Number(it.quantity) || 1;
         const sub = Number(it.subtotal || (Number(it.price || 0) * qty)) || 0;
+
+        const rawUnit = String(it.selectedUnit || it.unitType || 'product').toLowerCase();
+        let normalizedUnit = 'product';
+        if (rawUnit.includes('peti') || rawUnit.includes('box')) normalizedUnit = 'box';
+        else if (rawUnit.includes('tray') || rawUnit.includes('pack')) normalizedUnit = 'pack';
 
         if (!productStats.has(name)) {
           productStats.set(name, {
             name,
             totalSoldQty: 0,
             totalRevenue: 0,
-            unitType: it.selectedUnit || it.unitType || 'tray'
+            unitType: normalizedUnit
           });
         }
         const curr = productStats.get(name);
@@ -232,12 +242,22 @@ export function ShopAdminCharts({
 
     // If no sales items yet, fall back to active catalog products
     if (list.length === 0 && (products || []).length > 0) {
-      list = (products || []).slice(0, 5).map(p => ({
-        name: p.name,
-        totalSoldQty: Number(p.stock || 0),
-        totalRevenue: Math.round(Number(p.stock || 0) * Number(p.price || p.salePrice || 0)),
-        unitType: p.unitType || 'peti'
-      }));
+      list = (products || []).slice(0, 5).map(p => {
+        const cleanName = (p.name || 'Perfume Product')
+          .replace(/\(Egg\)/gi, '')
+          .replace(/\bEgg\b/gi, 'Product')
+          .replace(/\bEggs\b/gi, 'Products')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const pUnit = String(p.unitType || 'product').toLowerCase();
+        const unitType = (pUnit.includes('peti') || pUnit.includes('box')) ? 'box' : (pUnit.includes('tray') || pUnit.includes('pack')) ? 'pack' : 'product';
+        return {
+          name: cleanName,
+          totalSoldQty: Number(p.stock || 0),
+          totalRevenue: Math.round(Number(p.stock || 0) * Number(p.price || p.salePrice || 0)),
+          unitType
+        };
+      });
     }
 
     const maxRev = Math.max(...list.map(p => p.totalRevenue), 1);
@@ -906,6 +926,18 @@ export function ShopAdminCharts({
             ) : (
               topProductsData.list.map((prod, idx) => {
                 const pct = Math.round((prod.totalRevenue / topProductsData.maxRev) * 100);
+                const cleanName = (prod.name || 'Perfume Product')
+                  .replace(/\(Egg\)/gi, '')
+                  .replace(/\bEgg\b/gi, 'Product')
+                  .replace(/\bEggs\b/gi, 'Products')
+                  .replace(/\s+/g, ' ')
+                  .trim();
+                const unitLabel = prod.unitType === 'box' 
+                  ? (prod.totalSoldQty === 1 ? 'box' : 'boxes') 
+                  : prod.unitType === 'pack' 
+                  ? (prod.totalSoldQty === 1 ? 'pack' : 'packs') 
+                  : (prod.totalSoldQty === 1 ? 'product' : 'products');
+
                 return (
                   <div key={idx} className="p-3 bg-slate-50/70 hover:bg-slate-100/80 border border-slate-200 rounded-2xl transition-all space-y-2">
                     <div className="flex items-center justify-between text-xs">
@@ -913,16 +945,16 @@ export function ShopAdminCharts({
                         <span className="px-1.5 py-0.5 bg-violet-100 text-violet-800 border border-violet-200 rounded text-[9.5px] font-black">
                           #{idx + 1}
                         </span>
-                        <span className="font-extrabold text-slate-900 uppercase truncate max-w-[160px]">
-                          {prod.name}
+                        <span className="font-extrabold text-slate-900 uppercase truncate max-w-[200px]">
+                          {cleanName}
                         </span>
                       </div>
                       <div className="text-right">
                         <span className="font-black text-emerald-700 block">
                           {currency} {prod.totalRevenue.toLocaleString('en-PK')}
                         </span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">
-                          {prod.totalSoldQty} {prod.unitType}s sold
+                        <span className="text-[9px] font-bold text-slate-500 uppercase">
+                          {prod.totalSoldQty} {unitLabel} sold
                         </span>
                       </div>
                     </div>

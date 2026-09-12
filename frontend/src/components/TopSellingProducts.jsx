@@ -11,11 +11,18 @@ export function TopSellingProducts({ sales = [], products = [] }) {
     for (const sale of sales) {
       if (sale.status === 'returned' || sale.status === 'cancelled') continue;
       for (const item of (sale.items || [])) {
-        const id = item.productId?.toString() || item.name;
+        const rawName = item.name || 'Perfume Product';
+        const cleanName = rawName
+          .replace(/\(Egg\)/gi, '')
+          .replace(/\bEgg\b/gi, 'Product')
+          .replace(/\bEggs\b/gi, 'Products')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const id = item.productId?.toString() || cleanName;
         if (!map[id]) {
           map[id] = {
             id,
-            name: item.name || 'Unknown Product',
+            name: cleanName,
             totalQty: 0,
             totalAmount: 0,
             price: item.price || 0,
@@ -106,7 +113,7 @@ export function TopSellingProducts({ sales = [], products = [] }) {
                   <p className="text-xs font-black text-zinc-800 uppercase truncate tracking-tight">{product.name}</p>
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest whitespace-nowrap">
-                      {product.totalQty} units sold
+                      {product.totalQty} {product.totalQty === 1 ? 'product' : 'products'} sold
                     </span>
                     <span className="text-sm font-black text-emerald-600 whitespace-nowrap">
                       Rs. <CountUpNumber value={product.totalAmount} />
